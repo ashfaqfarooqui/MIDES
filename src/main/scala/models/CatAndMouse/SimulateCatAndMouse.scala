@@ -1,7 +1,7 @@
-package modelbuilding.models.CatAndMouse
+package main.scala.models.CatAndMouse
 
-import modelbuilding.core._
-import modelbuilding.core.modelInterfaces.Simulator
+import core._
+import core.modelInterfaces.Simulator
 
 class SimulateCatAndMouse extends Simulator{
 

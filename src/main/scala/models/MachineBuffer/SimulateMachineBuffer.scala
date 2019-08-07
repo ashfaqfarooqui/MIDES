@@ -1,7 +1,7 @@
-package modelbuilding.models.MachineBuffer
+package models.MachineBuffer
 
-import modelbuilding.core._
-import modelbuilding.core.modelInterfaces.Simulator
+import core._
+import core.modelInterfaces.Simulator
 
 class SimulateMachineBuffer extends Simulator{
   val m1="m1"

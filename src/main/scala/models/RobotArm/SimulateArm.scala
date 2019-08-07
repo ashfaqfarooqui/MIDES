@@ -1,7 +1,7 @@
-package modelbuilding.models.RobotArm
+package main.scala.models.RobotArm
 
-import modelbuilding.core.modelInterfaces._
-import modelbuilding.core._
+import core.modelInterfaces._
+import core._
 
 class SimulateArm(gridX: Int, gridY:Int ) extends Simulator{
 

@@ -1,7 +1,7 @@
-package modelbuilding.models.TestUnit
+package models.TestUnit
 
-import modelbuilding.core._
-import modelbuilding.core.modelInterfaces.Simulator
+import core._
+import core.modelInterfaces.Simulator
 
 class SimulateTL extends Simulator {
 
@@ -9,7 +9,7 @@ class SimulateTL extends Simulator {
   val m2 = "m2"
   val tu = "tu"
 
-  import modelbuilding.models.TestUnit.Status._
+  import models.TestUnit.Status._
   val initMap = Map(m1->Initial,m2->Initial,tu->Initial)
 
   override val initState: StateMap = StateMap(state = initMap)

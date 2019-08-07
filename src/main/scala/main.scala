@@ -1,28 +1,43 @@
+package ModelBuilding
 
+import core._
+import main.scala.models.CatAndMouse._
+
+
+import main.scala.models.RobotArm._
+import main.scala.models.StickPicking._
+import models.MachineBuffer._
 import grizzled.slf4j.Logging
-import modelbuilding.core.modelInterfaces._
-import modelbuilding.models.MachineBuffer.MachineBuffer
-import modelbuilding.solvers.FrehageSolver
+import models.TestUnit.TransferLine
+
+import scala.collection.JavaConverters._
 
 
 
 object ModelBuilder extends Logging {
 
-  val model: Model = MachineBuffer
+    val sim = new SULMachineBuffer
+  case class Transition(head:StateMap,tail:StateMap,event:Command)
+  val learningType = "mono" //"modular"
 
-  val solver: String = "frehage" // "modular", "mono"
+    def main(args: Array[String]) :Unit= {
 
-  def main(args: Array[String]) : Unit= {
+      info("Automata learn!")
 
-    info("Automata learn!")
 
-    val result = solver match {
-      case "frehage" => new FrehageSolver(model)
+      if(learningType=="modular"){
+
+      }
+      if(learningType=="mono"){
+
+
+
+      }
+
     }
 
-    info("Automata display!")
-    result.getAutomata.modules foreach println
+  def automatonBuilder(stateList:Set[(Int,StateMap)],trans:Set[Transition],init:StateMap,mState:Set[StateMap])={
+
 
   }
-
 }

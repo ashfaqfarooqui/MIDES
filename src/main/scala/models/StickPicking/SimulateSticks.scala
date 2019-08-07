@@ -1,7 +1,7 @@
-package modelbuilding.models.StickPicking
+package main.scala.models.StickPicking
 
-import modelbuilding.core._
-import modelbuilding.core.modelInterfaces.Simulator
+import core._
+import core.modelInterfaces.Simulator
 
 class SimulateSticks(sticks: Int) extends Simulator {
 

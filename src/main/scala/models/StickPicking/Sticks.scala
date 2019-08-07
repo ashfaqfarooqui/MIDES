@@ -1,11 +1,11 @@
-package modelbuilding.models.StickPicking
+package main.scala.models.StickPicking
 
-import modelbuilding.core._
-import modelbuilding.core.modelInterfaces._
+import core._
+import core.modelInterfaces._
 
 
 
-object Sticks extends Model {
+object Sticks extends model {
   val p1rem1 = Symbol(e11)
   val p2rem1 = Symbol(e21)
   val p1rem2 = Symbol(e12)

@@ -1,6 +1,6 @@
-package modelbuilding.models.TestUnit
+package models.TestUnit
 
-import modelbuilding.core._
+import core._
 trait TLDomain {
   override def toString: String = this match {
     case `start1` => "s1"
