@@ -18,6 +18,7 @@ trait SupremicaHelpers extends Base with Logging {
 
   //With StateMap
   def createSupremicaAutomaton(states: Set[State], transition: (State, Symbol) => State, A: Alphabet, iState: State, fState: Option[Set[State]], forbiddenState:Option[Set[State]],name:String ="hypothesis"): automata.Automaton = {
+
     val aut = new org.supremica.automata.Automaton()
     states.foreach(s => aut.addState(new automata.State(s.s)))
     aut.setInitialState(aut.getStateWithName(iState.s))

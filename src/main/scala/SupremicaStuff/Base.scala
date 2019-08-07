@@ -1,7 +1,9 @@
 package SupremicaStuff
 
 import java.io.File
+import java.net.URL
 import java.util.Calendar
+import scala.collection.JavaConverters._
 
 import net.sourceforge.waters.model.compiler.{CompilerOperatorTable, ModuleCompiler}
 import net.sourceforge.waters.model.expr.ExpressionParser
@@ -14,8 +16,6 @@ import org.supremica.automata
 import org.supremica.automata.IO.{AutomataToXML, ProjectBuildFromXML}
 import org.supremica.automata.Project
 import org.supremica.properties.Config
-
-import scala.collection.JavaConverters._
 
 trait Base extends SimpleModuleFactory {
   val mModule: ModuleSubject //= ReadFromWmodFileModuleFactory("supremicaFiles/controlabilitytest.xml").get

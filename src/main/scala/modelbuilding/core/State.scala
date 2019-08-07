@@ -10,7 +10,6 @@ case class StateSet(s: Set[String])
 
 
 
-
 case class StateMap(name: String = "State", state: Map[String, Any]) {
 
   def getState:Map[String,Any] = state
