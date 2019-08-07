@@ -36,7 +36,7 @@ class SimulateSticks(sticks: Int) extends Simulator {
       case `e13` => List(Decr(Ssticks,3),Assign(player,p2))
       case `e23` => List(Decr(Ssticks,3),Assign(player,p1))
       case `reset` => initState.getState.toList.map(x => Assign(x._1,x._2))
-      case `tou` => List(TouAction)
+      case `tau` => List(TauAction)
 
     }
 
@@ -60,7 +60,7 @@ class SimulateSticks(sticks: Int) extends Simulator {
       case `e23` =>AND(List(rem_three,p2Chance)).eval(s)
 
       case `reset` => Some(true)
-      case `tou` => Some(true)
+      case `tau` => Some(true)
     }
   }
 

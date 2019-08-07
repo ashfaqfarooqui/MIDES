@@ -31,7 +31,7 @@ class SimulateArm(gridX: Int, gridY:Int ) extends Simulator{
       case `grip` =>List(Toggle(gripped))
       case `release` =>List(Toggle(gripped))
       case `reset` => initState.getState.toList.map(x => Assign(x._1,x._2))
-      case `tou` => List(TouAction)
+      case `tau` => List(TauAction)
 
     }
 
@@ -61,7 +61,7 @@ class SimulateArm(gridX: Int, gridY:Int ) extends Simulator{
       case `grip` =>gripPred.eval(newState)
       case `release` =>releasePred.eval(newState)
       case `reset` => Some(true)
-      case `tou` => Some(true)
+      case `tau` => Some(true)
     }
   }
 

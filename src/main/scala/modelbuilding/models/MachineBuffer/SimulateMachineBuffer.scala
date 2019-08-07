@@ -3,12 +3,11 @@ package modelbuilding.models.MachineBuffer
 import modelbuilding.core._
 import modelbuilding.core.modelInterfaces.Simulator
 
-class SimulateMachineBuffer extends Simulator{
+class SimulateMachineBuffer extends Simulator {
   val m1="m1"
   val m2="m2"
-  val b="b"
   val initMap=Map(m1->false,m2->false)
-  override val initState: StateMap =StateMap(state=initMap)
+  override val initState: StateMap = StateMap(state = initMap)
 
   override def evalCommandToRun(c: Command, s: StateMap): Option[Boolean] = {
     val pred_l1=EQ(m1,false)
@@ -26,7 +25,7 @@ class SimulateMachineBuffer extends Simulator{
 
 
       case `reset` => Some(true)
-      case `tou` => Some(true)
+      case `tau` => Some(true)
     }
   }
 
@@ -39,7 +38,7 @@ class SimulateMachineBuffer extends Simulator{
 
 
       case `reset` => initState.getState.toList.map(x => Assign(x._1,x._2))
-      case `tou` => List(TouAction)
+      case `tau` => List(TauAction)
     }
   }
 }

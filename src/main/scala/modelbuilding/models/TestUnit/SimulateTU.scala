@@ -36,7 +36,7 @@ class SimulateTL extends Simulator {
 
 
       case `reset` => Some(true)
-      case `tou` => Some(true)
+      case `tau` => Some(true)
     }
 
   }
@@ -53,7 +53,7 @@ class SimulateTL extends Simulator {
 
 
       case `reset` => initState.getState.toList.map(x => Assign(x._1,x._2))
-      case `tou` => List(TouAction)
+      case `tau` => List(TauAction)
     }
   }
 

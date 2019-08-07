@@ -52,7 +52,7 @@ class SimulateCatAndMouse extends Simulator{
       case `m6` =>pred_m6.eval(s)
 
       case `reset` => Some(true)
-      case `tou` => Some(true)
+      case `tau` => Some(true)
     }
 
   }
@@ -75,7 +75,7 @@ class SimulateCatAndMouse extends Simulator{
       case `m6` => List(Assign(r0 ,MOUSE),Assign(r3,EMPTY))
 
       case `reset` => initState.getState.toList.map(x => Assign(x._1,x._2))
-      case `tou` => List(TouAction)
+      case `tau` => List(TauAction)
 
     }
   }
