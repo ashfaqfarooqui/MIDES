@@ -92,3 +92,4 @@ case class Word(pf:List[Symbol], w:Symbol) extends Grammar{
 case class Language(l:Set[Grammar])
 case class Transition(source: StateMap, target: StateMap, event: Command)
 
+

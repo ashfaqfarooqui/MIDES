@@ -5,10 +5,10 @@ import SupremicaStuff.SupremicaHelpers
 import modelbuilding.core.Automata
 import net.sourceforge.waters.subject.module.ModuleSubject
 
-class MonolithicSolver(model:Model) extends BaseSolver with SupremicaHelpers{
+
+class MonolithicSolver(model:Model) extends BaseSolver {
   override def getAutomata: Automata = ???
 
-  override val mModule: ModuleSubject = moduleFactory("")
 
 
 }

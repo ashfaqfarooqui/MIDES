@@ -16,6 +16,4 @@ object TransferLine extends MonolithicModel {
     "M2"->Alphabet(finish2,start2)
   )*/
 
-
-
 }

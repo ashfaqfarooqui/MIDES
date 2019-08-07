@@ -58,4 +58,5 @@ class FrehageSolver(_model: Model) extends BaseSolver {
 
 
   override def getAutomata: Automata = Automata(Set.empty[Automaton])
+
 }

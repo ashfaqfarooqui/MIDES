@@ -12,6 +12,7 @@ import scalax.collection.GraphEdge._
 
 case class Automaton(states: Set[State], transition: (State,Symbol) => State, A: Alphabet, iState: State, fState: Option[Set[State]],forbiddenStates:Option[Set[State]]=None){
 
+
   def createGraph={
 
     val edges = for{

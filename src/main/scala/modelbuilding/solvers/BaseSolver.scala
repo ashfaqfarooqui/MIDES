@@ -6,4 +6,5 @@ import modelbuilding.core.Automata
 
 trait BaseSolver extends Logging {
   def getAutomata: Automata
+
 }

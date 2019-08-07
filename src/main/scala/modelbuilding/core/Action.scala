@@ -23,3 +23,4 @@ case class Toggle(key:String) extends Action
 case class ToggleWithValues(key:String,value:(Any,Any)) extends Action
 
 case object TauAction extends Action
+

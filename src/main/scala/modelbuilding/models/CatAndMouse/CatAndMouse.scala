@@ -10,5 +10,6 @@ object CatAndMouse extends MonolithicModel {
 
 
 
+  override val simulation = new SULCatAndMouse
 
 }
