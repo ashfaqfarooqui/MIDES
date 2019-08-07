@@ -24,6 +24,6 @@ object MachineBuffer extends ModularModel {
     "Machine2" -> Alphabet(load2,unload2)
   )
 
-  val simulator = new SimulateMachineBuffer()
+  override val simulation = new SULMachineBuffer()
 
 }

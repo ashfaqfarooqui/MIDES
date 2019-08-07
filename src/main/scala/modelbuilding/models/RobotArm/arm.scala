@@ -7,6 +7,6 @@ object arm extends MonolithicModel {
 
   override val name: String = "RoboticArm"
   override val alphabet = Alphabet(up,down,left,right,extend,retract,grip,release)
-  override val simulator = new SimulateArm(5, 5)
+  override val simulation = new SULArm(5,5)
 
 }

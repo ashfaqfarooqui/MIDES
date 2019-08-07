@@ -2,7 +2,7 @@
 import grizzled.slf4j.Logging
 import modelbuilding.core.modelInterfaces._
 import modelbuilding.models.MachineBuffer.MachineBuffer
-import modelbuilding.solvers.FrehageSolver
+import modelbuilding.solvers._
 
 
 
