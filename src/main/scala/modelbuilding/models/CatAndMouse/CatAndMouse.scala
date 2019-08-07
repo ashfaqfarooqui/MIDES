@@ -23,6 +23,7 @@ object CatAndMouse extends Model{
 
   override val A = Alphabets(Set(t,c1s,c2s,c3s,c4s,c5s,c6s,c7s,m1s,m2s,m3s,m4s,m5s,m6s))
 
+  override val simulation = new SULCatAndMouse
 
   override val name: String = "CatAndMouse"
 }

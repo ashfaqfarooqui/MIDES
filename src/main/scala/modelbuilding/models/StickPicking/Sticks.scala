@@ -21,4 +21,5 @@ object Sticks extends Model {
 
 
   override val name: String = "Sticks"
+  override val simulation: SUL = new SULSticks(5)
 }

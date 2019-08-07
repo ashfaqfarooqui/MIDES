@@ -20,4 +20,5 @@ object arm extends Model {
 
 
   override val name: String = "RoboticArm"
+  override val simulation: SUL = new SULArm(4,4)
 }

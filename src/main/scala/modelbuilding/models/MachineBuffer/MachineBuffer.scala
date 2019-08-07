@@ -14,7 +14,7 @@ object MachineBuffer extends Model {
 
   val t = Symbol(tou)
   override val A: Alphabets = Alphabets(Set(l1,l2,u1,u2,t))
-
+  override val simulation = new SULMachineBuffer
   val eventMapping:Map[String,Set[Symbol]] = Map(
     "Machine2"->Set(t,l2,u2),
     "Machine1"->Set(t,l1,u1)

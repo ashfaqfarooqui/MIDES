@@ -30,4 +30,5 @@ object TransferLine extends Model {
 
 
   override val name: String = "TransferLine"
+  override val simulation: SUL = new SULTransferLine
 }
