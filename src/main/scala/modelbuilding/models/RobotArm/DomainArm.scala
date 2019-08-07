@@ -1,6 +1,6 @@
-package main.scala.models.RobotArm
+package modelbuilding.models.RobotArm
 
-import core._
+import modelbuilding.core._
 trait ArmDomain {
   override def toString: String = this match {
     case `left` => "l"

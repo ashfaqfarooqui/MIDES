@@ -1,8 +1,8 @@
-package main.scala.models.CatAndMouse
+package modelbuilding.models.CatAndMouse
 
-import core.modelInterfaces._
-import core._
-object CatAndMouse extends model{
+import modelbuilding.core.modelInterfaces._
+import modelbuilding.core._
+object CatAndMouse extends Model{
   val c1s = Symbol(c1)
   val c2s = Symbol(c2)
   val c3s = Symbol(c3)

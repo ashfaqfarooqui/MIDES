@@ -1,10 +1,10 @@
-package models.MachineBuffer
+package modelbuilding.models.MachineBuffer
 
-import core._
+import modelbuilding.core._
 
-import core.modelInterfaces._
+import modelbuilding.core.modelInterfaces._
 
-object MachineBuffer extends model {
+object MachineBuffer extends Model {
 
 
   val l1 = Symbol(load1)
@@ -22,4 +22,6 @@ object MachineBuffer extends model {
 
 
   override val name: String = "MachineBufferMachine"
+
+  val sim = new SULMachineBuffer()
 }
