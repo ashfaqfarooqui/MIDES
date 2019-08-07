@@ -1,6 +1,6 @@
-package models.MachineBuffer
+package modelbuilding.models.MachineBuffer
 
-import core._
+import modelbuilding.core._
 trait MachineBufferDomain {
   override def toString: String = this match{
     case `load1` =>"load1"

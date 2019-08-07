@@ -1,6 +1,6 @@
-package models.MachineBuffer
+package modelbuilding.models.MachineBuffer
 
-import core.modelInterfaces._
+import modelbuilding.core.modelInterfaces._
 class SULMachineBuffer extends SUL{
     override val simulator: Simulator = new SimulateMachineBuffer
 

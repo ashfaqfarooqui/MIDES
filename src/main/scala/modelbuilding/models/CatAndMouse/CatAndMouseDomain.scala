@@ -1,6 +1,6 @@
-package main.scala.models.CatAndMouse
+package modelbuilding.models.CatAndMouse
 
-import core._
+import modelbuilding.core._
 trait CatAndMouseDomain {
   override def toString: String = this match {
     case `c1` =>"c1"

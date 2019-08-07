@@ -1,9 +1,9 @@
-package main.scala.models.RobotArm
+package modelbuilding.models.RobotArm
 
-import core._
-import core.modelInterfaces._
+import modelbuilding.core._
+import modelbuilding.core.modelInterfaces._
 
-object arm extends model{
+object arm extends Model {
   val g = Symbol(grip)
   val ret = Symbol(retract)
   val e = Symbol(extend)

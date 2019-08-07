@@ -1,10 +1,10 @@
-package models.TestUnit
+package modelbuilding.models.TestUnit
 
-import core.modelInterfaces._
-import core._
+import modelbuilding.core.modelInterfaces._
+import modelbuilding.core._
 
 
-object TransferLine extends model {
+object TransferLine extends Model {
 
 
   val s1 = Symbol(start1)

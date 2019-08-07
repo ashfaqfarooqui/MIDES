@@ -1,6 +1,6 @@
-package main.scala.models.StickPicking
+package modelbuilding.models.StickPicking
 
-import core.{Command, Controllable, Uncontrollable}
+import modelbuilding.core.{Command, Controllable, Uncontrollable}
 
 trait SticksDomain {
   override def toString: String = this match {
