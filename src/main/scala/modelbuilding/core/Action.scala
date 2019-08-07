@@ -10,7 +10,7 @@ trait Action{
       case Decr(k,v) =>s.next(k,s.getOrElse(k,0).asInstanceOf[Int] - v.asInstanceOf[Int])
       case Toggle(k) => s.next(k, !s.getKey(k).get.asInstanceOf[Boolean])
       case ToggleWithValues(k:String,v:(Any,Any)) => s.next(k,if(s.getKey(k).get == v._1) v._2 else v._1 )
-      case TouAction => s
+      case TauAction => s
     }
   }
 }
@@ -22,4 +22,5 @@ case class Decr(key:String, value:AnyVal) extends Action
 case class Toggle(key:String) extends Action
 case class ToggleWithValues(key:String,value:(Any,Any)) extends Action
 
-case object TouAction extends Action
+case object TauAction extends Action
+

@@ -1,9 +1,10 @@
-package main.scala.modelbuilding.solvers
+package modelbuilding.solvers
 
+import modelbuilding.core.{Automata, Automaton}
 import modelbuilding.core.modelInterfaces.Model
-import modelbuilding.solvers.BaseSolver
-import org.supremica.automata.Automata
 
-class FrehageSolver(model: Model) extends BaseSolver{
-  override def getAutomata: Automata = ???
+class FrehageSolver(model: Model) extends BaseSolver {
+  info("Starting to build the models using modelbuilding.solvers.FrehageSolver")
+  override def getAutomata: Automata = Automata(Set.empty[Automaton])
+
 }

@@ -3,22 +3,10 @@ package modelbuilding.models.RobotArm
 import modelbuilding.core._
 import modelbuilding.core.modelInterfaces._
 
-object arm extends Model {
-  val g = Symbol(grip)
-  val ret = Symbol(retract)
-  val e = Symbol(extend)
-  val rel = Symbol(release)
-  val u = Symbol(up)
-  val d = Symbol(down)
-  val l = Symbol(left)
-  val r = Symbol(right)
-  val t = Symbol(tou)
-
-
-
-  override val A = Alphabets(Set(t,u,d,l,r,e,ret,g,rel))
-
+object arm extends MonolithicModel {
 
   override val name: String = "RoboticArm"
-  override val simulation: SUL = new SULArm(4,4)
+  override val alphabet = Alphabet(up,down,left,right,extend,retract,grip,release)
+  override val simulation = new SULArm(5,5)
+
 }

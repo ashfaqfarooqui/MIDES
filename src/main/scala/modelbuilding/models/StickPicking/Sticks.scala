@@ -5,21 +5,11 @@ import modelbuilding.core.modelInterfaces._
 
 
 
-object Sticks extends Model {
-  val p1rem1 = Symbol(e11)
-  val p2rem1 = Symbol(e21)
-  val p1rem2 = Symbol(e12)
-  val p2rem2 = Symbol(e22)
-  val p1rem3 = Symbol(e13)
-  val p2rem3 = Symbol(e23)
-
-  val t = Symbol(tou)
-
-
-
-  override val A = Alphabets(Set(t,p1rem1,p1rem2,p2rem1,p2rem2))
+object Sticks extends MonolithicModel {
 
 
   override val name: String = "Sticks"
-  override val simulation: SUL = new SULSticks(5)
+  override val alphabet = Alphabet(e11,e12,e13,e21,e22,e23)
+  override val simulation = new SULSticks(5)
+
 }

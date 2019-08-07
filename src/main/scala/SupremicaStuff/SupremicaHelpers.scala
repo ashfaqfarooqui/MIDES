@@ -1,41 +1,24 @@
 package SupremicaStuff
 
-import java.io.File
-import java.net.URL
-import java.util.Calendar
-
-import org.supremica.properties.Config
-import modelbuilding.core.{Alphabets, Controllable, State, StateMap, Symbol, Uncontrollable}
 import grizzled.slf4j.Logging
-import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker
-import net.sourceforge.waters.model.compiler.{CompilerOperatorTable, ModuleCompiler}
-import net.sourceforge.waters.model.marshaller.{DocumentManager, JAXBModuleMarshaller}
-import net.sourceforge.waters.subject.module.{ModuleSubject, ModuleSubjectFactory}
-import org.supremica.automata
-import org.supremica.automata.IO.{AutomataToWaters, AutomataToXML, ProjectBuildFromWaters, ProjectBuildFromXML}
-import org.supremica.automata._
-import org.supremica.automata.algorithms.minimization.MinimizationOptions
-import org.supremica.automata.algorithms._
+import modelbuilding.core.{Alphabet, Controllable, State, Symbol, Uncontrollable}
+import net.sourceforge.waters.model.marshaller.DocumentManager
 import net.sourceforge.waters.subject.module.ModuleSubject
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable
-import net.sourceforge.waters.model.des.{AutomatonTools, ProductDESProxyFactory}
-import net.sourceforge.waters.model.expr.ExpressionParser
-import net.sourceforge.waters.model.module.EventDeclProxy
-import net.sourceforge.waters.xsd.base.EventKind
-import net.sourceforge.waters.model.module.VariableComponentProxy
-import net.sourceforge.waters.subject.module.SimpleComponentSubject
+import org.supremica.automata
+import org.supremica.automata.IO.ProjectBuildFromWaters
+import org.supremica.automata._
+import org.supremica.automata.algorithms._
+import org.supremica.automata.algorithms.minimization.MinimizationOptions
 
 import scala.collection.JavaConverters._
-import net.sourceforge.waters.model.module.EnumSetExpressionProxy
-import net.sourceforge.waters.plain.des.ProductDESElementFactory
 
 
 
 trait SupremicaHelpers extends Base with Logging {
 
   //With StateMap
-  def createSupremicaAutomaton(states: Set[State], transition: (State, Symbol) => State, A: Alphabets, iState: State, fState: Option[Set[State]], forbiddenState:Option[Set[State]],name:String ="hypothesis"): automata.Automaton = {
+  def createSupremicaAutomaton(states: Set[State], transition: (State, Symbol) => State, A: Alphabet, iState: State, fState: Option[Set[State]], forbiddenState:Option[Set[State]],name:String ="hypothesis"): automata.Automaton = {
+
     val aut = new org.supremica.automata.Automaton()
     states.foreach(s => aut.addState(new automata.State(s.s)))
     aut.setInitialState(aut.getStateWithName(iState.s))

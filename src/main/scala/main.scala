@@ -1,7 +1,7 @@
 
-import main.scala.modelbuilding.solvers.FrehageSolver
 import modelbuilding.core.modelInterfaces._
 import modelbuilding.models.MachineBuffer.MachineBuffer
+import modelbuilding.solvers._
 import grizzled.slf4j.Logging
 import scala.collection.JavaConverters._
 
@@ -20,7 +20,7 @@ object ModelBuilder extends Logging {
     }
 
     info("Automata display!")
-    result.getAutomata.getAutomata.asScala foreach println
+    result.getAutomata.modules foreach println
 
   }
 

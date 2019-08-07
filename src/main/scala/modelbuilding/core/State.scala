@@ -1,5 +1,15 @@
 package modelbuilding.core
 
+
+case class State(s: String)
+
+object StateSet {
+  def apply(in: String*) = new StateSet(in.toSet)
+}
+case class StateSet(s: Set[String])
+
+
+
 case class StateMap(name: String = "State", state: Map[String, Any]) {
 
   def getState:Map[String,Any] = state

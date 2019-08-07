@@ -1,10 +1,10 @@
 package modelbuilding.solvers
 
-import SupremicaStuff.SupremicaHelpers
-import modelbuilding.core.Automaton
-import org.supremica.automata.Automata
+import grizzled.slf4j.Logging
+import modelbuilding.core.Automata
 
 
-trait BaseSolver {
-def getAutomata: Automata
+trait BaseSolver extends Logging {
+  def getAutomata: Automata
+
 }
