@@ -1,5 +1,7 @@
 package modelbuilding.core
 
+import java.io.{File, PrintWriter}
+
 import scalax.collection.Graph
 import scalax.collection.edge.{LDiEdge, LkDiEdge}
 import scalax.collection.edge.Implicits._
@@ -10,49 +12,75 @@ import scalax.collection.GraphPredef._
 import scalax.collection.GraphEdge._
 import scalax.collection.GraphEdge._
 
-case class Automaton(states: Set[State], transition: (State,Symbol) => State, A: Alphabet, iState: State, fState: Option[Set[State]],forbiddenStates:Option[Set[State]]=None){
+case class Automaton(
+                      name: String,
+                      states: Set[State],
+                      alphabet: Alphabet,
+                      transitions: Set[Transition],
+                      iState: State,
+                      fState: Option[Set[State]] = None,
+                      forbiddenStates:Option[Set[State]]=None
+                    ){
 
+  lazy val transitionFunction: Map[(State, Symbol),State] = transitions.map( t => (t.source, t.event) -> t.target ).toMap
 
-  def createGraph={
+  def createGraph: Graph[String, LkDiEdge] ={
 
-    val edges = for{
-      s <- states
-      a <- A.a
-    }yield {
-      LkDiEdge(s,transition(s,a))(a.toString)
-    }
-    // val g = Graph(edges)
+    val edges = transitions.map( t => LkDiEdge(t.source.s, t.target.s)(t.event.toString) )
+    Graph.from(states.map(_.s).toList, edges)//.filter(p => p.e._1.s != "s0" && p.e._2.s != "s0" ))
 
-
-    //  println(s"edges = $edges")
-    Graph.from(states.toList, edges)//.filter(p => p.e._1.s != "s0" && p.e._2.s != "s0" ))
   }
 
-  def getGraphAsDot ={
-    val root = DotRootGraph(directed = true,
-                            id       = Some("Hypothesis"))
+  lazy val getGraphAsDot: String = {
 
-    def edgeTransformer(innerEdge: Graph[State,LkDiEdge]#EdgeT):
-        Option[(DotGraph,DotEdgeStmt)] = innerEdge.edge match {
-      case LkDiEdge(source, target, label) => label match {
-        case label: String =>
-          Some((root,
-                DotEdgeStmt(source.toString,
-                            target.toString,
-                            if (label.nonEmpty) List(DotAttr("label", label.toString))
-                            else                Nil)))
-      }}
+    val root = DotRootGraph(directed = true,
+                            id       = Some(name))
+
+    def edgeTransformer(innerEdge: Graph[String,LkDiEdge]#EdgeT): Option[(DotGraph,DotEdgeStmt)] =
+      innerEdge.edge match {
+        case LkDiEdge(source, target, label) =>
+          label match {
+            case label: String =>
+              Some((root,
+                    DotEdgeStmt(source.toString,
+                                target.toString,
+                                if (label.nonEmpty) List(DotAttr("label", label.toString))
+                                else                Nil)))
+          }
+      }
+
     val gDot = createGraph.toDot(root,edgeTransformer)
     gDot
+
   }
 
+  def createDotFile: Unit = {
+    val gDot = getGraphAsDot
+    val pw = new PrintWriter(new File(s"$name.dot"))
+    pw.write(gDot)
+    pw.close
+    println("Graph saved to $name.dot")
+  }
 
   def getNextStates(state: State): Option[Set[State]] ={
-    val states = for(t <- A.a) yield (transition(state,t))
+    val states = for(e <- alphabet.a) yield transitionFunction(state,e)
     if (states.nonEmpty) Some(states) else None
   }
 
-  def getInitialState = iState
-  def getMarkedState = fState
+  def getInitialState: State = iState
+  def getMarkedState: Option[Set[State]] = fState
+
+  override def toString: String = {
+
+    s"Automaton( $name, " +
+      s"Q: (${states.map(_.s).mkString(",")}), " +
+      s"A: (${alphabet.a.map(_.getCommand.toString).mkString(",")}), " +
+      s"T: (${transitions.map{ case Transition(s,t,e) => s"(${s.s},${t.s},$e)" }.mkString(",")}) " +
+      s"q_i: (${iState.s}) " +
+      s"Q_m: ${fState match {
+        case Some(fs) => "(" + fs.map(_.s).mkString(",") + ")"
+        case None => "None"
+      }} )"
+  }
 
 }

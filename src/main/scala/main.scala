@@ -1,14 +1,13 @@
 
-import main.scala.modelbuilding.solvers.FrehageSolver
-import modelbuilding.core.modelInterfaces._
-import modelbuilding.models.MachineBuffer.MachineBuffer
-import modelbuilding.solvers._
 import grizzled.slf4j.Logging
-import scala.collection.JavaConverters._
+import modelbuilding.core.modelInterfaces._
+import modelbuilding.models._
+import modelbuilding.solvers.FrehageSolver
 
 object ModelBuilder extends Logging {
 
-  val model: Model = MachineBuffer
+  val model: Model = CatAndMouse.CatAndMouseModular
+//  val model: Model = MachineBuffer.MachineBuffer
 
   val solver: String = "frehage" // "modular", "mono"
 
@@ -20,8 +19,12 @@ object ModelBuilder extends Logging {
       case "frehage" => new FrehageSolver(model)
     }
 
-    info("Automata display!")
-    result.getAutomata.getAutomata.asScala foreach println
+    info("Learning done!")
+
+    val automata = result.getAutomata
+
+    automata.modules foreach println
+    automata.modules.foreach(_.createDotFile)
 
   }
 

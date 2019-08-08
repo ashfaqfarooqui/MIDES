@@ -5,7 +5,10 @@ import grizzled.slf4j.Logging
 
 
 trait Simulator extends Logging{
-  val initState:StateMap
+
+  val initState: StateMap
+  val goalStates: Option[Set[StateMap]]
+
   def evalCommandToRun(c:Command, s: StateMap):Option[Boolean]
   def translateCommand(c: Command):List[Action]
 

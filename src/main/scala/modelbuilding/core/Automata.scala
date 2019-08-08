@@ -1,3 +1,3 @@
 package modelbuilding.core
 
-case class Automata(val modules: Set[Automaton])
+case class Automata(modules: Set[Automaton])

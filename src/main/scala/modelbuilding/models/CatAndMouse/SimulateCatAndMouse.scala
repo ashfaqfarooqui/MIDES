@@ -7,8 +7,6 @@ class SimulateCatAndMouse extends Simulator{
 
   import Occupant._
 
-
-
   val r0 = "r0"
   val r1 = "r1"
   val r2 = "r2"
@@ -19,6 +17,7 @@ class SimulateCatAndMouse extends Simulator{
 
 
   override val initState: StateMap = StateMap(state = initMap)
+  override val goalStates: Option[Set[StateMap]] = None
 
   override def evalCommandToRun(c: Command, s: StateMap): Option[Boolean] = {
 
