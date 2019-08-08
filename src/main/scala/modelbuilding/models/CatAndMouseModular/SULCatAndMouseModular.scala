@@ -1,6 +1,7 @@
 package modelbuilding.models.CatAndMouseModular
 
 import modelbuilding.core.simulation.{SUL, Simulator}
+import modelbuilding.core.StateMap
 
 class SULCatAndMouseModular extends SUL{
 
