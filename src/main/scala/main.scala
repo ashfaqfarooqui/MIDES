@@ -1,8 +1,9 @@
 
 import grizzled.slf4j.Logging
+import modelbuilding.core.Alphabet
 import modelbuilding.core.modelInterfaces._
 import modelbuilding.models._
-import modelbuilding.solvers.FrehageSolver
+import modelbuilding.solvers.{FrehageSolver, MonolithicSolver}
 
 object ModelBuilder extends Logging {
 
@@ -17,6 +18,7 @@ object ModelBuilder extends Logging {
 
     val result = solver match {
       case "frehage" => new FrehageSolver(model)
+      case "monolithic" => new MonolithicSolver(model)
     }
 
     info("Learning done!")
