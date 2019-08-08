@@ -10,9 +10,10 @@ class SimulateTL extends Simulator {
   val tu = "tu"
 
   import modelbuilding.models.TestUnit.Status._
-  val initMap = Map(m1->Initial,m2->Initial,tu->Initial)
 
-  override val initState: StateMap = StateMap(state = initMap)
+  override val initState: StateMap = StateMap(m1->Initial,m2->Initial,tu->Initial)
+
+  override val goalStates: Option[Set[StateMap]] = None
 
   override def evalCommandToRun(c: Command, s: StateMap): Option[Boolean] = {
     val pred_s1 = EQ(m1,Initial)

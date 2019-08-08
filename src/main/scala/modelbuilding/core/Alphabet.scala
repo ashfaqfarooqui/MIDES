@@ -6,7 +6,7 @@ object Alphabet {
     new Alphabet(a.toSet)
 }
 
-case class Alphabet(_a: Set[Any], includeTau: Boolean = true, includeReset: Boolean = false) {
+case class Alphabet(_a: Set[Any], includeTau: Boolean = false, includeReset: Boolean = false) {
   val events: Set[Symbol] =
     if (_a.isEmpty)
       Set.empty[Symbol]

@@ -10,10 +10,11 @@ class SimulateArm(gridX: Int, gridY:Int ) extends Simulator{
   val extended = "extended"
   val gripped = "gripped"
 
-  val initMap = Map(x->0,y->0,extended->false,gripped->false)
+  val initState = StateMap(x->0,y->0,extended->false,gripped->false)
 
-  val goal = AND(List(EQ(x,0),EQ(y,0),EQ(extended,false),EQ(gripped,false)))
-  val initState = StateMap(state = initMap)
+  //val goal = AND(List(EQ(x,0),EQ(y,0),EQ(extended,false),EQ(gripped,false)))
+  override val goalStates: Option[Set[StateMap]] =
+    Some(Set(StateMap(x->0,y->0,extended->false,gripped->false)))
 
   def getGridSize()=
   {

@@ -12,14 +12,16 @@ class SimulateSticks(sticks: Int) extends Simulator {
   val p2 = "p2"
 
 
-  val initMap = Map(Ssticks->sticks, player->p1)
+  val initMap = Map()
 //val goalMap = Map(Ssticks->0, player->p2)
 
   val goal = AND(List(EQ(player,p1),EQ(Ssticks,0)))
   //val goal = EQ(Ssticks,0)
 
-  val initState = StateMap(state = initMap)
-//val goalState = StateMap(state = goalMap)
+  override val initState = StateMap(Ssticks->sticks, player->p1)
+
+  override val goalStates: Option[Set[StateMap]] =
+    Some(Set(StateMap(Ssticks->0, player->p1)))
 
   def getNoSticks()=
   {

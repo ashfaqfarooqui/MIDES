@@ -8,6 +8,7 @@ class SimulateMachineBuffer extends Simulator {
   val m2="m2"
   val initMap=Map(m1->false,m2->false)
   override val initState: StateMap = StateMap(state = initMap)
+  override val goalStates: Option[Set[StateMap]] = None
 
   override def evalCommandToRun(c: Command, s: StateMap): Option[Boolean] = {
     val pred_l1=EQ(m1,false)

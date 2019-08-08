@@ -89,6 +89,8 @@ case class Word(pf:List[Symbol], w:Symbol) extends Grammar{
   //override def toString: String = getSequence.mkString(",")
 }
 
-case class Language(l:Set[Grammar]) 
+case class Language(l:Set[Grammar])
+case class Transition(source: State, target: State, event: Symbol)
+case class StateMapTransition(source: StateMap, target: StateMap, event: Symbol)
 
 
