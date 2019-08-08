@@ -27,6 +27,7 @@ object ModelBuilder extends Logging {
     automata.modules foreach println
     automata.modules.foreach(_.createDotFile)
 
+
   }
 
 }
