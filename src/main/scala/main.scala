@@ -6,8 +6,8 @@ import modelbuilding.solvers.FrehageSolver
 
 object ModelBuilder extends Logging {
 
-  val model: Model = CatAndMouse.CatAndMouseModular
-//  val model: Model = MachineBuffer.MachineBuffer
+//  val model: Model = CatAndMouse.CatAndMouseModular
+  val model: Model = MachineBuffer.MachineBuffer
 
   val solver: String = "frehage" // "modular", "mono"
 

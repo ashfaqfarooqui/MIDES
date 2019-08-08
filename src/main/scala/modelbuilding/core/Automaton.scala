@@ -59,7 +59,7 @@ case class Automaton(
     val pw = new PrintWriter(new File(s"$name.dot"))
     pw.write(gDot)
     pw.close
-    println("Graph saved to $name.dot")
+    println(s"Graph saved to $name.dot")
   }
 
   def getNextStates(state: State): Option[Set[State]] ={
