@@ -43,5 +43,5 @@ case class StateMap(name: String = "State", state: Map[String, Any]) {
 
   def equals(o: StateMap): Boolean = this.getState.forall{p => o.getState(p._1) == p._2}
 
-  override def toString: String = state.map(x=>(s"(${x._1},${x._2})")).toString()
+  override def toString: String = "(" + state.map(v => s"${v._1}=${v._2}").mkString(",") + ")"
 }

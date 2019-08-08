@@ -53,12 +53,15 @@ class FrehageSolver(_model: Model) extends BaseSolver {
 
     val modules = for {
       m <- model.modules
-      states: Map[StateMap, State] = moduleStates(m).zipWithIndex.toMap.map{ case (s,i) => if (s == getReducedStateMap(simulator.getInitState, model, m)) (s,State("init")) else (s,State(i)) }
+      states: Map[StateMap, State] = moduleStates(m).map( s => {
+        val name = (if ( s.state.forall{ case (k,v) => simulator.getInitState.state(k) == v } ) "INIT: " else "") + s.toString
+        (s,State(name))
+      }).toMap
       transitions: Set[Transition] = moduleTransitions(m).map( t => Transition(states(t.source), states(t.target), t.event))
       alphabet: Alphabet = model.eventMapping(m)
-      iState: State = State("init")
+      iState: State = states(getReducedStateMap(simulator.getInitState, model, m) )
       fState: Option[Set[State]] = simulator.getGoalStates match {
-        case Some(gs) => Some(gs.map( s => states(getReducedStateMap(s, model, m) ) ))
+        case Some(gs) => Some(gs.map( s => states(getReducedStateMap(s, model, m)) ))
         case None => None
       }
     } yield Automaton(m, states.values.toSet, alphabet, transitions, iState, fState)
