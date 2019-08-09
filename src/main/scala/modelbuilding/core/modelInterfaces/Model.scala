@@ -8,10 +8,12 @@ trait Model{
   val name: String
   val alphabet: Alphabet
   val simulation: SUL
+  val specFilePath:Option[String] = None
 
   val isModular: Boolean
 
 }
+
 
 trait MonolithicModel extends Model {
   override val isModular = false

@@ -26,4 +26,7 @@ object MachineBuffer extends ModularModel {
 
   override val simulation = new SULMachineBuffer()
 
+  override val specFilePath:Option[String] = Some("SupremicaModels/MachineBufferMachine.wmod")
+
+
 }

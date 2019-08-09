@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="machineBuffer" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>Classical example of uncontrollable specfication. Adapted from 'Supervisory Control of a Class of Discrete Event Processes' by P. Ramadge and M. Wonham</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="CONTROLLABLE" Name="load1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="load2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="unload1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="unload2"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="Machine 2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="Idle2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="57" Y="56"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="Working2">
+                        <PointGeometry>
+                            <Point X="121" Y="118"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="Idle2" Target="Working2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="load2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="79"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="Working2" Target="Idle2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unload2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="81" Y="95"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Machine 1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="Idle1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="57" Y="57"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="Working1">
+                        <PointGeometry>
+                            <Point X="120" Y="119"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="Idle1" Target="Working1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="load1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="80" Y="95"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="Working1" Target="Idle1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unload1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="79"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="p:Buffer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="Empty">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="59" Y="58"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="Full">
+                        <PointGeometry>
+                            <Point X="123" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="Empty" Target="Full">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unload1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="78"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="Full" Target="Empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="load2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="80" Y="94"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="Empty" Target="Empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="load1"/>
+                            <SimpleIdentifier Name="unload2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="Full" Target="Full">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="load1"/>
+                            <SimpleIdentifier Name="unload2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
