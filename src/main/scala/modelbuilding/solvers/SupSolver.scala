@@ -164,7 +164,7 @@ class SupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logg
     fbdStates,
     model.name))
 
-  saveToXMLFile(s"SupremicaModels/result_${model.name}.xml",supAut)
+  saveToXMLFile(s"Output/result_${model.name}.xml",supAut)
 
 
   override def getAutomata: Automata = {
