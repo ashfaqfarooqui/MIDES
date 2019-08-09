@@ -9,6 +9,7 @@ object TransferLine extends MonolithicModel {
   override val name: String = "TransferLine"
   override val alphabet = Alphabet(start1,start2,finish1,finish2,accept,reject,test)
   override val simulation = new SULTransferLine()
+  override val specFilePath: Option[String] = Some("SupremicaModels/TransferLine.wmod")
 
   /*val eventMapping:Map[String,Alphabet] = Map(
     "TU"->Alphabet(accept,test,reject),

@@ -59,17 +59,13 @@ class SupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logg
   //experimenting with monolithin first
 
 
-  val visitedStates = Set.empty[StateMap]
   val queue: Queue[StateMap] = Queue(initState)
 
   def getNextSpecState(sp:automata.Automaton,st:StateMap, c:Symbol):Option[StateMap]={
     val specStateInMap=st.state(sp.getName).asInstanceOf[String]
-    info(s"StateMap state of Spec $specStateInMap Symbol ${c.toString}")
     val currSpecState = sp.getStateSet.getState(st.state(sp.getName).asInstanceOf[String])
-    info(s"current state transitions: ${currSpecState.getOutgoingArcs.asScala.filter(_.getSource.getName==specStateInMap).filter(_.getEvent.getName==c.toString)},")
     //since we know the spec is deterministic there can exist just one or none transitions
     val theTransition = currSpecState.getOutgoingArcs.asScala.filter(_.getSource.getName==specStateInMap).filter(_.getEvent.getName==c.toString)
-   info(s"found Transition $theTransition")
     if(theTransition.isEmpty)
       None
     else{
@@ -77,7 +73,10 @@ class SupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logg
     }
   }
 
+  private var forbiddedStates:Set[StateMap]=Set.empty[StateMap]
+
   def explore(queue: Queue[StateMap], visitedSet: Set[StateMap], arcs: Set[StateMapTransition]): Set[StateMapTransition] = {
+   debug("Starting to explore...")
     if (queue.isEmpty) {
       arcs
     }
@@ -87,23 +86,32 @@ class SupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logg
       val currState = queue.dequeue
       val visited = visitedSet + currState._1
 
-      info(s"current queue: $queue")
+      info(s"Queue size ${queue.size}")
+      info(s"VisitedSet size ${visited.size}")
+
       val reachedStates = events.map(e =>
         sul.getNextState(currState._1, e.getCommand) match {
           case Some(value) => getNextSpecState(spec, value, e) match {
             case Some(v) =>
               transitions = transitions + StateMapTransition(currState._1, v, e)
-              info(s"transition found: $transitions")
+              debug(s"transition size: ${transitions.size}")
               Some(v)
-            case _ => None
+            case _ =>
+              if(e.getCommand.isInstanceOf[Uncontrollable]){
+                forbiddedStates=forbiddedStates+currState._1
+              }
+              None
           }
           case _ =>
             None
         })
 
-      val updq = reachedStates.filter(_.isDefined).filterNot(a => visited.contains(a.get)).foldLeft(currState._2) {
+      info(s"reached states from ${currState._1} are ${reachedStates.size}")
+
+      val updq = reachedStates.filter(_.isDefined).filterNot(a => visited.contains(a.get)).filterNot(a=>currState._2.contains(a.get)).foldLeft(currState._2) {
         (q, v) => q :+ v.get
       }
+      info(s"upd Size: ${updq.size}")
       explore(updq, visited, transitions)
     }
 
@@ -129,16 +137,18 @@ class SupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logg
 
   info("Starting to build the models using MonolithicSolver")
 
-  val transitions = explore(queue,visitedStates,Set.empty[StateMapTransition])
+  val transitions = explore(queue,Set.empty[StateMap],Set.empty[StateMapTransition])
   val mappedStates= mapStates(getStatesFromTransitions(transitions))
   val mappedTransitions = mapTransitions(transitions)
+  val fbdStates=forbiddedStates map mappedStates
+  val markedStates=sul.getGoalStates
 
-  info(s"Mapped states: $mappedStates")
+  info(s"forbiddedStates states: $fbdStates")
   // val aut= Automaton(mappedStates.values.toSet + State("dump:"),createTransitionTable(mappedStates,transitions),model.alphabet,mappedStates(initState),None,None)
 
 
   override def getAutomata: Automata = {
-    Automata(Set(Automaton(model.name,mappedStates.values.toSet,model.alphabet,mappedTransitions,mappedStates(initState),None,None)))
+    Automata(Set(Automaton(model.name,mappedStates.values.toSet,model.alphabet,mappedTransitions,mappedStates(initState),None,Some(fbdStates))))
   }
 
 }

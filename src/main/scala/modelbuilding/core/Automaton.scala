@@ -80,7 +80,23 @@ case class Automaton(
       s"Q_m: ${fState match {
         case Some(fs) => "(" + fs.map(_.s).mkString(",") + ")"
         case None => "None"
-      }} )"
+      }} " +
+      s"Q_f: (${forbiddenStates match{
+        case Some(fs) => "(" + fs.map(_.s).mkString(",") + ")"
+        case None => "None"
+      }}) )" +
+      s"\n" +
+      s"\n" +
+      s"\n" +
+      s"\n" +
+    s" Properties:" +
+      s"Number of Transitions: ${transitions.size}" +
+      s"\n Number of States: ${states.size}" +
+      s"\n Number of Forbidded States: ${forbiddenStates match {
+        case Some(fs)=>fs.size
+        case None => 0
+      }}"
+
   }
 
 }
