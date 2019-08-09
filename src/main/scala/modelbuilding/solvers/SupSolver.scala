@@ -92,9 +92,11 @@ class SupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logg
       val reachedStates = events.map(e =>
         sul.getNextState(currState._1, e.getCommand) match {
           case Some(value) => getNextSpecState(spec, value, e) match {
-            case Some(v) =>
+            case Some(v) => if(!forbiddedStates.contains(currState._1)) {
               transitions = transitions + StateMapTransition(currState._1, v, e)
               Some(v)
+            }else
+              None
             case _ =>
               if(e.getCommand.isInstanceOf[Uncontrollable]){
                 forbiddedStates=forbiddedStates+currState._1
