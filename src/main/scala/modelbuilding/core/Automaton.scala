@@ -56,7 +56,7 @@ case class Automaton(
 
   def createDotFile: Unit = {
     val gDot = getGraphAsDot
-    val pw = new PrintWriter(new File(s"$name.dot"))
+    val pw = new PrintWriter(new File(s"Output/$name.dot"))
     pw.write(gDot)
     pw.close
     println(s"Graph saved to $name.dot")
