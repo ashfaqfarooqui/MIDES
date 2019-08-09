@@ -17,7 +17,6 @@ object MachineBuffer extends ModularModel {
   override def stateMapping: Map[Module,StateSet] = Map(
     "Machine1"->StateSet("m1"),
     "Machine2"->StateSet("m2")
-
   )
 
   override def eventMapping: Map[Module,Alphabet] = Map(

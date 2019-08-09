@@ -1,6 +1,6 @@
 package modelbuilding.core
 
-trait Action{
+trait Action {
   def next(s:StateMap): StateMap =
   {
     this match {

@@ -56,7 +56,6 @@ sealed trait Predicate{
 
  }
 
-
 case class AND(p:List[Predicate]) extends Predicate
 case class OR(p:List[Predicate]) extends Predicate
 //case class NOT(p: Predicate) extends Predicate
@@ -70,3 +69,7 @@ case class GR(l:String, r:Any) extends Predicate
 case class LE(l:String, r:Any) extends Predicate
 case class GREQ(l:String, r:Any) extends Predicate
 case class LEQ(l:String, r:Any) extends Predicate
+
+// Secondary constructors to handle simplify lists
+object AND { def apply(p: Predicate*) = new AND(p.toList)}
+object OR { def apply(p: Predicate*) = new OR(p.toList)}

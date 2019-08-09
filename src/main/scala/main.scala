@@ -8,7 +8,8 @@ object ModelBuilder extends Logging {
 
 //  val model: Model = CatAndMouse.CatAndMouseModular
 //  val model: Model = CatAndMouseModular.CatAndMouseModular
-  val model: Model = MachineBuffer.MachineBuffer
+// val model: Model = MachineBuffer.MachineBuffer
+  val model: Model = AGV.Agv
 
   val solver: String = "frehage" // "modular", "mono"
 

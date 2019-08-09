@@ -5,15 +5,6 @@ import modelbuilding.core.{Alphabet, Command, StateMap, Symbol, StateMapTransiti
 abstract class SUL {
 
   val simulator: Simulator
-  val stateToString: StateMap => Option[String] =
-    (s: StateMap) => {
-      val name =
-        (if (s.state.forall{
-          case (k,v) => getInitState.state(k) == v
-        }) "INIT: " else "") +
-        s.state.map(v => s"(${v._1}=${v._2})").mkString(",")
-      Some(name)
-    }
 
   def getInitState: StateMap = simulator.initState
   def getGoalStates: Option[Set[StateMap]] = simulator.goalStates

@@ -1,6 +1,6 @@
-package models.AGV
+package  modelbuilding.models.AGV
 
-import core.{Command, Controllable, Uncontrollable}
+import modelbuilding.core.{Command, Controllable, Uncontrollable}
 
 trait AGVDomain {
   override def toString: String = this match{
