@@ -29,8 +29,17 @@ class FrehageSolver(_model: Model) extends BaseSolver {
   private var moduleStates: Map[Module, Set[StateMap]] = model.modules.map(_ -> Set.empty[StateMap]).toMap
   private var moduleTransitions: Map[Module, Set[StateMapTransition]] = model.modules.map(_ -> Set.empty[StateMapTransition]).toMap
 
+  var count = 0
   // Loop until all modules are done exploring new states
   while (moduleQueue.values.exists(q => q.nonEmpty)) {
+
+    count += 1
+    println("#############################")
+    println(s"# Iteration $count")
+    println("Size of the data structure")
+    println("* Queues: " + moduleQueue.map(_._2.size).sum)
+    println("* States: " + moduleStates.map(_._2.size).sum)
+    println("* Transitions: " + moduleTransitions.map(_._2.size).sum)
 
     // Iterate over the modules to process them individually
     for (m <- model.modules) {

@@ -28,6 +28,7 @@ object Agv extends ModularModel with Specifications {
   )
 
   override val eventMapping:Map[String,Alphabet] = Map(
+
     "Input 1" -> Alphabet(e10, e11),
     "Input 3" -> Alphabet(e30, e31),
     "Output" -> Alphabet(e20, e21),
@@ -42,8 +43,8 @@ object Agv extends ModularModel with Specifications {
   )
 
   override val simulation = new SulAgv()
-
   override val specFilePath: Option[String] = Some("SupremicaModels/AGV.wmod")
   addSpecsFromSupremica(specFilePath.get)
+
 
 }

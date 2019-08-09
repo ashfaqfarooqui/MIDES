@@ -16,6 +16,7 @@ class SimulateTL extends Simulator {
   override val goalStates: Option[Set[StateMap]] = None
   override val goalPredicate: Option[Predicate] = Some(AND(EQ(m1,Initial),EQ(m2,Initial),EQ(tu,Initial)))
 
+
   override val guards: Map[Command,Predicate] = Map(
     start1 -> EQ(m1,Initial),
     finish1 -> EQ(m1,Working),

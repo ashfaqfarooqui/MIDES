@@ -18,6 +18,9 @@ class SimulateCatAndMouseModular extends Simulator{
   override val goalStates: Option[Set[StateMap]] = None
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1. Updated the Simulation structure
   override val guards: Map[Command,Predicate] = Map(
     c1 -> EQ(cat,R0),
     c2 -> EQ(cat,R1),
@@ -49,6 +52,7 @@ class SimulateCatAndMouseModular extends Simulator{
     m5 -> List(Assign(mouse,R3)),
     m6 -> List(Assign(mouse, R0))
   )
+<<<<<<< HEAD
 =======
   override def evalCommandToRun(c: Command, s: StateMap): Option[Boolean] = {
 
@@ -110,5 +114,7 @@ class SimulateCatAndMouseModular extends Simulator{
     }
   }
 >>>>>>> Created a new modular CatAndMouse model. Improved the output of the automata so we can see variables in the state names.
+=======
+>>>>>>> 1. Updated the Simulation structure
 
 }

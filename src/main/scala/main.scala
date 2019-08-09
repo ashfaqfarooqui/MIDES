@@ -20,7 +20,7 @@ object ModelBuilder extends Logging {
     case _ => throw new Exception("A model wasn't defined.")
   }
 
-  val solver: String = "frehage3" // "modular", "mono"
+  val solver: String = "modularSupSolver" // "modular", "mono"
 
   def main(args: Array[String]) : Unit= {
 
