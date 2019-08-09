@@ -35,10 +35,13 @@ object ModelBuilder extends Logging {
       case "modularSupSolver" => new ModularSupSolver(model)
     }
 
+//    info("Learning done!")
+
     val automata = result.getAutomata
 
     automata.modules foreach println
     automata.modules.foreach(_.createDotFile)
     SupremicaHelpers.exportAsSupremicaAutomata(automata, name=modelName)
   }
+
 }
