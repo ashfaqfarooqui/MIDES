@@ -8,6 +8,7 @@ trait Simulator extends Logging{
 
   val initState: StateMap
   val goalStates: Option[Set[StateMap]]
+  val goalPredicate:Option[Predicate] = None
 
   val guards: Map[Command,Predicate]
   val actions: Map[Command,List[Action]]

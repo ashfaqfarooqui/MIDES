@@ -1,7 +1,7 @@
 package modelbuilding.solvers
 import SupremicaStuff.SupremicaHelpers
 import grizzled.slf4j.Logging
-import modelbuilding.core.{Alphabet, Automata, Automaton, State, StateMap, StateMapTransition, Symbol, Transition, Uncontrollable}
+import modelbuilding.core.{AND, Alphabet, AlwaysTrue, Automata, Automaton, EQ, OR, State, StateMap, StateMapTransition, Symbol, Transition, Uncontrollable}
 import modelbuilding.core.modelInterfaces.{Model, ModularModel, MonolithicModel}
 import modelbuilding.solvers.SupSolver._
 import net.sourceforge.waters.subject.module.ModuleSubject
@@ -94,7 +94,6 @@ class SupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logg
           case Some(value) => getNextSpecState(spec, value, e) match {
             case Some(v) =>
               transitions = transitions + StateMapTransition(currState._1, v, e)
-              debug(s"transition size: ${transitions.size}")
               Some(v)
             case _ =>
               if(e.getCommand.isInstanceOf[Uncontrollable]){
@@ -137,18 +136,43 @@ class SupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logg
 
   info("Starting to build the models using MonolithicSolver")
 
+
+  //val extendedGoal = if(spec.hasAcceptingState) spec.getStateSet.asScala.filter(_.isAccepting).map(a=>spec->a.getName).map(_=>sul.getGoalStates.getOrElse(State)) else sul.getGoalStates
+
+  val specGoal = if(spec.hasAcceptingState) spec.getStateSet.asScala.filter(_.isAccepting).map(a=>EQ(spec.getName,a.getName)).toList else List(AlwaysTrue)
+  val extendedGoalPredicate = AND(sul.getGoalPredicate.getOrElse(AlwaysTrue),OR(specGoal))
   val transitions = explore(queue,Set.empty[StateMap],Set.empty[StateMapTransition])
-  val mappedStates= mapStates(getStatesFromTransitions(transitions))
+  val allStatesAsStateMap = getStatesFromTransitions(transitions) union forbiddedStates
+  val mappedStates= mapStates(allStatesAsStateMap)
   val mappedTransitions = mapTransitions(transitions)
-  val fbdStates=forbiddedStates map mappedStates
-  val markedStates=sul.getGoalStates
+  val fbdStates= if(!forbiddedStates.isEmpty) Some(forbiddedStates map mappedStates) else None
+  val markedStateSet=allStatesAsStateMap.filter(extendedGoalPredicate.eval(_).get) map mappedStates
+  val markedStates = if(markedStateSet.isEmpty) None else Some(markedStateSet)
+
 
   info(s"forbiddedStates states: $fbdStates")
   // val aut= Automaton(mappedStates.values.toSet + State("dump:"),createTransitionTable(mappedStates,transitions),model.alphabet,mappedStates(initState),None,None)
 
+  val supAut=new automata.Automata()
+  supAut.addAutomaton(createSupremicaAutomaton(mappedStates.values.toSet,
+    mappedTransitions,
+    model.alphabet,
+    mappedStates(initState),
+    markedStates,
+    fbdStates,
+    model.name))
+
+  saveToXMLFile(s"SupremicaModels/result_${model.name}.xml",supAut)
+
 
   override def getAutomata: Automata = {
-    Automata(Set(Automaton(model.name,mappedStates.values.toSet,model.alphabet,mappedTransitions,mappedStates(initState),None,Some(fbdStates))))
+    Automata(Set(Automaton(model.name,
+      mappedStates.values.toSet,
+      model.alphabet,
+      mappedTransitions,
+      mappedStates(initState),
+      markedStates,
+      fbdStates)))
   }
 
 }

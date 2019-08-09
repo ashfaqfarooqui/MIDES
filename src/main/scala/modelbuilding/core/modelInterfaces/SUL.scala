@@ -1,6 +1,6 @@
 package modelbuilding.core.modelInterfaces
 
-import modelbuilding.core.{Alphabet, Command, StateMap, Symbol, StateMapTransition}
+import modelbuilding.core.{Alphabet, Command, Predicate, StateMap, StateMapTransition, Symbol}
 
 abstract class SUL {
 
@@ -10,6 +10,7 @@ abstract class SUL {
 
   def getInitState: StateMap = simulator.initState
   def getGoalStates: Option[Set[StateMap]] = simulator.goalStates
+  def getGoalPredicate: Option[Predicate] = simulator.goalPredicate
 
   def getNextState(state: StateMap, command:Command): Option[StateMap] = {
     simulator.runCommand(command, state, acceptsPartialStates) match {

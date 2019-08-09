@@ -4,7 +4,9 @@ package modelbuilding.core
 object State {
   def apply(s: AnyVal) = new State(s.toString)
 }
-case class State(s: String)
+case class State(s: String){
+  override def toString = s
+}
 
 
 object StateSet {
