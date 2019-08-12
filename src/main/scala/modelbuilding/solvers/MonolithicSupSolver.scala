@@ -80,8 +80,9 @@ class MonolithicSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers
             case Some(v) => if(!forbiddedStates.contains(currState._1)) {
               transitions = transitions + StateMapTransition(currState._1, v, e)
               Some(v)
-            }else
+            }else {
               None
+            }
             case _ =>
               if(e.getCommand.isInstanceOf[Uncontrollable]){
                 forbiddedStates=forbiddedStates+currState._1
@@ -90,12 +91,12 @@ class MonolithicSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers
           }
           case _ =>
             None
-        })
+        }).filter(_.isDefined).map(_.get)
 
       info(s"reached states from ${currState._1} are ${reachedStates.size}")
 
-      val updq = reachedStates.filter(_.isDefined).filterNot(a => visited.contains(a.get)).filterNot(a=>currState._2.contains(a.get)).foldLeft(currState._2) {
-        (q, v) => q :+ v.get
+      val updq = reachedStates.diff(visited).filterNot(a=>currState._2.contains(a)).foldLeft(currState._2) {
+        (q, v) => q :+ v
       }
       info(s"upd Size: ${updq.size}")
       explore(updq, visited, transitions)

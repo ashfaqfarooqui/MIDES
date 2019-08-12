@@ -20,11 +20,11 @@ object ModelBuilder extends Logging {
     case _ => throw new Exception("A model wasn't defined.")
 
   }
-  val solver: String = "supSolver" // "modular", "mono"
+  val solver: String = "modularSupSolver"
 
   def main(args: Array[String]) : Unit= {
 
-//    info("Automata learn!")
+    info(s"Running model: $model")
 
     val result = solver match {
       case "frehage" => new FrehageSolverWithPartialStates(model)

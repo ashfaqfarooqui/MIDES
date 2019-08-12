@@ -22,12 +22,7 @@ case class StateMap(name: String = "State", state: Map[String, Any]) {
 
 
 
-
-
-  val x: StateSet = StateSet("a","2")
-
-
-
+  def removeKeys(key:Set[String]) = StateMap(state=this.getState.filterKeys(key.contains))
   def getState:Map[String,Any] = state
   def getOrElse(key:String,default:Any) = this.state.getOrElse(key,default)
   def inState(key:String) = this.state.contains(key)
