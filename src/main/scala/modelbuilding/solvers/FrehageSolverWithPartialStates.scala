@@ -3,9 +3,9 @@ package modelbuilding.solvers
 import modelbuilding.core._
 import modelbuilding.core.modeling.{Model, ModularModel}
 import modelbuilding.core.simulation.SUL
-import modelbuilding.solvers.FrehageSolver._
+import modelbuilding.solvers.FrehageSolverWithPartialStates._
 
-object FrehageSolver {
+object FrehageSolverWithPartialStates {
 
   def getReducedStateMap(state: StateMap, model: ModularModel, module: Module): StateMap =
     StateMap(state.name, state.state.filterKeys(s => model.stateMapping(module).states.contains(s)))
@@ -15,9 +15,11 @@ object FrehageSolver {
 
 }
 
-class FrehageSolver(_model: Model) extends BaseSolver {
+class FrehageSolverWithPartialStates(_model: Model) extends BaseSolver {
 
-  assert(_model.isModular, "modelbuilder.solver.FrehageSolver requires a modular model.")
+  assert(_model.isModular, "modelbuilder.solver.FrehageSolverWithPartialStates requires a modular model.")
+  //assert(_model.simulation.acceptsPartialStates, "modelbuilder.solver.FrehageSolverWithPartialStates requires a simulator that can evaluate partial states.")
+
   private val model = _model.asInstanceOf[ModularModel]
   private val simulator: SUL = model.simulation
 
