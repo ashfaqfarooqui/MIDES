@@ -36,25 +36,25 @@ Positions available to the vehicles:
 
 	"z1", "z2", "z3", "z4",	// The crossings (mutex zones)
 
-	"z12", "z21",		// Transition between zones. 
-	"z23", "z32",		// (`zXzY` means transitions from zone `X` to zone `Y`
-	"z34", "z43",		//
+	"z12", "z21",           // Transition between zones. 
+	"z23", "z32",           // (`zXzY` means transitions from zone `X` to zone `Y`
+	"z34", "z43",           //
 
-	"z4O", "zO4",		// There is a significant distance from z4 to the output.
+	"z4O", "zO4",           // There is a significant distance from z4 to the output.
 
-	"i11","i12", 		// At Input 1, ready to: (i) pickup material, (ii) leave station
-	"i31","i32", 		// At Input 3, ready to: (i) pickup material, (ii) leave station
-	"o1","o2", 		// At Output, ready to: (i) drop of product, (ii) leave station
+	"i1",                   // Input 1
+	"i3"                    // Input 3
+	"o"                     // Output
 
-	"w1i11","w1i12", 	// At input 1 of Workstation 1, ready to: (i) drop of material, (ii) leave station
-	"w1i21","w1i22", 	// At input 2 of Workstation 1, ready to: (i) drop of material, (ii) leave station
-	"w1o1","w1o2", 	// At output of Workstation 1, ready to: (i) pick up material, (ii) leave station
+	"w1i1",                 // Input 1 of Workstation 1
+	"w1i2",                 // Input 2 of Workstation 1
+	"w1o", 	                // Output of Workstation 1
 
-	"w2i1","w2i2", 	// At input of Workstation 2, ready to: (i) drop of material, (ii) leave station
-	"w2o1","w2o2", 	// At output of Workstation 2, ready to: (i) pick up material, (ii) leave station
+	"w2i",                  // Input of Workstation 2
+	"w2o",                  // Output of Workstation 2
 
-	"w3i1","w3i2", 	// At input of Workstation 3, ready to: (i) drop of material, (ii) leave station
-	"w3o1","w3o2", 	// At output of Workstation 3, ready to: (i) pick up material, (ii) leave station
+	"w3i",                  // Input of Workstation 3
+	"w3o",                  // Output of Workstation 3
 
 
 
@@ -67,13 +67,19 @@ Positions available to the vehicles:
 	in3: Boolean
 	out: Boolean
 
-### Vehicles
+### Vehicles 
 
-	v1: Domain("i11", "i12", "z1", "w2i1", "w2i2")
-	v2: Domain("i31", "i32", "z1", "z12", "z2", "z23", "z3", "z32", "z21", "w3i1", "w3i2")
-	v3: Domain("w2o1", "w2o2", "z2", "w1i11", "w1i12")
-	v4: Domain("w3o1", "w3o2", "z3", "z34", "z4", "z43", "w1i21", "w1i22")
-	v5: Domain("w1o1", "w1o2", "z4", "z4O", "zOz4", "o1", "o2")
+Carrying item:
+
+    v1l, v2l, v3l, v4l, v5l: Boolean
+
+Positions:
+
+	v1p: Domain("i1", "i1", "z1", "w2i", "w2i")
+	v2p: Domain("i3", "i3", "z1", "z12", "z2", "z23", "z3", "z32", "z21", "w3i", "w3i")
+	v3p: Domain("w2o", "w2o", "z2", "w1i1", "w1i1")
+	v4p: Domain("w3o", "w3o", "z3", "z34", "z4", "z43", "w1i2", "w1i2")
+	v5p: Domain("w1o", "w1o", "z4", "z4O", "zOz4", "o", "o")
 
 ### Workstations
 * `wXY` means that Workstation `X` is ready for process `Y`

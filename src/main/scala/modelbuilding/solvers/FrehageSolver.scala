@@ -25,34 +25,43 @@ class FrehageSolver(_model: Model) extends BaseSolver {
 
 
   // One queue for each module to track new states that should be explored.
-  private var moduleQueue: Map[Module, Set[StateMap]] = model.modules.map(_ -> Set(simulator.getInitState)).toMap
-  private var moduleStates: Map[Module, Set[StateMap]] = model.modules.map(_ -> Set.empty[StateMap]).toMap
+  private var globalStateSpace: Vector[StateMap] = Vector(simulator.getInitState)
+  private var moduleExplored: Map[Module, Int] = model.modules.map(_ -> 0).toMap
+  private var moduleStates: Map[Module, Vector[StateMap]] = model.modules.map(_ -> Vector.empty[StateMap]).toMap
   private var moduleTransitions: Map[Module, Set[StateMapTransition]] = model.modules.map(_ -> Set.empty[StateMapTransition]).toMap
 
   var count = 0
   // Loop until all modules are done exploring new states
-  while (moduleQueue.values.exists(q => q.nonEmpty)) {
-
+  while (moduleExplored.values.exists(q => q < globalStateSpace.size)) {
+//  for (i <- 1 to 20) {
     count += 1
     println("#############################")
-    println(s"# Iteration $count")
-    println("Size of the data structure")
-    println("* Queues: " + moduleQueue.map(_._2.size).sum)
+    println(s"Iteration $count")
+    println("* Global state space: " + globalStateSpace.size)
     println("* States: " + moduleStates.map(_._2.size).sum)
     println("* Transitions: " + moduleTransitions.map(_._2.size).sum)
 
     // Iterate over the modules to process them individually
     for (m <- model.modules) {
 
-      moduleQueue += (m -> moduleQueue(m).filter(s => !moduleStates(m).contains(getReducedStateMap(s, model, m))))
+      println(s"Processing module $m")
 
-      moduleStates += (m -> (moduleStates(m) ++ moduleQueue(m).map(s => getReducedStateMap(s, model, m))))
+      val stateIndex = (moduleExplored(m) until globalStateSpace.size).filter(i => !(moduleStates(m) contains getReducedStateMap(globalStateSpace(i), model, m)) )
+      val moduleQueue = stateIndex.map(i => (getReducedStateMap(globalStateSpace(i), model, m),i))
+      moduleExplored += (m -> globalStateSpace.size)
 
-      val next = moduleQueue(m).flatMap(s => simulator.getOutgoingTransitions(s, model.eventMapping(m)))
+      /*println("######################### ")
+      println("##### ", m)
+//      println("##### ", moduleExplored(m))
+      println("##### ", moduleQueue)
+//      println("##### ", globalStateSpace.drop(moduleExplored(m)))
+      println("##### ", moduleStates(m))*/
+      moduleStates += (m -> (moduleStates(m) ++ moduleQueue.map(_._1).distinct))
+
+      val next = moduleQueue.flatMap(s => simulator.getOutgoingTransitions(globalStateSpace(s._2), model.eventMapping(m)))
       moduleTransitions += (m -> (moduleTransitions(m) ++ next.map( t => getReducedStateMapTransition(t, model, m))))
+      globalStateSpace ++= next.map(_.target)
 
-      moduleQueue(m).empty
-      for (m <- model.modules) moduleQueue += (m -> (moduleQueue(m) ++ next.map(s => s.target)))
 
     }
 
@@ -76,7 +85,6 @@ class FrehageSolver(_model: Model) extends BaseSolver {
     } yield Automaton(m, states.values.toSet, alphabet, transitions, iState, fState)
 
     Automata(modules)
-
   }
 
 }

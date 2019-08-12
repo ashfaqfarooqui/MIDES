@@ -11,18 +11,18 @@ object Agv extends ModularModel {
 
   override val alphabet: Alphabet = Alphabet(c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,e11,e10,e20,e21,e30,e31,u10,u11,u20,u21,u22,u23,u24,u25,u26,u27,u28,u29,u30,u31,u40,u41,u42,u43,u44,u45,u50,u51,u52,u53,w11,w12,w13,w14,w15,w21,w22,w23,w24,w31,w32,w33,w34)
 
-  val stateString: String = "in1 in3 out v1 v2 v3 v4 v5 w1_11 w1_12 w1_2 w1_3 w1_4 w1_5 w2 w3"
+  val stateString: String = "in1 in3 out v1l v2l v3l v4l v5l v1p v2p v3p v4p v5p w1_11 w1_12 w1_2 w1_3 w1_4 w1_5 w2 w3"
   override val states: StateSet = StateSet(stateString.split(" ").toSet)
 
   override def stateMapping: Map[Module,StateSet] = Map(
     "Input 1" -> StateSet("in1"),
     "Input 3" -> StateSet("in3"),
     "Output" -> StateSet("out"),
-    "AGV1" -> StateSet("v1"),
-    "AGV2" -> StateSet("v2"),
-    "AGV3" -> StateSet("v3"),
-    "AGV4" -> StateSet("v4"),
-    "AGV5" -> StateSet("v5"),
+    "AGV1" -> StateSet("v1l", "v1p"),
+    "AGV2" -> StateSet("v2l", "v2p"),
+    "AGV3" -> StateSet("v3l", "v3p"),
+    "AGV4" -> StateSet("v4l", "v4p"),
+    "AGV5" -> StateSet("v5l", "v5p"),
     "WS1" -> StateSet("w1_11","w1_12","w1_2","w1_3","w1_4","w1_5"),
     "WS2" -> StateSet("w2"),
     "WS3" -> StateSet("w3")
@@ -33,7 +33,7 @@ object Agv extends ModularModel {
     "Input 3" -> Alphabet(e30, e31),
     "Output" -> Alphabet(e20, e21),
     "AGV1" -> Alphabet(e10, w23, c1, c2, u10, u11),
-    "AGV2" -> Alphabet(e20, w32, c3, c4, u20, u21, u22, u23, u24, u25, u26, u27, u28, u29),
+    "AGV2" -> Alphabet(e30, w32, c3, c4, u20, u21, u22, u23, u24, u25, u26, u27, u28, u29),
     "AGV3" -> Alphabet(w14, w22, c5, c6, u30, u31),
     "AGV4" -> Alphabet(w15, w31, c7, c8, u40, u41, u42, u43, u44, u45),
     "AGV5" -> Alphabet(e20, w13, c8, c9, u50, u51, u52, u53),
