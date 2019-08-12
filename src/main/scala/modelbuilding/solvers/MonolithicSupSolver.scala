@@ -3,7 +3,7 @@ import SupremicaStuff.SupremicaHelpers
 import grizzled.slf4j.Logging
 import modelbuilding.core.{AND, Alphabet, AlwaysTrue, Automata, Automaton, EQ, OR, State, StateMap, StateMapTransition, Symbol, Transition, Uncontrollable}
 import modelbuilding.core.modelInterfaces.{Model, ModularModel, MonolithicModel}
-import modelbuilding.solvers.SupSolver._
+import modelbuilding.solvers.MonolithicSupSolver._
 import net.sourceforge.waters.subject.module.ModuleSubject
 import org.supremica._
 
@@ -11,31 +11,15 @@ import scala.collection.JavaConverters._
 import scala.collection.immutable.Queue
 
 
-object SupSolver {
-  def aggregateModulesForModel(m:ModularModel,sp:Set[automata.Automaton]) = {
-    sp.map {
-      s =>
-        val specAlphabet = s.getAlphabet
-        //This should work for the base case -- we get a supervisor, but not a supremal controllable supervisor
-        def selectedAlphabet = m.eventMapping filter {
-          case (k: String, v: Set[Symbol]) => v.exists(x => specAlphabet.contains(x.toString))
-        }
-
-        val selAlphabet = Alphabet(selectedAlphabet.values.toSet.foldLeft(Set.empty[Symbol]) {
-          (acc, i) => acc union i.events
-        } union m.alphabet.a.filter(a => specAlphabet.contains(a.toString)))
-        s -> selAlphabet
-    }.toMap
-  }
-
-  def extendStateMap(sp:Set[automata.Automaton],st:StateMap): StateMap ={
+object MonolithicSupSolver {
+    def extendStateMap(sp:Set[automata.Automaton],st:StateMap): StateMap ={
     StateMap(state=st.state ++  sp.map(s=> s.getName-> s.getInitialState.getName).toMap)
   }
 
 
   }
 
-class SupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logging{
+class MonolithicSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logging{
 
   assert(_model.specFilePath.isDefined, "modelbuilder.solver.SupSolver requires a specification model.")
   info("Initializing SupSolver")
@@ -63,7 +47,7 @@ class SupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logg
 
   def getNextSpecState(sp:automata.Automaton,st:StateMap, c:Symbol):Option[StateMap]={
     val specStateInMap=st.state(sp.getName).asInstanceOf[String]
-    val currSpecState = sp.getStateSet.getState(st.state(sp.getName).asInstanceOf[String])
+    val currSpecState = sp.getStateSet.getState(specStateInMap)
     //since we know the spec is deterministic there can exist just one or none transitions
     val theTransition = currSpecState.getOutgoingArcs.asScala.filter(_.getSource.getName==specStateInMap).filter(_.getEvent.getName==c.toString)
     if(theTransition.isEmpty)
@@ -91,6 +75,7 @@ class SupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logg
 
       val reachedStates = events.map(e =>
         sul.getNextState(currState._1, e.getCommand) match {
+            //getNextSpecState updates the state variable in the statemap. hence use the new current state.Mo
           case Some(value) => getNextSpecState(spec, value, e) match {
             case Some(v) => if(!forbiddedStates.contains(currState._1)) {
               transitions = transitions + StateMapTransition(currState._1, v, e)
