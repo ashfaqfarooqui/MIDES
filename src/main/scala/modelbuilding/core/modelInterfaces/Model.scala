@@ -10,6 +10,7 @@ trait Model{
   val simulation: SUL
 
   val isModular: Boolean
+
 }
 
 trait MonolithicModel extends Model {

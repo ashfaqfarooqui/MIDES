@@ -5,5 +5,6 @@ import modelbuilding.core.modelInterfaces._
 class SULMachineBuffer extends SUL {
 
   override val simulator: Simulator = new SimulateMachineBuffer
+  override val acceptsPartialStates = false
 
 }

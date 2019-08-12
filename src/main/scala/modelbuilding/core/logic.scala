@@ -20,7 +20,7 @@ sealed trait Predicate {
   }
 
 
-  def eval(s: StateMap): Option[Boolean] = {
+  def eval(s: StateMap, allowPartialStates: Boolean = false): Option[Boolean] = {
     def evalEqualities(l: String, r: Any, e: (Any, Any) => Boolean) = {
       s.get(l) match {
         case Right(v) => Some(e(v, r))
@@ -28,10 +28,9 @@ sealed trait Predicate {
       }
     }
 
-    def e(pred: Predicate): Option[Boolean] = {
+    def evalPredicate(pred: Predicate): Option[Boolean] = {
       pred match {
-        case AND(p) => Some(!p.flatMap(e(_)).contains(false))
-        case OR(p) => Some(p.flatMap(e(_)).contains(true))
+        case AND(_) | OR(_) => evalCompoundPredicate(pred.asInstanceOf[CompoundPredicate])
        // case NOT(p) => for {b <- e(p)} yield !b
         case EQ(l, r) => evalEqualities(l, r, _ == _)
         case NEQ(l, r) => evalEqualities(l, r, _ != _)
@@ -44,16 +43,25 @@ sealed trait Predicate {
         case p => throw new IllegalArgumentException(s"Unknown predicate: $p")
       }
     }
+    def evalCompoundPredicate(cp: CompoundPredicate): Option[Boolean] = {
+      val inner = cp.p.flatMap(evalPredicate)
+      if (!allowPartialStates && inner.size < cp.p.size) None // tried to evaluate a variable that was not part of the state map.
+      else cp match {
+        case AND(p) => Some(!inner.contains(false))
+        case OR(p) => Some(inner.contains(true))
+      }
+    }
 
-    e(this)
+    evalPredicate(this)
   }
 
 
 }
 
 
-case class AND(p:List[Predicate]) extends Predicate
-case class OR(p:List[Predicate]) extends Predicate
+sealed trait CompoundPredicate extends Predicate { val p: List[Predicate]}
+case class AND(p:List[Predicate]) extends CompoundPredicate
+case class OR(p:List[Predicate]) extends CompoundPredicate
 //case class NOT(p: Predicate) extends Predicate
 case object AlwaysTrue extends Predicate
 case object AlwaysFalse extends Predicate

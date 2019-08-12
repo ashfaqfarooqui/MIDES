@@ -24,7 +24,7 @@ class SimulateArm(gridX: Int, gridY:Int ) extends Simulator{
   // Not applicable since evalCommandToRun requires some special treatment (implementation of predicate `NEXT`)
   override val guards: Map[Command,Predicate] = Map.empty[Command,Predicate]
 
-  override def evalCommandToRun(c:Command, s: StateMap): Option[Boolean] ={
+  override def evalCommandToRun(c:Command, s: StateMap, acceptPartialStates: Boolean): Option[Boolean] ={
     val newState = actions(c).foldLeft(s)((st,a)=>a.next(st))
     //val newState = s
     val canMove = EQ(extended,false)
