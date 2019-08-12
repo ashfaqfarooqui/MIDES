@@ -28,43 +28,30 @@ class SimulateSticks(sticks: Int) extends Simulator {
     sticks
   }
 
-  override def translateCommand(c: Command)=
-  {
-    c match {
-      case `e11` => List(Decr(Ssticks,1),Assign(player,p2))
-      case `e12` =>List(Decr(Ssticks,2),Assign(player,p2))
-      case `e21` =>  List(Decr(Ssticks,1),Assign(player,p1))
-      case `e22` => List(Decr(Ssticks,2),Assign(player,p1))
-      case `e13` => List(Decr(Ssticks,3),Assign(player,p2))
-      case `e23` => List(Decr(Ssticks,3),Assign(player,p1))
-      case `reset` => initState.getState.toList.map(x => Assign(x._1,x._2))
-      case `tau` => List(TauAction)
-
-    }
-
-  }
-
-
-  override def evalCommandToRun(c:Command, s: StateMap) ={
-
+  override val guards: Map[Command,Predicate] = {
     val rem_one = GR(Ssticks,0)
     val rem_two = GR(Ssticks,1)
     val rem_three = GR(Ssticks,2)
     val p1Chance = EQ(player,p1)
     val p2Chance = EQ(player,p2)
-
-    c match {
-      case `e11` => AND(List(rem_one,p1Chance)).eval(s)
-      case `e12` =>AND(List(rem_two,p1Chance)).eval(s)
-      case `e21` => AND(List(rem_one,p2Chance)).eval(s)
-      case `e22` =>AND(List(rem_two,p2Chance)).eval(s)
-      case `e13` =>AND(List(rem_three,p1Chance)).eval(s)
-      case `e23` =>AND(List(rem_three,p2Chance)).eval(s)
-
-      case `reset` => Some(true)
-      case `tau` => Some(true)
-    }
+    Map(
+      e11 -> AND(rem_one,p1Chance),
+      e12 -> AND(rem_two,p1Chance),
+      e21 -> AND(rem_one,p2Chance),
+      e22 -> AND(rem_two,p2Chance),
+      e13 -> AND(rem_three,p1Chance),
+      e23 -> AND(rem_three,p2Chance),
+    )
   }
+
+  override val actions: Map[Command,List[Action]] = Map(
+    e11 -> List(Decr(Ssticks,1),Assign(player,p2)),
+    e12 -> List(Decr(Ssticks,2),Assign(player,p2)),
+    e21 -> List(Decr(Ssticks,1),Assign(player,p1)),
+    e22 -> List(Decr(Ssticks,2),Assign(player,p1)),
+    e13 -> List(Decr(Ssticks,3),Assign(player,p2)),
+    e23 -> List(Decr(Ssticks,3),Assign(player,p1)),
+  )
 
 
 

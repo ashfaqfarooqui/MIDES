@@ -4,13 +4,15 @@ import modelbuilding.core.{Alphabet, Command, StateMap, Symbol, StateMapTransiti
 
 abstract class SUL {
 
-  val simulator:Simulator
+  val simulator: Simulator
+  val acceptsPartialStates: Boolean
+
 
   def getInitState: StateMap = simulator.initState
   def getGoalStates: Option[Set[StateMap]] = simulator.goalStates
 
   def getNextState(state: StateMap, command:Command): Option[StateMap] = {
-    simulator.runCommand(command, state) match {
+    simulator.runCommand(command, state, acceptsPartialStates) match {
       case Right(s) => Some(s)
       case Left(_) => None
     }

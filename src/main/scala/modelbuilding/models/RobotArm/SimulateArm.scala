@@ -20,37 +20,23 @@ class SimulateArm(gridX: Int, gridY:Int ) extends Simulator{
   {
     (gridX,gridY)
   }
-  override def translateCommand(c: Command)=
-  {
-    c match {
-      case `left` => List(Decr(x,1))
-      case `right` =>List(Incr(x,1))
-      case `up` =>  List(Incr(y,1))
-      case `down` => List(Decr(y,1))
-      case `extend` =>List(Toggle(extended))
-      case `retract` =>List(Toggle(extended))
-      case `grip` =>List(Toggle(gripped))
-      case `release` =>List(Toggle(gripped))
-      case `reset` => initState.getState.toList.map(x => Assign(x._1,x._2))
-      case `tau` => List(TauAction)
 
-    }
+  // Not applicable since evalCommandToRun requires some special treatment (implementation of predicate `NEXT`)
+  override val guards: Map[Command,Predicate] = Map.empty[Command,Predicate]
 
-  }
-
-  override def evalCommandToRun(c:Command, s: StateMap) ={
-    val newState = translateCommand(c).foldLeft(s)((st,a)=>a.next(st))
+  override def evalCommandToRun(c:Command, s: StateMap, acceptPartialStates: Boolean): Option[Boolean] ={
+    val newState = actions(c).foldLeft(s)((st,a)=>a.next(st))
     //val newState = s
     val canMove = EQ(extended,false)
 
-    val xPred = AND(List(GREQ(x,0), LEQ(x,gridX),canMove))
-    val yPred = AND(List(GREQ(y,0), LEQ(y,gridY),canMove))
+    val xPred = AND(GREQ(x,0), LEQ(x,gridX), canMove)
+    val yPred = AND(GREQ(y,0), LEQ(y,gridY), canMove)
 
     val extPred = EQ(extended,true)
     val retPred = EQ(extended,false)
 
-    val gripPred = AND(List(EQ(gripped,true),EQ(extended,true)))
-    val releasePred = AND(List(EQ(gripped,false),EQ(extended,true)))
+    val gripPred = AND(EQ(gripped,true),EQ(extended,true))
+    val releasePred = AND(EQ(gripped,false),EQ(extended,true))
 
     c match {
       case `left` => xPred.eval(newState)
@@ -66,7 +52,16 @@ class SimulateArm(gridX: Int, gridY:Int ) extends Simulator{
     }
   }
 
-
-
-
+  override val actions: Map[Command,List[Action]] = Map(
+    left -> List(Decr(x,1)),
+    right ->List(Incr(x,1)),
+    up ->  List(Incr(y,1)),
+    down -> List(Decr(y,1)),
+    extend ->List(Toggle(extended)),
+    retract ->List(Toggle(extended)),
+    grip ->List(Toggle(gripped)),
+    release ->List(Toggle(gripped)),
+    reset -> initState.getState.toList.map(x => Assign(x._1,x._2)),
+    tau -> List(TauAction),
+  )
 }

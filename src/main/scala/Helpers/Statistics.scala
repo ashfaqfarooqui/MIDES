@@ -1,6 +1,7 @@
 package Helpers
 
 class Statistics {
+
   private var _membQueries: BigInt = 0
 
   def membQueries: BigInt = _membQueries
