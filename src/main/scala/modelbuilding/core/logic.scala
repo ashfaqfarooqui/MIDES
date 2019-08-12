@@ -1,6 +1,6 @@
 package modelbuilding.core
 
-sealed trait Predicate{
+sealed trait Predicate {
 
   private implicit class inequalityAttributes(l: Any) {
     def >(r: Any) = {
@@ -20,41 +20,37 @@ sealed trait Predicate{
   }
 
 
-
-
-
-    def eval(s: StateMap): Option[Boolean] = {
-      def evalEqualities(l: String, r: Any, e: (Any, Any) => Boolean) = {
-        s.get(l) match {
-          case Right(v) => Some(e(v, r))
-          case Left(p) => Some(false)
-        }
-
+  def eval(s: StateMap): Option[Boolean] = {
+    def evalEqualities(l: String, r: Any, e: (Any, Any) => Boolean) = {
+      s.get(l) match {
+        case Right(v) => Some(e(v, r))
+        case Left(_) => None
       }
-
-
-      def e(pred: Predicate):Option[Boolean] = {
-        pred match {
-          case AND(p) => Some(!p.flatMap(e(_)).contains(false))
-          case OR(p) => Some(p.flatMap(e(_)).contains(true))
-         // case NOT(p) => for {b <- e(p)} yield !b
-          case EQ(l, r) => evalEqualities(l, r, _ == _)
-          case NEQ(l, r) => evalEqualities(l, r, _ != _)
-          case GR(l, r) => evalEqualities(l, r, _ > _)
-          case LE(l, r) => evalEqualities(l, r, _ < _)
-          case GREQ(l, r) => evalEqualities(l, r, _ >= _)
-          case LEQ(l, r) => evalEqualities(l, r, _ <= _)
-          case AlwaysTrue => Some(true)
-          case AlwaysFalse => Some(false)
-          //case Left(s) => Some(None)
-        }
-      }
-
-      e(this)
     }
 
+    def e(pred: Predicate): Option[Boolean] = {
+      pred match {
+        case AND(p) => Some(!p.flatMap(e(_)).contains(false))
+        case OR(p) => Some(p.flatMap(e(_)).contains(true))
+       // case NOT(p) => for {b <- e(p)} yield !b
+        case EQ(l, r) => evalEqualities(l, r, _ == _)
+        case NEQ(l, r) => evalEqualities(l, r, _ != _)
+        case GR(l, r) => evalEqualities(l, r, _ > _)
+        case LE(l, r) => evalEqualities(l, r, _ < _)
+        case GREQ(l, r) => evalEqualities(l, r, _ >= _)
+        case LEQ(l, r) => evalEqualities(l, r, _ <= _)
+        case AlwaysTrue => Some(true)
+        case AlwaysFalse => Some(false)
+        case p => throw new IllegalArgumentException(s"Unknown predicate: $p")
+      }
+    }
 
- }
+    e(this)
+  }
+
+
+}
+
 
 case class AND(p:List[Predicate]) extends Predicate
 case class OR(p:List[Predicate]) extends Predicate

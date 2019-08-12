@@ -151,7 +151,7 @@ class SimulateAgv extends Simulator {
     u51 -> List(Assign(v5p, "w1o")),
     u52 -> List(Assign(v5p, "z4O")),
     u53 -> List(Assign(v5p, "o")),
-    w11 -> List(Assign(w1_2, true), Assign(w1_11, false), Assign(w1_11, false)),
+    w11 -> List(Assign(w1_2, true), Assign(w1_11, false), Assign(w1_12, false)),
     w12 -> List(Assign(w1_3, true), Assign(w1_2, false)),
     w13 -> List(Assign(v5l, true), Assign(w1_4, true), Assign(w1_5, true), Assign(w1_3, false)),
     w14 -> List(Assign(v3l, false), Assign(w1_11, true), Assign(w1_4, false)),

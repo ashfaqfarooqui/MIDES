@@ -34,8 +34,9 @@ trait Simulator extends Logging{
     if(evalCommandToRun(c,s).get){
       Right(translateCommand(c).foldLeft(s)((st,a)=>a.next(st)))
     }
-    else
+    else {
       Left(s)
+    }
   }
 
 

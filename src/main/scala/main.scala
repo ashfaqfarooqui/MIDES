@@ -15,14 +15,14 @@ object ModelBuilder extends Logging {
 
   def main(args: Array[String]) : Unit= {
 
-    info("Automata learn!")
+//    info("Automata learn!")
 
     val result = solver match {
       case "frehage" => new FrehageSolver(model)
       case "monolithic" => new MonolithicSolver(model)
     }
 
-    info("Learning done!")
+//    info("Learning done!")
 
     val automata = result.getAutomata
 
