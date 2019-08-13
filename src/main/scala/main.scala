@@ -8,15 +8,16 @@ import modelbuilding.solvers.{FrehageSolverWithPartialStates, ModularSupSolver, 
 
 object ModelBuilder extends Logging {
 
-  val modelName = "TestUnit"
+  val modelName = "CatMouseModular"
 
   val model: Model = modelName match{
     case "TestUnit" => TestUnit.TransferLine
     case "CatMouse" => CatAndMouse.CatAndMouse
-    case "CatMouseModular" => CatAndMouse.CatAndMouseModular
+    case "CatMouseModular" => CatAndMouseModular.CatAndMouseModular
     case "MachineBuffer" => MachineBuffer.MachineBuffer
     case "RoboticArm" => RobotArm.Arm
     case "Sticks" => StickPicking.Sticks
+    case "AGV" => AGV.Agv
     case _ => throw new Exception("A model wasn't defined.")
 
   }

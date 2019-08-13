@@ -90,9 +90,11 @@ case class Automaton(
       s"\n" +
       s"\n" +
     s" Properties:" +
-      s"Number of Transitions: ${transitions.size}" +
+    s"${name}" +
+      s"\n Number of Transitions: ${transitions.size}" +
       s"\n Number of States: ${states.size}" +
-      s"\n Number of Forbidded States: ${forbiddenStates match {
+      s"\n Number of events: ${alphabet.events.size}" +
+      s"\n Number of Forbidden States: ${forbiddenStates match {
         case Some(fs)=>fs.size
         case None => 0
       }}"

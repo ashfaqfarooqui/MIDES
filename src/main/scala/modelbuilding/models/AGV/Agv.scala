@@ -44,6 +44,6 @@ object Agv extends ModularModel {
 
   override val simulation = new SulAgv()
 
-  val suprFile: String = "./supremicaFiles/AGV.wmod"
+  override val specFilePath: Option[String] = Some("SupremicaModels/AGV.wmod")
 
 }

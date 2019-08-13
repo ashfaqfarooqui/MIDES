@@ -11,11 +11,6 @@ object TransferLine extends ModularModel {
   override val simulation = new SULTransferLine()
   override val specFilePath: Option[String] = Some("SupremicaModels/TransferLineFull.wmod")
 
-  /*val eventMapping:Map[String,Alphabet] = Map(
-    "TU"->Alphabet(accept,test,reject),
-    "M1"->Alphabet(finish1,start1),
-    "M2"->Alphabet(finish2,start2)
-  )*/
   override val modules: Set[ModularModel.Module] = Set.empty
 
   val stateString: String = "m1 m2 tu"

@@ -25,4 +25,6 @@ object CatAndMouseModular extends ModularModel {
     "Mouse" -> Alphabet(m1,m2,m3,m4,m5,m6)
   )
 
+  override val specFilePath: Option[String] = Some("SupremicaModels/CatAndMouse.wmod")
+
 }
