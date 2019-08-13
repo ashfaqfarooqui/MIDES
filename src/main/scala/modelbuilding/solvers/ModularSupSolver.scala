@@ -2,7 +2,7 @@ package modelbuilding.solvers
 import SupremicaStuff.SupremicaHelpers
 import grizzled.slf4j.Logging
 import modelbuilding.core.modelInterfaces.ModularModel.Module
-import modelbuilding.core.{Alphabet, Automata, Automaton, State, StateMap, StateMapTransition, Symbol, Transition, Uncontrollable}
+import modelbuilding.core.{Alphabet, Automata, Automaton, State, StateMap, StateMapTransition, StateSet, Symbol, Transition, Uncontrollable}
 import modelbuilding.core.modelInterfaces.{Model, ModularModel, MonolithicModel}
 import modelbuilding.solvers.ModularSupSolver._
 import modelbuilding.solvers.MonolithicSupSolver.extendStateMap
@@ -13,16 +13,19 @@ import scala.collection.immutable.Queue
 import scala.collection.JavaConverters._
 
 object ModularSupSolver{
+  def getRequiredModules(m:ModularModel,spec:automata.Automaton):Map[Module,Alphabet]={
+    m.eventMapping filter {
+      case (k: Module, v: Alphabet) => v.events.exists(x => x.getCommand.isInstanceOf[Uncontrollable] && spec.getAlphabet.contains(x.toString))
+    }
+  }
   def aggregateModulesForModel(m:ModularModel,sp:Set[automata.Automaton]) = {
     sp.map {
       s =>
         val specAlphabet = s.getAlphabet
         //This should work for the base case -- we get a supervisor, but not a supremal controllable supervisor
-        val selectedAlphabet = m.eventMapping filter {
-          case (k: Module, v: Alphabet) => v.events.exists(x => x.getCommand.isInstanceOf[Uncontrollable] && specAlphabet.contains(x.toString))
-        }
+        def selectedAlphabet = getRequiredModules(m,s).values.toSet
         println(s"Selected alphabet: $selectedAlphabet")
-        val selAlphabet = selectedAlphabet.values.toSet.foldLeft(Set.empty[Symbol]) {
+        val selAlphabet = selectedAlphabet.foldLeft(Set.empty[Symbol]) {
           (acc, i) => acc union i.events
         } union m.alphabet.events.filter(a => specAlphabet.contains(a.toString))
 
@@ -32,9 +35,12 @@ object ModularSupSolver{
   }
 
   //Remove spec variable
-  def getReducedState(sp:StateMap,module: Module,allModules:Set[Module]):StateMap= {
-    sp.removeKeys(allModules.filterNot(_ == module))
+  def getReducedState(model: ModularModel,spec:automata.Automaton)(sp:StateMap):StateMap= {
+    def reducedVariables:Set[StateSet] = model.stateMapping.filterKeys(getRequiredModules(model,spec).contains).values.toSet
+    StateMap(sp.name,state = sp.state.filterKeys((reducedVariables.flatMap(_.states)+ spec.getName).contains))
   }
+
+
 }
 
 class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with  Logging {
@@ -62,7 +68,6 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
   def initMaps[T] = moduleMapping.keySet.map((_.getName.asInstanceOf[Module]->Set.empty[T])).toMap
 
 
-  private var moduleTransitions: Map[Module, Set[StateMapTransition]] = moduleMapping.map(_._1.getName -> Set.empty[StateMapTransition]).toMap
   private var forbiddenStates:Map[Module,Set[StateMap]]=initMaps[StateMap]
 
   def getNextSpecState(sp:automata.Automaton,st:StateMap, c:Symbol):Option[StateMap]={
@@ -93,28 +98,32 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
       val currState = queue.dequeue
       var newQueue = currState._2
       for(m<-moduleMapping.keySet){
-        val module = m.getName
+
+        val module = m.getName.asInstanceOf[Module]
+
+        def stateReducer:StateMap=>StateMap = getReducedState(model,m)
+
         info(s"working on module $module")
 
 
         visited= visited + (module->(visitedSet(module) + currState._1))
         info(s"modulestates $moduleStates")
 
-        if(moduleStates(module).contains(currState._1)) {
+        if(moduleStates(module).contains(stateReducer(currState._1))) {
 //only iterate over reachable states
 
           def reachedStates = moduleMapping(m).events.map { e =>
             sul.getNextState(currState._1, e.getCommand) match {
               case Some(value) => getNextSpecState(m, value, e) match {
-                case Some(v) => if (!forbiddenStates(module).contains(currState._1)) {
-                  transitions += (module -> (transitions(module) + StateMapTransition(currState._1, v, e)))
+                case Some(v) => if (!forbiddenStates(module).contains(stateReducer(currState._1))) {
+                  transitions += (module -> (transitions(module) + StateMapTransition(stateReducer(currState._1), stateReducer(v), e)))
                   Some(v)
                 } else {
                   None
                 }
                 case _ =>
                   if (e.getCommand.isInstanceOf[Uncontrollable]) {
-                    forbiddenStates += (module -> (forbiddenStates(module) + currState._1))
+                    forbiddenStates += (module -> (forbiddenStates(module) + stateReducer(currState._1)))
                   }
                   None
               }
@@ -124,7 +133,7 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
           }.filter(_.isDefined).map(_.get)
 
           info(s"computed reached states of size: ${reachedStates.size}")
-          mStates = mStates + (module -> (mStates(module) ++ reachedStates))
+          mStates = mStates + (module -> (mStates(module) ++ reachedStates.map(stateReducer)))
 
           newQueue = reachedStates.diff(visited(module)).filterNot(a => newQueue.contains(a)).foldLeft(newQueue) {
             (q, v) => q :+ v
@@ -139,7 +148,7 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
   }
 
 
-  def initModuleState = moduleMapping.keySet.map(_.getName.asInstanceOf[Module]-> Set(initState)) toMap
+  def initModuleState = moduleMapping.keySet.map(m=>(m.getName.asInstanceOf[Module]-> Set(getReducedState(model,m)(initState)))) toMap
 
   val (mStates,mTransitions) = explore(initQueue,initModuleState,initMaps[StateMap],initMaps[StateMapTransition])
 
@@ -147,7 +156,6 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
     info(s"nbr of states  ${mStates(m.getName).size}")
     info(s"nbr of Trans  ${mTransitions(m.getName).size}")
   }
-  info(s"found states $mStates")
 
 
 
@@ -175,10 +183,12 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
   override def getAutomata: Automata = {
     val supAut=new automata.Automata()
 
-    val modules = moduleMapping.keySet.map{m=> val module=m.getName
+    val modules = moduleMapping.keySet.map{m=> val module=m.getName.asInstanceOf[Module]
+      //def reducer:StateMap=>StateMap = getReducedState(module,moduleMapping.keySet.map(_.getName))
       val mappedStates = mapStates(mStates(module) union forbiddenStates(module) union getStatesFromTransitions(mTransitions(module)))
+      info(s"mapped states: $mappedStates")
       val mappedTransitions= mapTransitions(mappedStates,mTransitions(module))
-      val fbdStates= if(forbiddenStates(module).nonEmpty) Some(forbiddenStates(module) map mappedStates) else None
+      val fbdStates= if(forbiddenStates(module).nonEmpty) Some(forbiddenStates(module)  map mappedStates) else None
 
 
 

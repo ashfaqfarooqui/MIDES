@@ -17,10 +17,15 @@ object TransferLine extends ModularModel {
     "M2"->Alphabet(finish2,start2)
   )*/
   override val modules: Set[ModularModel.Module] = Set.empty
-  override val states: StateSet = StateSet()
 
-  override def stateMapping: Map[ModularModel.Module, StateSet] = Map.empty
+  val stateString: String = "m1 m2 tu"
+  override val states: StateSet = StateSet(stateString.split(" ").toSet)
 
+  override def stateMapping: Map[ModularModel.Module,StateSet] = Map(
+    "M1"->StateSet("m1"),
+    "M2"->StateSet("m2"),
+    "TU"->StateSet("tu")
+  )
   override def eventMapping: Map[ModularModel.Module, Alphabet] = Map(
     "TU"->Alphabet(accept,test,reject),
     "M1"->Alphabet(finish1,start1),

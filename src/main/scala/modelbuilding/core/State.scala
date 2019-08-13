@@ -22,7 +22,7 @@ case class StateMap(name: String = "State", state: Map[String, Any]) {
 
 
 
-  def removeKeys(key:Set[String]) = StateMap(state=this.getState.filterKeys(key.contains))
+  def removeKeys(key:Set[String]) = StateMap(state=this.getState.filterKeys( !key.contains(_)))
   def getState:Map[String,Any] = state
   def getOrElse(key:String,default:Any) = this.state.getOrElse(key,default)
   def inState(key:String) = this.state.contains(key)
