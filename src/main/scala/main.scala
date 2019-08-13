@@ -2,7 +2,7 @@
 import grizzled.slf4j.Logging
 import modelbuilding.core.modelInterfaces._
 import modelbuilding.models._
-import modelbuilding.solvers.{FrehageSolverWithPartialStates, MonolithicSolver}
+import modelbuilding.solvers._
 
 object ModelBuilder extends Logging {
 
@@ -11,14 +11,16 @@ object ModelBuilder extends Logging {
 // val model: Model = MachineBuffer.MachineBuffer
   val model: Model = AGV.Agv
 
-  val solver: String = "frehage" // "modular", "mono"
+  val solver: String = "frehage3" // "modular", "mono"
 
   def main(args: Array[String]) : Unit= {
 
 //    info("Automata learn!")
 
     val result = solver match {
-      case "frehage" => new FrehageSolverWithPartialStates(model)
+      case "frehage1" => new FrehageSolverWithPartialStates(model)
+      case "frehage2" => new FrehageSolverWithoutPartialStates(model)
+      case "frehage3" => new FrehageSolver3_BFS(model)
       case "monolithic" => new MonolithicSolver(model)
     }
 

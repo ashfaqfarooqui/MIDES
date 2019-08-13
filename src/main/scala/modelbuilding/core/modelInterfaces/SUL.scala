@@ -18,14 +18,14 @@ abstract class SUL {
     }
   }
 
-  def getNextState(state:StateMap, commands: Alphabet): Set[StateMap] =
+  def getNextState(state:StateMap, commands: Alphabet): List[StateMap] =
     getOutgoingTransitions(state, commands).map(_.target)
 
-  def getOutgoingTransitions(state:StateMap, commands: Alphabet): Set[StateMapTransition] =
+  def getOutgoingTransitions(state:StateMap, commands: Alphabet): List[StateMapTransition] =
     commands.a.foldLeft(List.empty[StateMapTransition])((acc: List[StateMapTransition], in: Symbol) =>
       getNextState(state, in.getCommand) match {
         case Some(s) => StateMapTransition(state, s, in) :: acc
         case None => acc
-      }).toSet
+      })
 
 }

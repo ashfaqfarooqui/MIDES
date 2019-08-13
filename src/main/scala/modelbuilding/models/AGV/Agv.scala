@@ -15,17 +15,17 @@ object Agv extends ModularModel {
   override val states: StateSet = StateSet(stateString.split(" ").toSet)
 
   override def stateMapping: Map[Module,StateSet] = Map(
-    "Input 1" -> StateSet("in1"),
-    "Input 3" -> StateSet("in3"),
-    "Output" -> StateSet("out"),
-    "AGV1" -> StateSet("v1l", "v1p"),
-    "AGV2" -> StateSet("v2l", "v2p"),
-    "AGV3" -> StateSet("v3l", "v3p"),
-    "AGV4" -> StateSet("v4l", "v4p"),
-    "AGV5" -> StateSet("v5l", "v5p"),
-    "WS1" -> StateSet("w1_11","w1_12","w1_2","w1_3","w1_4","w1_5"),
-    "WS2" -> StateSet("w2"),
-    "WS3" -> StateSet("w3")
+    "Input 1" -> StateSet("in1", "v1l", "v1p"),
+    "Input 3" -> StateSet("in3", "v2l", "v2p"),
+    "Output" -> StateSet("out", "v5l", "v5p"),
+    "AGV1" -> StateSet("v1l", "v1p", "in1", "w2"),
+    "AGV2" -> StateSet("v2l", "v2p", "in3", "w3"),
+    "AGV3" -> StateSet("v3l", "v3p", "w1_4", "w2"),
+    "AGV4" -> StateSet("v4l", "v4p", "w1_5", "w3"),
+    "AGV5" -> StateSet("o", "v5l", "v5p"),
+    "WS1" -> StateSet("w1_11","w1_12","w1_2","w1_3","w1_4","w1_5", "v3l", "v3p", "v4l", "v4p", "v5l", "v5p"),
+    "WS2" -> StateSet("w2", "v1l", "v1p", "v3l", "v3p"),
+    "WS3" -> StateSet("w3", "v2l", "v2p", "v4l", "v4p")
   )
 
   override val eventMapping:Map[Module,Alphabet] = Map(
