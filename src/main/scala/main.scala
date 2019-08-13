@@ -2,9 +2,7 @@
 import grizzled.slf4j.Logging
 import modelbuilding.core.modelInterfaces._
 import modelbuilding.models._
-
-
-import modelbuilding.solvers.{FrehageSolverWithPartialStates, ModularSupSolver, MonolithicSolver, MonolithicSupSolver}
+import modelbuilding.solvers._
 
 object ModelBuilder extends Logging {
 
@@ -21,21 +19,21 @@ object ModelBuilder extends Logging {
     case _ => throw new Exception("A model wasn't defined.")
 
   }
-  val solver: String = "modularSupSolver"
+
+  val solver: String = "frehage2" // "modular", "mono"
 
   def main(args: Array[String]) : Unit= {
 
     info(s"Running model: $model")
 
     val result = solver match {
-      case "frehage" => new FrehageSolverWithPartialStates(model)
+      case "frehage1" => new FrehageSolverWithPartialStates(model)
+      case "frehage2" => new FrehageSolverWithoutPartialStates(model)
       case "monolithic" => new MonolithicSolver(model)
       case "monolithicSupSolver" => new MonolithicSupSolver(model)
       case "modularSupSolver" => new ModularSupSolver(model)
 
     }
-
-//    info("Learning done!")
 
     val automata = result.getAutomata
 
