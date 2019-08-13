@@ -8,7 +8,7 @@ object ModelBuilder extends Logging {
 
   val modelName = "CatMouseModular"
 
-  val model: Model = modelName match{
+  val model: Model = modelName match {
     case "TestUnit" => TestUnit.TransferLine
     case "CatMouse" => CatAndMouse.CatAndMouse
     case "CatMouseModular" => CatAndMouseModular.CatAndMouseModular
@@ -17,7 +17,6 @@ object ModelBuilder extends Logging {
     case "Sticks" => StickPicking.Sticks
     case "AGV" => AGV.Agv
     case _ => throw new Exception("A model wasn't defined.")
-
   }
 
   val solver: String = "frehage2" // "modular", "mono"
@@ -32,7 +31,6 @@ object ModelBuilder extends Logging {
       case "monolithic" => new MonolithicSolver(model)
       case "monolithicSupSolver" => new MonolithicSupSolver(model)
       case "modularSupSolver" => new ModularSupSolver(model)
-
     }
 
     val automata = result.getAutomata
