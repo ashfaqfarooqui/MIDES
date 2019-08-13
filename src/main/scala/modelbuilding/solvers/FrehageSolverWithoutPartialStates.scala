@@ -1,7 +1,8 @@
 /*
 
-First version that work with simulations that does not allow partial states. It is inefficient
-due to the large number of states that have to be expanded in each module.
+Second version without partial states.
+
+A brute force BFS that split the result into modules rather than a monolithic plant.
 
 */
 
@@ -22,7 +23,7 @@ object FrehageSolverWithoutPartialStates {
     StateMap(state.name, state.state.filterKeys(s => model.stateMapping(module).states.contains(s)))
 
   def getReducedStateMapTransition(t: StateMapTransition, model: ModularModel, module: Module): StateMapTransition =
-    StateMapTransition(getReducedStateMap(t.source, model, module), getReducedStateMap(t.target, model, module), t.event)
+    StateMapTransition(getReducedStateMap(t.source, model, module), getReducedStateMap(t.target, model, module), if (model.eventMapping(module).a contains t.event) t.event else Symbol(tau))
 
 }
 
@@ -32,67 +33,59 @@ class FrehageSolverWithoutPartialStates(_model: Model) extends BaseSolver {
   private val model = _model.asInstanceOf[ModularModel]
   private val simulator: SUL = model.simulation
 
+  private var queue: List[StateMap] = List(simulator.getInitState)
+
   // One queue for each module to track new states that should be explored.
-  private val moduleStates: Map[Module, mutable.Map[StateMap,Boolean]] = model.modules.map(_ -> mutable.Map(simulator.getInitState -> false)).toMap
-  private val moduleTransitions: Map[Module, mutable.MutableList[StateMapTransition]] = model.modules.map(_ -> mutable.MutableList.empty[StateMapTransition]).toMap
+  private val moduleStates: Map[Module, mutable.Set[StateMap]] = model.modules.map(m => m -> mutable.Set(getReducedStateMap(simulator.getInitState,model,m))).toMap
+  private val moduleTransitions: Map[Module, mutable.Set[StateMapTransition]] = model.modules.map(_ -> mutable.Set.empty[StateMapTransition]).toMap
 
   var count = 0
   // Loop until all modules are done exploring new states
-  while ( moduleStates.exists( _._2.exists(_._2 == false))  ) {
-    //  for (i <- 1 to 20) {
+  while ( {
     count += 1
-    println("#############################")
-    println("#############################")
-    println("#############################")
-    println("#############################")
-    println("#############################")
-    println("#############################")
-    println("#############################")
-    println(s"Iteration $count")
-    println("* States: " + moduleStates.map(_._2.size).sum)
-    println("* Transitions: " + moduleTransitions.map(_._2.size).sum)
+    println(s"Iteration: $count")
+    queue.nonEmpty
+  }) {
 
-    // Iterate over the modules to process them individually
-    for (m <- model.modules) {
+    val next: List[StateMapTransition] = queue.flatMap(simulator.getOutgoingTransitions(_, model.alphabet))
 
-      println(s"Processing module $m")
+    queue = List.empty[StateMap]
 
-      val moduleQueue = time { moduleStates(m).filter(_._2 == false).keys }
-
-      time {  moduleQueue.foreach(s => moduleStates(m)(s) = true) }
-
-      val next = time { moduleQueue.flatMap(s => simulator.getOutgoingTransitions(s, model.eventMapping(m))) }
-      time { moduleTransitions(m) ++= next }
-      time {
-//        val stateChanges: Map[StateMap, Set[String]] =
-//          next.map(t => (t.target, t.target.state.keys.filter(k => t.target.state(k) != t.source.state(k)).toSet)).toMap
-
-        for (m <- model.modules) {
-//          next.filter( t => !(moduleStates(m) contains t.target) ).foreach( t =>  moduleStates(m) += (t.target -> false))
-          next.foreach( t => if (!(moduleStates(m) contains t.target)) moduleStates(m) += (t.target -> false))
+    next.foreach { t =>
+      val changedVars = t.target.state.keySet.filter(k => t.source.state(k) != t.target.state(k))
+      var newStateFound = false
+      for (m <- model.modules if (model.stateMapping(m).states intersect changedVars).nonEmpty) {
+        val tReduced = getReducedStateMapTransition(t, model, m)
+        moduleTransitions(m) += tReduced
+        if (!(moduleStates(m) contains tReduced.target)) {
+          moduleStates(m) += tReduced.target
+          newStateFound = true
         }
       }
+      if (newStateFound) queue = t.target :: queue
     }
 
   }
 
   override def getAutomata: Automata = {
-
     val modules = for {
       m <- model.modules
-      states: Map[StateMap, State] = moduleStates(m).keys.map( s => {
-        val name = (if ( s.state.forall{ case (k,v) => simulator.getInitState.state(k) == v } ) "INIT: " else "") + getReducedStateMap(s,model,m).toString
+      nonLocalVariables = moduleTransitions(m).filter(_.event.getCommand == tau).flatMap(t => t.source.state.keys.filter(k => t.source.state(k) != t.target.state(k)))
+      //      nonLocalVariables = Set.empty[String]
+      states: Map[StateMap, State] = moduleStates(m).map( s => {
+        val state = StateMap(s.state.filterKeys(k => !nonLocalVariables.contains(k)))
+        val name = (if ( state.state.forall{ case (k,v) => simulator.getInitState.state(k) == v } ) "INIT: " else "") + state.toString
         (getReducedStateMap(s,model,m),State(name))
       }).toMap
-      transitions: Set[Transition] = moduleTransitions(m).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
+      transitions: Set[Transition] = moduleTransitions(m).filterNot(_.event.getCommand == tau).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
+      //      transitions: Set[Transition] = moduleTransitions(m).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
       alphabet: Alphabet = model.eventMapping(m)
       iState: State = states(getReducedStateMap(simulator.getInitState, model, m) )
       fState: Option[Set[State]] = simulator.getGoalStates match {
         case Some(gs) => Some(gs.map( s => states(getReducedStateMap(s, model, m)) ))
         case None => None
       }
-    } yield Automaton(m, states.values.toSet, alphabet, transitions.toSet, iState, fState)
-
+    } yield Automaton(m, states.values.toSet, alphabet, transitions, iState, fState)
     Automata(modules)
   }
 
