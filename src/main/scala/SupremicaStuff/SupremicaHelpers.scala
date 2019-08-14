@@ -1,7 +1,7 @@
 package SupremicaStuff
 
 import grizzled.slf4j.Logging
-import modelbuilding.core.{Alphabet, Controllable, State, Symbol, Uncontrollable}
+import modelbuilding.core.{Alphabet, Controllable, State, Symbol, Transition, Uncontrollable}
 import net.sourceforge.waters.model.marshaller.DocumentManager
 import net.sourceforge.waters.subject.module.ModuleSubject
 import org.supremica.automata
@@ -17,8 +17,7 @@ import scala.collection.JavaConverters._
 trait SupremicaHelpers extends Base with Logging {
 
   //With StateMap
-  def createSupremicaAutomaton(states: Set[State], transition: (State, Symbol) => State, A: Alphabet, iState: State, fState: Option[Set[State]], forbiddenState:Option[Set[State]],name:String ="hypothesis"): automata.Automaton = {
-
+  def createSupremicaAutomaton(states: Set[State], transitions: Set[Transition], A: Alphabet, iState: State, fState: Option[Set[State]], forbiddenState:Option[Set[State]], name:String ="hypothesis"): automata.Automaton = {
     val aut = new org.supremica.automata.Automaton(name)
     states.foreach(s => aut.addState(new automata.State(s.s)))
     aut.setInitialState(aut.getStateWithName(iState.s))
@@ -31,24 +30,19 @@ trait SupremicaHelpers extends Base with Logging {
       }
     }
 
-    A.a.filterNot(_.getCommand.toString=="tou").map{ e=>
+    A.events.map{ e=>
       val l=new LabeledEvent(e.toString())
-    l.setControllable(isControllable(e))
+      l.setControllable(isControllable(e))
       l
     }.foreach(aut.getAlphabet.addEvent(_))
 
-    /*A.a.foreach(e=>aut.getAlphabet.addEvent(e.toString match {
-      case "tou" => new automata.TauEvent(new LabeledEvent(e.toString))
-      case _ => new LabeledEvent(e.toString)
-    } ))*/
-    for {
-      s <- states
-      a <- A.a.filterNot(_.getCommand.toString=="tou")
-
-    } {
-      aut.addArc(new Arc(aut.getStateWithName(s.s), aut.getStateWithName(transition(s, a).s), aut.getAlphabet.getEvent(a.s.toString)))
+    transitions.foreach{
+      t=>
+        aut.addArc(
+        new Arc(aut.getStateWithName(t.source.s),
+          aut.getStateWithName(t.target.s),
+          aut.getAlphabet.getEvent(t.event.getCommand.toString)))
     }
-    aut.removeState(aut.getStateWithName("dump:"))
     aut.setType(AutomatonType.SUPERVISOR)
     aut
 

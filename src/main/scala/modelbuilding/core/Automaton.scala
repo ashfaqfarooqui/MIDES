@@ -56,7 +56,7 @@ case class Automaton(
 
   def createDotFile: Unit = {
     val gDot = getGraphAsDot
-    val pw = new PrintWriter(new File(s"Output/$name.dot"))
+    val pw = new PrintWriter(new File(s"Output/${name.replaceAll("\\s", "")}.dot"))
     pw.write(gDot)
     pw.close
     println(s"Graph saved to $name.dot")
@@ -80,7 +80,25 @@ case class Automaton(
       s"Q_m: ${fState match {
         case Some(fs) => "(" + fs.map(_.s).mkString(",") + ")"
         case None => "None"
-      }} )"
+      }} " +
+      s"Q_f: (${forbiddenStates match{
+        case Some(fs) => "(" + fs.map(_.s).mkString(",") + ")"
+        case None => "None"
+      }}) )" +
+      s"\n" +
+      s"\n" +
+      s"\n" +
+      s"\n" +
+    s" Properties:" +
+    s"${name}" +
+      s"\n Number of Transitions: ${transitions.size}" +
+      s"\n Number of States: ${states.size}" +
+      s"\n Number of events: ${alphabet.events.size}" +
+      s"\n Number of Forbidden States: ${forbiddenStates match {
+        case Some(fs)=>fs.size
+        case None => 0
+      }}"
+
   }
 
 }

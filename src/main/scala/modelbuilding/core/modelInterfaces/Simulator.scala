@@ -1,6 +1,6 @@
 package modelbuilding.core.modelInterfaces
 
-import modelbuilding.core.{Action, Command, StateMap}
+import modelbuilding.core._
 import grizzled.slf4j.Logging
 
 
@@ -8,17 +8,33 @@ trait Simulator extends Logging{
 
   val initState: StateMap
   val goalStates: Option[Set[StateMap]]
+  val goalPredicate:Option[Predicate] = None
 
-  def evalCommandToRun(c:Command, s: StateMap):Option[Boolean]
-  def translateCommand(c: Command):List[Action]
+  val guards: Map[Command,Predicate]
+  val actions: Map[Command,List[Action]]
 
-  def runCommand(c:Command, s:StateMap):Either[StateMap,StateMap]={
-    if(evalCommandToRun(c,s).get){
-      Right(translateCommand(c).foldLeft(s)((st,a)=>a.next(st)))
+  def evalCommandToRun(c: Command, s: StateMap, acceptPartialStates: Boolean = false): Option[Boolean] =
+    c match {
+      case `reset` => Some(true)
+      case `tau` => Some(true)
+      case x if guards contains x => guards(x).eval(s, acceptPartialStates)
+      case y => throw new IllegalArgumentException(s"Unknown command: `$y`")
     }
-    else
-      Left(s)
-  }
+
+  def translateCommand(c: Command): List[Action] =
+    c match {
+      case `reset` => initState.getState.toList.map(x => Assign(x._1,x._2))
+      case `tau` => List(TauAction)
+      case x if guards contains x => actions(x)
+      case y => throw new IllegalArgumentException(s"Unknown command: `$y`")
+    }
+
+  def runCommand(c:Command, s:StateMap, acceptPartialStates: Boolean = false):Either[StateMap,StateMap] =
+    evalCommandToRun(c,s,acceptPartialStates) match {
+      case Some(true) => Right(translateCommand(c).foldLeft(s)((st,a)=>a.next(st)))
+      case Some(false) => Left(s)
+      case None => throw new IllegalArgumentException(s"Can not evaluate Command `$c`, since Partial state `$s` does not include all affected variables.")
+    }
 
 
   def runListOfCommands(commands: List[Command],s :StateMap):Either[StateMap,StateMap] ={
