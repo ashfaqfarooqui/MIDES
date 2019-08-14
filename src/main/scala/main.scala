@@ -6,7 +6,7 @@ import modelbuilding.solvers._
 
 object ModelBuilder extends Logging {
 
-  val modelName = "CatMouseModular"
+  val modelName = "AGV"
 
   val model: Model = modelName match {
     case "TestUnit" => TestUnit.TransferLine
@@ -19,7 +19,7 @@ object ModelBuilder extends Logging {
     case _ => throw new Exception("A model wasn't defined.")
   }
 
-  val solver: String = "frehage2" // "modular", "mono"
+  val solver: String = "modularSupSolver" // "modular", "mono"
 
   def main(args: Array[String]) : Unit= {
 

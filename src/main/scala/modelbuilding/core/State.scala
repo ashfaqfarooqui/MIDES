@@ -17,7 +17,7 @@ case class StateSet(states: Set[String])
 
 object StateMap {
   def apply(in: (String, Any)*) = new StateMap(state = in.toMap)
-  def apply(state: Map[String, Any]) = new StateMap(state = state)
+  def apply(states: Map[String, Any]) = new StateMap(state = states)
 }
 case class StateMap(name: String = "State", state: Map[String, Any]) {
 
