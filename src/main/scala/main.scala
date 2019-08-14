@@ -2,15 +2,13 @@
 import grizzled.slf4j.Logging
 import modelbuilding.core.modelInterfaces._
 import modelbuilding.models._
-
-
-import modelbuilding.solvers.{FrehageSolverWithPartialStates, ModularSupSolver, MonolithicSolver, MonolithicSupSolver}
+import modelbuilding.solvers._
 
 object ModelBuilder extends Logging {
 
-  val modelName = "CatMouseModular"
+  val modelName = "AGV"
 
-  val model: Model = modelName match{
+  val model: Model = modelName match {
     case "TestUnit" => TestUnit.TransferLine
     case "CatMouse" => CatAndMouse.CatAndMouse
     case "CatMouseModular" => CatAndMouseModular.CatAndMouseModular
@@ -19,23 +17,21 @@ object ModelBuilder extends Logging {
     case "Sticks" => StickPicking.Sticks
     case "AGV" => AGV.Agv
     case _ => throw new Exception("A model wasn't defined.")
-
   }
-  val solver: String = "modularSupSolver"
+
+  val solver: String = "modularSupSolver" // "modular", "mono"
 
   def main(args: Array[String]) : Unit= {
 
     info(s"Running model: $model")
 
     val result = solver match {
-      case "frehage" => new FrehageSolverWithPartialStates(model)
+      case "frehage1" => new FrehageSolverWithPartialStates(model)
+      case "frehage2" => new FrehageSolverWithoutPartialStates(model)
       case "monolithic" => new MonolithicSolver(model)
       case "monolithicSupSolver" => new MonolithicSupSolver(model)
       case "modularSupSolver" => new ModularSupSolver(model)
-
     }
-
-//    info("Learning done!")
 
     val automata = result.getAutomata
 
