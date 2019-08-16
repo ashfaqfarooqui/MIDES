@@ -1,23 +1,21 @@
 package modelbuilding.solvers
 
-import Helpers.Diagnostic
-
-import modelbuilding.core.modelInterfaces.ModularModel.Module
-import modelbuilding.core.modelInterfaces.{Model, ModularModel, SUL}
 import modelbuilding.core._
-import modelbuilding.solvers.FrehageSolverWithPartialStates._
+import modelbuilding.core.modeling.{Model, ModularModel}
+import modelbuilding.core.simulation.SUL
+import modelbuilding.solvers.FrehagePlantBuilderWithPartialStates._
 
-object FrehageSolverWithPartialStates {
+object FrehagePlantBuilderWithPartialStates {
 
-  def getReducedStateMap(state: StateMap, model: ModularModel, module: Module): StateMap =
+  def getReducedStateMap(state: StateMap, model: ModularModel, module: String): StateMap =
     StateMap(state.name, state.state.filterKeys(s => model.stateMapping(module).states.contains(s)))
 
-  def getReducedStateMapTransition(t: StateMapTransition, model: ModularModel, module: Module): StateMapTransition =
+  def getReducedStateMapTransition(t: StateMapTransition, model: ModularModel, module: String): StateMapTransition =
     StateMapTransition(getReducedStateMap(t.source, model, module), getReducedStateMap(t.target, model, module), t.event)
 
 }
 
-class FrehageSolverWithPartialStates(_model: Model) extends BaseSolver {
+class FrehagePlantBuilderWithPartialStates(_model: Model) extends BaseSolver {
 
   assert(_model.isModular, "modelbuilder.solver.FrehageSolverWithPartialStates requires a modular model.")
   //assert(_model.simulation.acceptsPartialStates, "modelbuilder.solver.FrehageSolverWithPartialStates requires a simulator that can evaluate partial states.")
@@ -25,9 +23,9 @@ class FrehageSolverWithPartialStates(_model: Model) extends BaseSolver {
   private val model = _model.asInstanceOf[ModularModel]
   private val simulator: SUL = model.simulation
 
-  private var moduleQueue: Map[Module, Set[StateMap]] = model.modules.map(_ -> Set(simulator.getInitState)).toMap
-  private var moduleStates: Map[Module, Set[StateMap]] = model.modules.map(_ -> Set.empty[StateMap]).toMap
-  private var moduleTransitions: Map[Module, Vector[StateMapTransition]] = model.modules.map(_ -> Vector.empty[StateMapTransition]).toMap
+  private var moduleQueue: Map[String, Set[StateMap]] = model.modules.map(_ -> Set(simulator.getInitState)).toMap
+  private var moduleStates: Map[String, Set[StateMap]] = model.modules.map(_ -> Set.empty[StateMap]).toMap
+  private var moduleTransitions: Map[String, Vector[StateMapTransition]] = model.modules.map(_ -> Vector.empty[StateMapTransition]).toMap
 
   for (m <- model.modules) {
 

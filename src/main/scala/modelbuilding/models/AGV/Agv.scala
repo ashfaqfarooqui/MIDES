@@ -1,20 +1,19 @@
 package  modelbuilding.models.AGV
 
+import modelbuilding.core.modeling._
 import modelbuilding.core.{Alphabet, StateSet}
-import modelbuilding.core.modelInterfaces.ModularModel
-import modelbuilding.core.modelInterfaces.ModularModel.Module
 
-object Agv extends ModularModel {
+object Agv extends ModularModel with Specifications {
 
   override val name: String = "AGV"
-  override val modules: Set[Module] = Set("Input 1", "Input 3", "Output", "AGV1", "AGV2", "AGV3", "AGV4", "AGV5", "WS1", "WS2", "WS3")
+  override val modules: Set[String] = Set("Input 1", "Input 3", "Output", "AGV1", "AGV2", "AGV3", "AGV4", "AGV5", "WS1", "WS2", "WS3")
 
   override val alphabet: Alphabet = Alphabet(c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,e11,e10,e20,e21,e30,e31,u10,u11,u20,u21,u22,u23,u24,u25,u26,u27,u28,u29,u30,u31,u40,u41,u42,u43,u44,u45,u50,u51,u52,u53,w11,w12,w13,w14,w15,w21,w22,w23,w24,w31,w32,w33,w34)
 
   val stateString: String = "in1 in3 out v1l v2l v3l v4l v5l v1p v2p v3p v4p v5p w1_11 w1_12 w1_2 w1_3 w1_4 w1_5 w2 w3"
   override val states: StateSet = StateSet(stateString.split(" ").toSet)
 
-  override def stateMapping: Map[Module,StateSet] = Map(
+  override def stateMapping: Map[String,StateSet] = Map(
     "Input 1" -> StateSet("in1", "v1l", "v1p"),
     "Input 3" -> StateSet("in3", "v2l", "v2p"),
     "Output" -> StateSet("out", "v5l", "v5p"),
@@ -28,7 +27,7 @@ object Agv extends ModularModel {
     "WS3" -> StateSet("w3", "v2l", "v2p", "v4l", "v4p")
   )
 
-  override val eventMapping:Map[Module,Alphabet] = Map(
+  override val eventMapping:Map[String,Alphabet] = Map(
     "Input 1" -> Alphabet(e10, e11),
     "Input 3" -> Alphabet(e30, e31),
     "Output" -> Alphabet(e20, e21),
@@ -45,5 +44,6 @@ object Agv extends ModularModel {
   override val simulation = new SulAgv()
 
   override val specFilePath: Option[String] = Some("SupremicaModels/AGV.wmod")
+  addSpecsFromSupremica(specFilePath.get)
 
 }

@@ -1,12 +1,14 @@
 
 import grizzled.slf4j.Logging
-import modelbuilding.core.modelInterfaces._
+import modelbuilding.core.modeling.Model
 import modelbuilding.models._
 import modelbuilding.solvers._
 
+import supremicastuff.SupremicaHelpers._
+
 object ModelBuilder extends Logging {
 
-  val modelName = "AGV"
+  val modelName = "CatMouseModular"
 
   val model: Model = modelName match {
     case "TestUnit" => TestUnit.TransferLine
@@ -26,8 +28,9 @@ object ModelBuilder extends Logging {
     info(s"Running model: $model")
 
     val result = solver match {
-      case "frehage1" => new FrehageSolverWithPartialStates(model)
-      case "frehage2" => new FrehageSolverWithoutPartialStates(model)
+      case "frehage1" => new FrehagePlantBuilderWithPartialStates(model)
+      case "frehage2" => new FrehagePlantBuilder(model)
+      case "frehage3" => new FrehageModularSupSynthesis(model)
       case "monolithic" => new MonolithicSolver(model)
       case "monolithicSupSolver" => new MonolithicSupSolver(model)
       case "modularSupSolver" => new ModularSupSolver(model)
@@ -37,7 +40,6 @@ object ModelBuilder extends Logging {
 
     automata.modules foreach println
     automata.modules.foreach(_.createDotFile)
-
+    exportAsSupremicaAutomata(automata, name=modelName)
   }
-
 }

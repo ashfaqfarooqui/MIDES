@@ -1,25 +1,24 @@
 package modelbuilding.solvers
-import SupremicaStuff.SupremicaHelpers
 import grizzled.slf4j.Logging
-import modelbuilding.core.modelInterfaces.ModularModel.Module
+import modelbuilding.core.modeling.{Model, ModularModel}
+import modelbuilding.core.simulation.SUL
 import modelbuilding.core.{AND, Alphabet, AlwaysTrue, Automata, Automaton, EQ, OR, State, StateMap, StateMapTransition, StateSet, Symbol, Transition, Uncontrollable}
-import modelbuilding.core.modelInterfaces.{Model, ModularModel, MonolithicModel}
 import modelbuilding.solvers.ModularSupSolver._
 import modelbuilding.solvers.MonolithicSupSolver.extendStateMap
-import net.sourceforge.waters.subject.module.ModuleSubject
 import org.supremica.automata
+import supremicastuff.SupremicaWatersSystem
 
 import scala.annotation.tailrec
-import scala.collection.immutable.Queue
 import scala.collection.JavaConverters._
+import scala.collection.immutable.Queue
 
 object ModularSupSolver {
-  def getRequiredModules(m:ModularModel,spec:automata.Automaton):Map[Module,Alphabet]={
+  def getRequiredModules(m:ModularModel,spec:automata.Automaton):Map[String,Alphabet]={
     m.eventMapping filter {
-      case (k: Module, v: Alphabet) => v.events.exists(x => x.getCommand.isInstanceOf[Uncontrollable] && spec.getAlphabet.contains(x.toString))
+      case (k: String, v: Alphabet) => v.events.exists(x => x.getCommand.isInstanceOf[Uncontrollable] && spec.getAlphabet.contains(x.toString))
     }
   }
-  def aggregateModulesForModel(m:ModularModel,sp:Set[automata.Automaton]) = {
+  def aggregateModulesForModel(m:ModularModel,sp:Set[automata.Automaton]): Map[automata.Automaton, Alphabet] = {
     sp.map {
       s =>
         val specAlphabet = s.getAlphabet
@@ -31,7 +30,7 @@ object ModularSupSolver {
 
         println(s"Selected alphabet: ${s->selAlphabet}")
         //Dirty hack, Alphabet does not take a set as is.
-        s -> new Alphabet(selAlphabet.asInstanceOf[Set[Any]])
+        s -> new Alphabet(selAlphabet)
     }.toMap
   }
 
@@ -44,32 +43,29 @@ object ModularSupSolver {
 
 }
 
-class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with  Logging {
+class ModularSupSolver(_model:Model) extends BaseSolver with Logging {
 
   assert(_model.specFilePath.isDefined, "modelbuilder.solver.ModularSupSolver requires a specification.")
   assert(_model.isModular, "modelbuilder.solver.ModularSupSolver requires a modular model.")
 
   info("Initializing ModularSupSolver")
-  override val mModule: ModuleSubject = ReadFromWmodFile(_model.specFilePath.get).get
-  val specs = getSupremicaAutomataFromWaters(mModule).get.filter(_.isSpecification).toSet
-
-
+  val specs: Set[automata.Automaton] = SupremicaWatersSystem(_model.specFilePath.get).getSupremicaSpecs.asScala.toSet
 
   specs.foreach(s=>info(s"Read spec for ${s.getName}"))
 
-  val model = _model.asInstanceOf[ModularModel]
-  val sul = model.simulation
-  val initState = extendStateMap(specs, sul.getInitState)
+  val model: ModularModel = _model.asInstanceOf[ModularModel]
+  val sul: SUL = model.simulation
+  val initState: StateMap = extendStateMap(specs, sul.getInitState)
 
 
-  val initQueue:Queue[StateMap] = Queue(initState)
-  val moduleMapping = aggregateModulesForModel(model,specs)
+  val initQueue: Queue[StateMap] = Queue(initState)
+  val moduleMapping: Map[automata.Automaton, Alphabet] = aggregateModulesForModel(model,specs)
   println(s"module mapping $moduleMapping")
 
-  def initMaps[T] = moduleMapping.keySet.map((_.getName.asInstanceOf[Module]->Set.empty[T])).toMap
+  def initMaps[T]: Map[String, Set[T]] = moduleMapping.keySet.map(_.getName->Set.empty[T]).toMap
 
 
-  private var forbiddenStates:Map[Module,Set[StateMap]]=initMaps[StateMap]
+  private var forbiddenStates:Map[String,Set[StateMap]]=initMaps[StateMap]
 
   def getNextSpecState(sp:automata.Automaton,st:StateMap, c:Symbol):Option[StateMap]={
     if(!sp.getAlphabet.contains(c.toString)){
@@ -88,21 +84,21 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
   }
 
   @tailrec
-  final def explore(queue:Queue[StateMap], moduleStates:Map[Module,Set[StateMap]], visitedSet:Map[Module,Set[StateMap]], arcs:Map[Module,Set[StateMapTransition]]):(Map[Module,Set[StateMap]],Map[Module,Set[StateMapTransition]])={
+  final def explore(queue:Queue[StateMap], moduleStates:Map[String,Set[StateMap]], visitedSet:Map[String,Set[StateMap]], arcs:Map[String,Set[StateMapTransition]]):(Map[String,Set[StateMap]],Map[String,Set[StateMapTransition]])={
     info(s"Starting to explore with queue size ${queue.size}")
     if(queue.isEmpty){
       (moduleStates,arcs)
     }
     else{
-      var transitions: Map[Module,Set[StateMapTransition]] = arcs
-      var visited:Map[Module,Set[StateMap]] =visitedSet
-      var mStates:Map[Module,Set[StateMap]] = moduleStates
+      var transitions: Map[String,Set[StateMapTransition]] = arcs
+      var visited:Map[String,Set[StateMap]] =visitedSet
+      var mStates:Map[String,Set[StateMap]] = moduleStates
       val currState = queue.dequeue
       var newQueue = currState._2
 
       for(m<-moduleMapping.keySet){
 
-        val module = m.getName.asInstanceOf[Module]
+        val module = m.getName
         def stateReducer:StateMap=>StateMap = getReducedState(model,m)
 
         visited += (module->(visited(module) + currState._1))
@@ -149,7 +145,7 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
   }
 
 
-  def initModuleState = moduleMapping.keySet.map(m=>(m.getName.asInstanceOf[Module]-> Set(getReducedState(model,m)(initState)))) toMap
+  def initModuleState: Map[String, Set[StateMap]] = moduleMapping.keySet.map(m => m.getName-> Set(getReducedState(model,m)(initState))).toMap
 
   val (mStates,mTransitions) = explore(initQueue,initModuleState,initMaps[StateMap],initMaps[StateMapTransition])
 
@@ -169,7 +165,8 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
 
 
   def mapStates(states:Set[StateMap]):Map[StateMap,State]={
-    states.zipWithIndex.toMap.map{case(sm,i)=> (sm,if(sm.equals(initState)) State(s"init") else State(s"s${i}"))}
+   // states.zipWithIndex.toMap.map{case(sm,i)=> (sm,if(sm.equals(initState)) State(s"init") else State(s"s${i}"))}
+    states.map(s => (s, State(s.toString))).toMap
   }
 
   def mapTransitions(stateMapping:Map[StateMap,State],trans:Set[StateMapTransition]): Set[Transition] ={
@@ -182,9 +179,8 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
 
 
   override def getAutomata: Automata = {
-    val supAut=new automata.Automata()
 
-    val modules = moduleMapping.keySet.map{m=> val module=m.getName.asInstanceOf[Module]
+    val modules = moduleMapping.keySet.map{m=> val module=m.getName
       def stateReducer:StateMap=>StateMap = getReducedState(model,m)
       val mappedStates = mapStates(mStates(module) union forbiddenStates(module) union getStatesFromTransitions(mTransitions(module)))
       info(s"mapped states: $mappedStates")
@@ -197,16 +193,6 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
       val markedStateSet=mStates(module).filter(extendedGoalPredicate.eval(_,sul.acceptsPartialStates).get) map mappedStates
       val markedStates = if(markedStateSet.isEmpty) None else Some(markedStateSet)
 
-
- supAut.addAutomaton(createSupremicaAutomaton(mappedStates.values.toSet,
-        mappedTransitions,
-        moduleMapping(m),
-        mappedStates(stateReducer(initState)),
-        markedStates,
-        fbdStates,
-        module))
-
-
       Automaton(module,
         mappedStates.values.toSet,
         moduleMapping(m),
@@ -216,8 +202,6 @@ class ModularSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers wi
         fbdStates)
 
     }
-
-    saveToXMLFile(s"Output/result_${model.name}.xml",supAut)
     Automata(modules)
   }
 

@@ -1,8 +1,7 @@
-package modelbuilding.core.modelInterfaces
+package modelbuilding.core.simulation
 
-import modelbuilding.core._
 import grizzled.slf4j.Logging
-
+import modelbuilding.core._
 
 trait Simulator extends Logging{
 

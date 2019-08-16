@@ -1,7 +1,7 @@
 package modelbuilding.models.MachineBuffer
 
 import modelbuilding.core._
-import modelbuilding.core.modelInterfaces.Simulator
+import modelbuilding.core.simulation.Simulator
 
 class SimulateMachineBuffer extends Simulator {
 

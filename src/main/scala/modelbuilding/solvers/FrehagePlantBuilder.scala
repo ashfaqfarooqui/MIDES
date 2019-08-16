@@ -9,25 +9,24 @@ A brute force BFS that split the result into modules rather than a monolithic pl
 package modelbuilding.solvers
 
 
-import modelbuilding.core.modelInterfaces.ModularModel.Module
-import modelbuilding.core.modelInterfaces.{Model, ModularModel, SUL}
 import modelbuilding.core._
-import modelbuilding.solvers.FrehageSolverWithoutPartialStates._
-import Helpers.Diagnostic._
+import modelbuilding.core.modeling.{Model, ModularModel}
+import modelbuilding.core.simulation.SUL
+import modelbuilding.solvers.FrehagePlantBuilder._
 
 import scala.collection.mutable
 
-object FrehageSolverWithoutPartialStates {
+object FrehagePlantBuilder {
 
-  def getReducedStateMap(state: StateMap, model: ModularModel, module: Module): StateMap =
+  def getReducedStateMap(state: StateMap, model: ModularModel, module: String): StateMap =
     StateMap(state.name, state.state.filterKeys(s => model.stateMapping(module).states.contains(s)))
 
-  def getReducedStateMapTransition(t: StateMapTransition, model: ModularModel, module: Module): StateMapTransition =
-    StateMapTransition(getReducedStateMap(t.source, model, module), getReducedStateMap(t.target, model, module), if (model.eventMapping(module).a contains t.event) t.event else Symbol(tau))
+  def getReducedStateMapTransition(t: StateMapTransition, model: ModularModel, module: String): StateMapTransition =
+    StateMapTransition(getReducedStateMap(t.source, model, module), getReducedStateMap(t.target, model, module), if (model.eventMapping(module).events contains t.event) t.event else Symbol(tau))
 
 }
 
-class FrehageSolverWithoutPartialStates(_model: Model) extends BaseSolver {
+class FrehagePlantBuilder(_model: Model) extends BaseSolver {
 
   assert(_model.isModular, "modelbuilder.solver.FrehageSolver requires a modular model.")
   private val model = _model.asInstanceOf[ModularModel]
@@ -36,8 +35,8 @@ class FrehageSolverWithoutPartialStates(_model: Model) extends BaseSolver {
   private var queue: List[StateMap] = List(simulator.getInitState)
 
   // One queue for each module to track new states that should be explored.
-  private val moduleStates: Map[Module, mutable.Set[StateMap]] = model.modules.map(m => m -> mutable.Set(getReducedStateMap(simulator.getInitState,model,m))).toMap
-  private val moduleTransitions: Map[Module, mutable.Set[StateMapTransition]] = model.modules.map(_ -> mutable.Set.empty[StateMapTransition]).toMap
+  private val moduleStates: Map[String, mutable.Set[StateMap]] = model.modules.map(m => m -> mutable.Set(getReducedStateMap(simulator.getInitState,model,m))).toMap
+  private val moduleTransitions: Map[String, mutable.Set[StateMapTransition]] = model.modules.map(_ -> mutable.Set.empty[StateMapTransition]).toMap
 
   var count = 0
   // Loop until all modules are done exploring new states

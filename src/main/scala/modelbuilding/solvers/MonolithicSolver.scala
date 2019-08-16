@@ -1,9 +1,7 @@
 package modelbuilding.solvers
 
-import modelbuilding.core.modelInterfaces.Model
-import SupremicaStuff.SupremicaHelpers
+import modelbuilding.core.modeling.Model
 import modelbuilding.core.{Automata, Automaton, State, StateMap, StateMapTransition, Symbol, Transition}
-import net.sourceforge.waters.subject.module.ModuleSubject
 
 import scala.collection.immutable.Queue
 

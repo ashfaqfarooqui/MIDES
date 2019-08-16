@@ -1,30 +1,30 @@
 package modelbuilding.solvers
-import SupremicaStuff.SupremicaHelpers
 import grizzled.slf4j.Logging
-import modelbuilding.core.{AND, Alphabet, AlwaysTrue, Automata, Automaton, EQ, OR, State, StateMap, StateMapTransition, Symbol, Transition, Uncontrollable}
-import modelbuilding.core.modelInterfaces.{Model, ModularModel, MonolithicModel}
+import modelbuilding.core.modeling.{Model, ModularModel, MonolithicModel}
+import modelbuilding.core.{AND, AlwaysTrue, Automata, Automaton, EQ, OR, State, StateMap, StateMapTransition, Symbol, Transition, Uncontrollable}
 import modelbuilding.solvers.MonolithicSupSolver._
-import net.sourceforge.waters.subject.module.ModuleSubject
 import org.supremica._
+import supremicastuff.SupremicaWatersSystem
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Queue
 
 
 object MonolithicSupSolver {
-    def extendStateMap(sp:Set[automata.Automaton],st:StateMap): StateMap ={
+  def extendStateMap(sp:Set[automata.Automaton],st:StateMap): StateMap ={
     StateMap(state=st.state ++  sp.map(s=> s.getName-> s.getInitialState.getName).toMap)
   }
 
 
   }
 
-class MonolithicSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logging{
+class MonolithicSupSolver(_model:Model) extends BaseSolver with Logging{
 
-  assert(_model.specFilePath.isDefined, "modelbuilder.solver.SupSolver requires a specification model.")
+  assert(_model.specFilePath.isDefined, "modelbuilder.solver.MonolithicSupSolver requires a specification model.")
   info("Initializing SupSolver")
-  override val mModule: ModuleSubject = ReadFromWmodFile(_model.specFilePath.get).get
-  val specs = getSupremicaAutomataFromWaters(mModule).get.filter(_.isSpecification).toSet
+
+  val specs: Set[automata.Automaton] = SupremicaWatersSystem(_model.specFilePath.get).getSupremicaSpecs.asScala.toSet
+
   //lets assume single spec for simplicity
   val spec = specs.head
 
@@ -141,26 +141,14 @@ class MonolithicSupSolver(_model:Model) extends BaseSolver with SupremicaHelpers
   info(s"forbiddedStates states: $fbdStates")
   // val aut= Automaton(mappedStates.values.toSet + State("dump:"),createTransitionTable(mappedStates,transitions),model.alphabet,mappedStates(initState),None,None)
 
-  val supAut=new automata.Automata()
-  supAut.addAutomaton(createSupremicaAutomaton(mappedStates.values.toSet,
-    mappedTransitions,
-    model.alphabet,
-    mappedStates(initState),
-    markedStates,
-    fbdStates,
-    model.name))
-
-  saveToXMLFile(s"Output/result_${model.name}.xml",supAut)
-
-
   override def getAutomata: Automata = {
     Automata(Set(Automaton(model.name,
-      mappedStates.values.toSet,
-      model.alphabet,
-      mappedTransitions,
-      mappedStates(initState),
-      markedStates,
-      fbdStates)))
+              mappedStates.values.toSet,
+              model.alphabet,
+              mappedTransitions,
+              mappedStates(initState),
+              markedStates,
+              fbdStates)))
   }
 
 }
