@@ -19,7 +19,7 @@ case class Automaton(
                       transitions: Set[Transition],
                       iState: State,
                       fState: Option[Set[State]] = None,
-                      forbiddenStates: Option[Set[State]] = None
+                      forbiddenStates:Option[Set[State]]=None
                     ){
 
   lazy val transitionFunction: Map[(State, Symbol),State] = transitions.map( t => (t.source, t.event) -> t.target ).toMap
@@ -74,7 +74,7 @@ case class Automaton(
 
     s"Automaton( $name, " +
       s"Q: (${states.map(_.s).mkString(",")}), " +
-      s"A: (${alphabet.events.map(_.getCommand.toString).mkString(",")}), " +
+      s"A: (${alphabet.a.map(_.getCommand.toString).mkString(",")}), " +
       s"T: (${transitions.map{ case Transition(s,t,e) => s"(${s.s},${t.s},$e)" }.mkString(",")}) " +
       s"q_i: (${iState.s}) " +
       s"Q_m: ${fState match {
@@ -85,7 +85,8 @@ case class Automaton(
         case Some(fs) => "(" + fs.map(_.s).mkString(",") + ")"
         case None => "None"
       }}) )" +
-    s" Properties:" +
+      s"\n" +
+    s" Properties:\n" +
     s"${name}" +
       s"\n Number of Transitions: ${transitions.size}" +
       s"\n Number of States: ${states.size}" +
@@ -94,7 +95,7 @@ case class Automaton(
         case Some(fs)=>fs.size
         case None => 0
       }}" +
-      s"\n"
+      s"\n \n \n"
 
   }
 

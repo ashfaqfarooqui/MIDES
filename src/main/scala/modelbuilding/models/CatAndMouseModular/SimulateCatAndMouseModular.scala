@@ -12,6 +12,7 @@ class SimulateCatAndMouseModular extends Simulator{
 
   override val initState: StateMap = StateMap(cat->R2,mouse->R4)
   override val goalStates: Option[Set[StateMap]] = None
+  override val goalPredicate: Option[Predicate] = Some(AND(EQ(cat,R2),EQ(mouse,R4)))
 
   override val guards: Map[Command,Predicate] = Map(
     c1 -> EQ(cat,R0),

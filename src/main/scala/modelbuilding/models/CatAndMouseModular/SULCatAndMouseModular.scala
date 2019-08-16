@@ -5,6 +5,6 @@ import modelbuilding.core.simulation.{SUL, Simulator}
 class SULCatAndMouseModular extends SUL{
 
   override val simulator: Simulator = new SimulateCatAndMouseModular
-  override val acceptsPartialStates = false
+  override val acceptsPartialStates = true
 
 }

@@ -1,8 +1,9 @@
 package modelbuilding.core.simulation
 
-import modelbuilding.core.{Alphabet, Command, Predicate, StateMap, StateMapTransition, Symbol}
+import modelbuilding.core.modelInterfaces.Teacher
+import modelbuilding.core.{Alphabet, AlwaysTrue, Command, Grammar, Predicate, StateMap, StateMapTransition, Symbol, Word}
 
-abstract class SUL {
+abstract class SUL extends Teacher {
 
   val simulator: Simulator
   val acceptsPartialStates: Boolean = false
@@ -27,5 +28,25 @@ abstract class SUL {
         case Some(s) => StateMapTransition(state, s, in) :: acc
         case None => acc
       })
+
+  def grammarToList(g: Grammar):List[Command]={
+    g match {
+      case w : Word => w.getSequence.map(_.getCommand)
+      case s : Symbol => List(s.getCommand)
+    }
+  }
+
+  def isMember(g:Grammar):Int= {
+
+    val cmds = grammarToList(g)
+
+    simulator.runListOfCommands(cmds, simulator.initState) match {
+
+      case Right(st) => if(getGoalPredicate.getOrElse(AlwaysTrue).eval(st).get ||getGoalStates.getOrElse(Set.empty).contains(st)) 2 else 1
+      case Left(st) =>
+        0
+    }
+  }
+
 
 }
