@@ -1,6 +1,6 @@
 package modelbuilding.core.modeling
 
-import modelbuilding.core.{Alphabet, StateMap, StateSet}
+import modelbuilding.core.{Alphabet, StateMap, StateMapTransition, StateSet}
 import org.supremica.automata
 import supremicastuff.SupremicaWatersSystem
 
@@ -55,31 +55,23 @@ trait Specifications extends Model {
     StateMap(states = stateMap.state, specs = specs.map(s => s.getName -> s.getInitialState.getName).toMap)
   }
 
-  /*def evalTransition(t: StateMapTransition, specs: Set[String]): Map[String, Option[String]] = {
-
-    println("""##########""")
-    println(t)
-    println(specs)
+  def evalTransition(t: StateMapTransition, specs: Set[String]): Map[String, Option[String]] = {
 
     val sourceStates = specs.map(s => s -> t.source.specs(s))
-    println(sourceStates)
 
-    val targetStates = sourceStates.map { case (spec, sourceState) =>
+    val targetStates: Map[String, Option[String]] = sourceStates.map { case (spec, sourceState) =>
       if (!supremicaSpecs(spec).getAlphabet.contains(t.event.getCommand.toString))
-        sourceState
+        spec -> Some(sourceState)
       else {
-        supremicaSpecs(spec).getStateSet.getState(sourceState).getOutgoingArcs.asScala.head.getTarget
+        val transitions = supremicaSpecs(spec).getStateSet.getState(sourceState).getOutgoingArcs.asScala
+        if (transitions.isEmpty) spec -> None
+        // else if (transitions.size > 1) throw new Error("") Can never occur since we have verified that the spec is deterministic
+        else spec -> Some(transitions.head.getTarget.getName)
       }
-    }
+    }.toMap
 
-//    val targetStates = sourceStates.map { s =>
-//      supremicaSpecs(s).getStateSet.getState(sourceStates(s)).getOutgoingArcs.asScala.map(t => (t.getLabel, s._1, t.getTarget.getName)).toSet.
-//        union(for (e <- commands.events.map(_.getCommand.toString) if !supremicaSpecs(s._1).getAlphabet.contains(e)) yield (e, s._1, s._2))
-//    }
-    println(targetStates)
-
-    Map()
-  }*/
+    targetStates
+  }
 
 
 

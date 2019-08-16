@@ -33,11 +33,8 @@ object FrehageModularSupSynthesis {
 
 class FrehageModularSupSynthesis(_model: Model) extends BaseSolver {
 
-  throw new NotImplementedError("FrehageModularSupSynthesis is not yet done...")
-
   assert(_model.hasSpecs, "modelbuilder.solver.ModularSupSolver requires a specification.")
   assert(_model.isModular, "modelbuilder.solver.FrehageModularSupSynthesis requires a modular model.")
-
 
   private val model = _model.asInstanceOf[ModularModel]
   private val specifications = _model.asInstanceOf[Specifications]
@@ -55,7 +52,7 @@ class FrehageModularSupSynthesis(_model: Model) extends BaseSolver {
   // One queue for each module to track new states that should be explored.
   var count = 0
   // Loop until all modules are done exploring new states
-  println(s"Iteration: 1")
+//  println(s"Iteration: 1")
   while ( {
     count += 1
     if (count%100 == 0) println(s"Iteration: $count")
@@ -69,33 +66,46 @@ class FrehageModularSupSynthesis(_model: Model) extends BaseSolver {
 
     for ( t <- outgoingTransitionsInPlant )  {
 
+      // filter out those modules that still is part of the state
+      val remainingModules = modules.filter(m => state.specs.contains(m.name))
+
       // check what states have changed in transitions `t`
       val changedStates = t.target.state.keySet.filter(k => t.source.state(k) != t.target.state(k))
 
+      // Find the target states of the transitions in the specifications, caused by executing the event in current state
+      val specTargetStates = specifications.evalTransition(t, remainingModules.map(_.name))
+
+      // if event is uncontrollable, those modulesthat try to block it should be forbidden
+      if (!t.event.isControllable)
+        remainingModules.filter( m => specTargetStates(m.name).isEmpty ).foreach( m => moduleForbidden(m.name) += getReducedStateMap(state, m))
+
       // filter out modules that should include this transitions, being those that (1 AND (2 OR 3)):
-      // 1) those specs that is still present in the outgoing state
-      // 2) have one of there state variables changed by the transition
-      // 3) have the event in their alphabet (indicating a transition in the spec or a self loop)
-      val concernedModules = modules.filter( m =>
-        state.specs.contains(m.name) && (m.stateSet.states.intersect(changedStates).nonEmpty || m.alphabet.events.contains(t.event)) )
-
-      println(s"### $state")
-//      val nextSpecState = specifications.evalTransition(t, concernedModules.map(_.name))
-//
-//      nextSpecState foreach println
-      /*var newStateFound = false
-      for (m <- concernedModules) {
-
-        val status = specifications.evalTransition(t, m.specs)
-        println(status)
-//        val tReduced = getReducedStateMapTransition(t, m)
-//        moduleTransitions(m.name) += tReduced
-//        if (!(moduleStates(m.name) contains tReduced.target)) {
-//          moduleStates(m.name) += tReduced.target
-//          newStateFound = true
-//        }
+      // 1) does not have the transition blocked by the spec, i.e. their name remains in specTargetStates
+      // 2) the state of the spec is changed by the transition
+      // 3) at least one state variable is changed by the transition
+      val concernedModules = remainingModules.filter { m =>
+        specTargetStates(m.name).nonEmpty &&
+          (state.specs(m.name) != specTargetStates(m.name).getOrElse("") || m.stateSet.states.intersect(changedStates).nonEmpty)
       }
-      if (newStateFound) queue = t.target :: queue*/
+
+      // update the transition with the target states of the specifications
+      val trans = StateMapTransition(t.source, StateMap(states=t.target.state, specs=specTargetStates.filter(_._2.nonEmpty).mapValues(_.get)), t.event)
+
+      var newStateFound = false
+      for (m <- concernedModules) {
+        specTargetStates(m.name) match {
+          case None =>
+
+          case Some(_) =>
+            val tReduced = getReducedStateMapTransition(trans, m)
+            moduleTransitions(m.name) += tReduced
+            if (!(moduleStates(m.name) contains tReduced.target)) {
+              moduleStates(m.name) += tReduced.target
+              newStateFound = true
+            }
+        }
+      }
+      if (newStateFound) queue = trans.target :: queue
     }
 
 /*    val uncontrollableModules = modules.filter(m => outgoingTransitionsInPlant.filter(!_.event.isControllable).exists{ t =>
@@ -126,14 +136,29 @@ class FrehageModularSupSynthesis(_model: Model) extends BaseSolver {
     }*/
 
   }
-  println(s"DONE! Number of iterations: $count")
+  println("DONE!")
+  println(s"Number of iterations: $count")
 
 
   override def getAutomata: Automata = {
 
+    /*println("#########")
+    println(initState)
+    for (m <- modules) {
+      println("#")
+      println(m.name)
+      println(getReducedStateMap(initState,m))
+      println("##")
+      moduleStates(m.name) foreach println
+      println("###")
+      moduleForbidden(m.name) foreach println
+      println("####")
+      moduleTransitions(m.name) foreach println
+    }*/
 
     val automatons = for {
       m <- modules
+      _ = println(s"Processing: " + m.name)
       nonLocalVariables = moduleTransitions(m.name).filter(_.event.getCommand == tau).flatMap(t => t.source.state.keys.filter(k => t.source.state(k) != t.target.state(k)))
       //      nonLocalVariables = Set.empty[String]
       states: Map[StateMap, State] = moduleStates(m.name).map( s => {

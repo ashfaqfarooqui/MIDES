@@ -3,8 +3,7 @@ import grizzled.slf4j.Logging
 import modelbuilding.core.modeling.Model
 import modelbuilding.models._
 import modelbuilding.solvers._
-
-import supremicastuff.SupremicaHelpers._
+import supremicastuff.SupremicaHelpers
 
 object ModelBuilder extends Logging {
 
@@ -21,7 +20,7 @@ object ModelBuilder extends Logging {
     case _ => throw new Exception("A model wasn't defined.")
   }
 
-  val solver: String = "modularSupSolver" // "modular", "mono"
+  val solver: String = "frehage3" // "modular", "mono"
 
   def main(args: Array[String]) : Unit= {
 
@@ -40,6 +39,6 @@ object ModelBuilder extends Logging {
 
     automata.modules foreach println
     automata.modules.foreach(_.createDotFile)
-    exportAsSupremicaAutomata(automata, name=modelName)
+    SupremicaHelpers.exportAsSupremicaAutomata(automata, name=modelName)
   }
 }
