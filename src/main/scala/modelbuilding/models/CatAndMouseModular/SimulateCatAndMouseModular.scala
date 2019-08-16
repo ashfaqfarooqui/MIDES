@@ -1,7 +1,7 @@
 package modelbuilding.models.CatAndMouseModular
 
 import modelbuilding.core._
-import modelbuilding.core.modelInterfaces.Simulator
+import modelbuilding.core.simulation.Simulator
 
 class SimulateCatAndMouseModular extends Simulator{
 

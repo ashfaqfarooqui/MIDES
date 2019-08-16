@@ -1,7 +1,7 @@
 package modelbuilding.models.StickPicking
 
 import modelbuilding.core._
-import modelbuilding.core.modelInterfaces.Simulator
+import modelbuilding.core.simulation.Simulator
 
 class SimulateSticks(sticks: Int) extends Simulator {
 

@@ -1,6 +1,6 @@
 package modelbuilding.models.MachineBuffer
 
-import modelbuilding.core.modelInterfaces._
+import modelbuilding.core.simulation.{SUL, Simulator}
 
 class SULMachineBuffer extends SUL {
 

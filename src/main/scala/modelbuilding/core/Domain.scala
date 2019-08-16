@@ -40,12 +40,12 @@ def +(b:Grammar):Grammar
     }
   }
 }
-case class Symbol(s:Command) extends Grammar{
+case class Symbol(s:Command) extends Grammar {
   //override def toString: String = s.toString.mkString("")
 
-  def getCommand = s
+  def getCommand: Command = s
 
-  override def equals(o: Any)= o match{
+  override def equals(o: Any): Boolean = o match{
     case that: Symbol =>that.s == this.s
     case that: Word => (that.w == this.s) && that.pf.isEmpty
     case _ => false
@@ -56,6 +56,12 @@ case class Symbol(s:Command) extends Grammar{
       case (a:Symbol,b:Word) => Word(a :: b.pf,b.w)
     }
    }
+  def isControllable: Boolean = {
+    getCommand match {
+      case _: Controllable => true
+      case _: Uncontrollable => false
+    }
+  }
 }
 case class Word(pf:List[Symbol], w:Symbol) extends Grammar{
   override def equals(o: Any) = o match{

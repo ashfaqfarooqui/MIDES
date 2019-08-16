@@ -1,6 +1,6 @@
 package modelbuilding.models.StickPicking
 
-import modelbuilding.core.modelInterfaces.{SUL, Simulator}
+import modelbuilding.core.simulation.{SUL, Simulator}
 
 class SULSticks(n:Int) extends SUL{
   override val simulator: Simulator = new SimulateSticks(n)

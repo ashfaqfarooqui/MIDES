@@ -1,32 +1,32 @@
 package modelbuilding.models.MachineBuffer
 
 import modelbuilding.core._
-import modelbuilding.core.modelInterfaces.ModularModel.Module
-import modelbuilding.core.modelInterfaces._
+import modelbuilding.core.modeling._
 
-object MachineBuffer extends ModularModel {
+object MachineBuffer extends ModularModel with Specifications {
 
   override val name: String = "MachineBufferMachine"
-  override val modules: Set[Module] = Set("Machine1", "Machine2")
+  override val modules: Set[String] = Set("Machine1", "Machine2")
 
   val alphabet = Alphabet(load1,load2,unload1,unload2)
 
   val stateString: String = "m1 m2"
   override val states: StateSet = StateSet(stateString.split(" ").toSet)
 
-  override def stateMapping: Map[Module,StateSet] = Map(
+  override def stateMapping: Map[String,StateSet] = Map(
     "Machine1"->StateSet("m1"),
     "Machine2"->StateSet("m2")
   )
 
-  override def eventMapping: Map[Module,Alphabet] = Map(
+  override def eventMapping: Map[String,Alphabet] = Map(
     "Machine1" -> Alphabet(load1,unload1),
     "Machine2" -> Alphabet(load2,unload2)
   )
 
   override val simulation = new SULMachineBuffer()
 
-  override val specFilePath:Option[String] = Some("SupremicaModels/MachineBufferMachine.wmod")
-
+  // Add all specifications available to the model
+  override val specFilePath: Option[String] = Some("SupremicaModels/MachineBufferMachine.wmod")
+  addSpecsFromSupremica(specFilePath.get)
 
 }

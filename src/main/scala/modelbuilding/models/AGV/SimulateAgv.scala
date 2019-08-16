@@ -1,7 +1,7 @@
 package  modelbuilding.models.AGV
 
-import modelbuilding.core.modelInterfaces.Simulator
 import modelbuilding.core._
+import modelbuilding.core.simulation.Simulator
 
 class SimulateAgv extends Simulator {
 

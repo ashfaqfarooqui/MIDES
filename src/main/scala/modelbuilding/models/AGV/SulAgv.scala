@@ -1,7 +1,6 @@
 package  modelbuilding.models.AGV
 
-import modelbuilding.core.{Action, Command, StateMap}
-import modelbuilding.core.modelInterfaces.{SUL, Simulator}
+import modelbuilding.core.simulation.{SUL, Simulator}
 
 
 class SulAgv extends SUL {

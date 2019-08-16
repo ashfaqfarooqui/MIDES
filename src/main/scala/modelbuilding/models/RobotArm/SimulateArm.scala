@@ -1,7 +1,7 @@
 package modelbuilding.models.RobotArm
 
-import modelbuilding.core.modelInterfaces._
 import modelbuilding.core._
+import modelbuilding.core.simulation.Simulator
 
 class SimulateArm(gridX: Int, gridY:Int ) extends Simulator{
 

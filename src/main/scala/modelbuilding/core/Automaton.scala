@@ -19,7 +19,7 @@ case class Automaton(
                       transitions: Set[Transition],
                       iState: State,
                       fState: Option[Set[State]] = None,
-                      forbiddenStates:Option[Set[State]]=None
+                      forbiddenStates: Option[Set[State]] = None
                     ){
 
   lazy val transitionFunction: Map[(State, Symbol),State] = transitions.map( t => (t.source, t.event) -> t.target ).toMap
@@ -63,7 +63,7 @@ case class Automaton(
   }
 
   def getNextStates(state: State): Option[Set[State]] ={
-    val states = for(e <- alphabet.a) yield transitionFunction(state,e)
+    val states = for(e <- alphabet.events) yield transitionFunction(state,e)
     if (states.nonEmpty) Some(states) else None
   }
 
@@ -74,7 +74,7 @@ case class Automaton(
 
     s"Automaton( $name, " +
       s"Q: (${states.map(_.s).mkString(",")}), " +
-      s"A: (${alphabet.a.map(_.getCommand.toString).mkString(",")}), " +
+      s"A: (${alphabet.events.map(_.getCommand.toString).mkString(",")}), " +
       s"T: (${transitions.map{ case Transition(s,t,e) => s"(${s.s},${t.s},$e)" }.mkString(",")}) " +
       s"q_i: (${iState.s}) " +
       s"Q_m: ${fState match {
@@ -85,10 +85,6 @@ case class Automaton(
         case Some(fs) => "(" + fs.map(_.s).mkString(",") + ")"
         case None => "None"
       }}) )" +
-      s"\n" +
-      s"\n" +
-      s"\n" +
-      s"\n" +
     s" Properties:" +
     s"${name}" +
       s"\n Number of Transitions: ${transitions.size}" +
@@ -97,7 +93,11 @@ case class Automaton(
       s"\n Number of Forbidden States: ${forbiddenStates match {
         case Some(fs)=>fs.size
         case None => 0
-      }}"
+      }}" +
+      s"\n" +
+      s"\n" +
+      s"\n" +
+      s"\n"
 
   }
 
