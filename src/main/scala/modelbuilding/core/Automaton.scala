@@ -74,7 +74,7 @@ case class Automaton(
 
     s"Automaton( $name, " +
       s"Q: (${states.map(_.s).mkString(",")}), " +
-      s"A: (${alphabet.a.map(_.getCommand.toString).mkString(",")}), " +
+      s"A: (${alphabet.events.map(_.getCommand.toString).mkString(",")}), " +
       s"T: (${transitions.map{ case Transition(s,t,e) => s"(${s.s},${t.s},$e)" }.mkString(",")}) " +
       s"q_i: (${iState.s}) " +
       s"Q_m: ${fState match {

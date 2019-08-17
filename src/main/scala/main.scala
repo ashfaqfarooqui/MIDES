@@ -7,7 +7,11 @@ import supremicastuff.SupremicaHelpers
 
 object ModelBuilder extends Logging {
 
+<<<<<<< HEAD
   val modelName = "AGV"
+=======
+  val modelName = "MachineBuffer"
+>>>>>>> storing this as a checkpoint...it doesnt work and I havnt been able to pin point the error
 
   val model: Model = modelName match {
     case "TestUnit" => TestUnit.TransferLine
@@ -20,7 +24,7 @@ object ModelBuilder extends Logging {
     case _ => throw new Exception("A model wasn't defined.")
   }
 
-  val solver: String = "modularSupSolver" // "modular", "mono"
+  val solver: String = "LStarLearner" // "modular", "mono"
 
   def main(args: Array[String]) : Unit= {
 
@@ -33,6 +37,7 @@ object ModelBuilder extends Logging {
       case "monolithic" => new MonolithicSolver(model)
       case "monolithicSupSolver" => new MonolithicSupSolver(model)
       case "modularSupSolver" => new ModularSupSolver(model)
+      case "LStarLearner" => new LStarPlantSolver(model)
     }
 
 //    info("Learning done!")

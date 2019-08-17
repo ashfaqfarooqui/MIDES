@@ -23,9 +23,11 @@ class LStar(teacher: Teacher, A:Alphabet,ceGen:CEGenerator) extends Logging
    // debug(table.prettyPrintTable)
     info(s"S: ${table.S.size}, E: ${table.E.size}")
     info(s"Instance: ${table.instance}")
+   println(table.prettyPrintTable)
+
 
     if (table.isClosed.nonEmpty) {
-      info("Table is not closed...closing")
+      info(s"Table is not closed ${table.isClosed}...closing")
       learn(updateTable(table,table.S+table.isClosed.get.head,table.E))
     }
     else {
@@ -61,7 +63,7 @@ class LStar(teacher: Teacher, A:Alphabet,ceGen:CEGenerator) extends Logging
 
   def startLearning()= {
     info("Starting Learner")
-    val l = learn(obsTable(Set(t),Set(t)))
+    val l = learn(updateTable(obsTable(Set(t),Set(t)),Set(t),Set(t)))
     info("Done Learner")
     l
   }

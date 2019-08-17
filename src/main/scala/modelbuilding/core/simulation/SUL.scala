@@ -1,9 +1,10 @@
 package modelbuilding.core.simulation
 
+import grizzled.slf4j.Logging
 import modelbuilding.core.modelInterfaces.Teacher
 import modelbuilding.core.{Alphabet, AlwaysTrue, Command, Grammar, Predicate, StateMap, StateMapTransition, Symbol, Word}
 
-abstract class SUL extends Teacher {
+abstract class SUL extends Teacher with Logging{
 
   val simulator: Simulator
   val acceptsPartialStates: Boolean = false
@@ -40,7 +41,7 @@ abstract class SUL extends Teacher {
 
     val cmds = grammarToList(g)
 
-    simulator.runListOfCommands(cmds, simulator.initState) match {
+    simulator.runListOfCommands(cmds, getInitState) match {
 
       case Right(st) => if(getGoalPredicate.getOrElse(AlwaysTrue).eval(st).get ||getGoalStates.getOrElse(Set.empty).contains(st)) 2 else 1
       case Left(st) =>

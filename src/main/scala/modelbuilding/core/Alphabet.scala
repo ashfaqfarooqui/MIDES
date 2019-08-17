@@ -16,7 +16,7 @@ object Alphabet {
 
 }
 
-case class Alphabet(_a: Set[Symbol], includeTau: Boolean = false, includeReset: Boolean = false) {
+case class Alphabet(_a: Set[Symbol], includeTau: Boolean = true, includeReset: Boolean = false) {
   val events: Set[Symbol] = _a union (if (includeTau) Set(Symbol(tau)) else Set.empty[Symbol]) union (if (includeReset) Set(Symbol(reset)) else Set.empty[Symbol])
 
   def +(that: Alphabet): Alphabet = new Alphabet(this.events union that.events)

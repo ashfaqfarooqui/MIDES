@@ -1,17 +1,19 @@
 package modelbuilding.solvers
 
-import SupremicaStuff.SupremicaHelpers
 import grizzled.slf4j.Logging
+import modelbuilding.algorithms.EquivalenceOracle.Wmethod
 import modelbuilding.algorithms.LStar.LStar
 import modelbuilding.core.Automata
-import modelbuilding.core.modelInterfaces.Model
+import modelbuilding.core.modeling.Model
+import supremicastuff.SupremicaHelpers._
 import org.supremica._
 
-class LStarPlantSolver(_model:Model) extends BaseSolver with SupremicaHelpers with Logging{
+class LStarPlantSolver(_model:Model) extends BaseSolver with Logging{
 
 
   val teacher = _model.simulation
-  val runner = new LStar(teacher, wCEG).startLearning()
+
+  val runner = new LStar(teacher,_model.alphabet, Wmethod(_model.alphabet,50)).startLearning()
 
 
 

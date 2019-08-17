@@ -7,10 +7,10 @@ import modelbuilding.solvers.FrehageSolverWithPartialStates._
 
 object FrehageSolverWithPartialStates {
 
-  def getReducedStateMap(state: StateMap, model: ModularModel, module: Module): StateMap =
+  def getReducedStateMap(state: StateMap, model: ModularModel, module: String): StateMap =
     StateMap(state.name, state.state.filterKeys(s => model.stateMapping(module).states.contains(s)))
 
-  def getReducedStateMapTransition(t: StateMapTransition, model: ModularModel, module: Module): StateMapTransition =
+  def getReducedStateMapTransition(t: StateMapTransition, model: ModularModel, module: String): StateMapTransition =
     StateMapTransition(getReducedStateMap(t.source, model, module), getReducedStateMap(t.target, model, module), t.event)
 
 }
@@ -27,9 +27,9 @@ class FrehageSolverWithPartialStates(_model: Model) extends BaseSolver {
 
 
   // One queue for each module to track new states that should be explored.
-  private var moduleQueue: Map[Module, Set[StateMap]] = model.modules.map(_ -> Set(simulator.getInitState)).toMap
-  private var moduleStates: Map[Module, Set[StateMap]] = model.modules.map(_ -> Set.empty[StateMap]).toMap
-  private var moduleTransitions: Map[Module, Set[StateMapTransition]] = model.modules.map(_ -> Set.empty[StateMapTransition]).toMap
+  private var moduleQueue: Map[String, Set[StateMap]] = model.modules.map(_ -> Set(simulator.getInitState)).toMap
+  private var moduleStates: Map[String, Set[StateMap]] = model.modules.map(_ -> Set.empty[StateMap]).toMap
+  private var moduleTransitions: Map[String, Set[StateMapTransition]] = model.modules.map(_ -> Set.empty[StateMapTransition]).toMap
 
   var count = 0
   // Loop until all modules are done exploring new states
