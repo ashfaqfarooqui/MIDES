@@ -7,7 +7,7 @@ import modelbuilding.core.modeling.{ModularModel, Specifications}
 object TransferLine extends ModularModel with Specifications {
 
   override val name: String = "TransferLine"
-  override val alphabet = Alphabet(start1,start2,finish1,finish2,accept,reject,test)
+  override val alphabet = Alphabet(true,start1,start2,finish1,finish2,accept,reject,test)
   override val simulation = new SULTransferLine()
 
   override val modules: Set[String] = Set.empty

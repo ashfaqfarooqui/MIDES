@@ -3,8 +3,6 @@ package modelbuilding.algorithms.EquivalenceOracle
 import grizzled.slf4j.Logging
 import modelbuilding.algorithms.LStar.ObservationTable
 import modelbuilding.core.{Alphabet, Automaton, Grammar, State, Symbol}
-import net.sourceforge.waters.subject.module.ModuleSubject
-import org.supremica.automata.Automata
 
 object Wmethod{
   def apply(alphabets: Alphabet, nbrState: Int): Wmethod = new Wmethod(alphabets, nbrState)
@@ -33,7 +31,7 @@ class Wmethod(alphabets:Alphabet,nbrState: Int) extends CEGenerator with Logging
   }
   override def findCE(t: ObservationTable): Either[Grammar, Boolean] = {
 
-    val P = (t.S ++ t.sa).filterNot(p=>t.getRow(p).get.values.forall(_==0))
+    val P = (t.S ++ t.sa).filterNot(p=>t.getRowValues(p).get.forall(_==0))
     val W = t.E
     val h = t.getAutomata
     val A= h.alphabet.events
@@ -54,31 +52,23 @@ class Wmethod(alphabets:Alphabet,nbrState: Int) extends CEGenerator with Logging
       if (n<=0||i>=4) {
         return Right(true)
       }
-      //lazy val U=A.flatMap(e=>oldU.map(a=>e+a))
-      //info(s"running for u:$U")
+
       for{
         p<-P
         w<-W
         u<-U
-
       }
       {
         val s = p+u+w
         val sysOp = t.teacher.isMember(s)
         val hypOp = evalString(s,h)
-        //
-        // info(s"checking for ce with $p + $u + $w + ,got sys: $sysOp, and hypOp : $hypOp")
-
+        debug(s"checking for ce with $p + $u + $w + ,got sys: $sysOp, and hypOp : $hypOp")
         if(sysOp != hypOp){
           return Left(s)
         }
       }
       loop(n-1,U)
     }
-
     loop(nbrState - h.states.size,A.asInstanceOf[Set[Grammar]])
-
   }
-
-
 }

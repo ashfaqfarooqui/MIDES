@@ -7,11 +7,8 @@ import supremicastuff.SupremicaHelpers
 
 object ModelBuilder extends Logging {
 
-<<<<<<< HEAD
-  val modelName = "AGV"
-=======
-  val modelName = "MachineBuffer"
->>>>>>> storing this as a checkpoint...it doesnt work and I havnt been able to pin point the error
+
+  val modelName = "TestUnit"
 
   val model: Model = modelName match {
     case "TestUnit" => TestUnit.TransferLine

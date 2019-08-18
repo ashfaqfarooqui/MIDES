@@ -3,24 +3,21 @@ package modelbuilding.algorithms.LStar
 import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
 
 import com.github.martincooper.datatable.{DataColumn, DataRow, DataTable}
-import com.github.tototoshi.csv.CSVWriter
 import grizzled.slf4j.Logging
 import modelbuilding.core.{Alphabet, Automaton, Grammar, State, Symbol, Transition, tau}
-import modelbuilding.algorithms.LStar._
+import modelbuilding.algorithms.LStar.ObservationTable._
 import modelbuilding.core.modelInterfaces.Teacher
 
 import scala.util.{Failure, Success}
 
 object ObservationTable {
 
-  println("initialing table")
-  val col2= new DataColumn[Int](Symbol(tau).toString,Set(2))
-  val col1 = new DataColumn[String]("T",Set(Symbol(tau).toString))
-  val initTable = DataTable("table",Seq(col1,col2)) match {
+  val defaultCell00 = "T"
+  val col1 = new DataColumn[String](defaultCell00,Vector.empty[String])
+  val initTable = DataTable("table",Vector(col1)) match {
     case Success(value) => value
     case Failure(e) => throw new Exception(s"Couldn't create an inital table: $e")
   }
-  println(s"table $initTable")
 
   def apply(table: DataTable, A: Alphabet, S: Set[Grammar], E: Set[Grammar],teacher: Teacher, instance: Int): ObservationTable = new ObservationTable(table, A, S, E,teacher, instance)
   def apply(A: Alphabet, S: Set[Grammar], E: Set[Grammar],teacher: Teacher, instance: Int): ObservationTable = new ObservationTable(initTable, A, S, E,teacher, instance)
@@ -57,10 +54,10 @@ object ObservationTable {
       (s + a)
     }
 
-    val column1 = new DataColumn[String]("T", (newS union sa).map(_.toString))
+    val column1 = new DataColumn[String](defaultCell00, (newS union sa).toVector.map(_.toString))
     val columns = column1 :: newE.map {
       e =>
-        val colValues = (newS union sa).toList.map(s => oldTable.getElement(s, e).getOrElse(oldTable.teacher.isMember(s + e)))
+        val colValues = (newS union sa).toVector.map(s => oldTable.getElement(s, e).getOrElse(oldTable.teacher.isMember(s + e)))
         val c = new DataColumn[Int](s"$e", colValues)
         c
     }.toList
@@ -88,19 +85,14 @@ case class ObservationTable(table :DataTable, A: Alphabet, S: Set[Grammar], E: S
     buf++= div
     for(s <- S.toList.sortWith(_.toString.mkString(",").length < _.toString.mkString(",").length)) {
       buf ++= s"| $s" + " " * (maxSa - s.toString.length) + " | "
-      //buf ++= row(s).map{x => if(x._1) s"1" else "0"}.mkString(" | ")
-      //buff with state observations
-      buf ++= getRowValues(s).mkString(" | ")
-
+      buf ++= getRowValues(s).get.mkString(" | ")
       buf += '\n'
     }
 
     buf++= div
     for(s <- (sa diff S).toList.sortWith(_.toString.mkString(",").length < _.toString.mkString(",").length)) {
       buf ++= s"|$s" + " "* (maxSa - s.toString.length) + " | "
-      //buf ++= row(s).map{x => if(x._1) "1" else "0"}.mkString(" | ")
-      //buff with state observations
-      buf ++= getRowValues(s).mkString(" | ")
+       buf ++= getRowValues(s).get.mkString(" | ")
       buf += '\n'
     }
 
@@ -108,13 +100,6 @@ case class ObservationTable(table :DataTable, A: Alphabet, S: Set[Grammar], E: S
 
   }
 
-
- // def prettyPrint = {
- //   println("Current Table")
- //   table.rows.map(_.values.toString()).foreach(println)
- // }
-  //def getInconsistent: Grammar = ???
-  //def getUnclosed: Grammar = ???
 
   def sa = for (s <- S; a <- A.events) yield {
     (s + a)
@@ -169,7 +154,7 @@ case class ObservationTable(table :DataTable, A: Alphabet, S: Set[Grammar], E: S
   def getRowValues(g:Grammar):Option[List[Int]]= {
      getRow(g) match {
       case Some(value) =>
-        Some(table.columns.filter(_.name !="T").map(t=>
+        Some(table.columns.filter(_.name !=defaultCell00).map(t=>
           value.getAs[Int](t.name) match {
             case Failure(exception) => throw new Exception(s"Row value not found $exception")
             case Success(value) => value
@@ -179,7 +164,7 @@ case class ObservationTable(table :DataTable, A: Alphabet, S: Set[Grammar], E: S
 
   }
   def getRow(g:Grammar):Option[DataRow] = getRow(g.toString)
-  def getRow(g:String):Option[DataRow] = table.find(_ ("T") == g)//filter(row=> row.as[Grammar]("T")==g).toDataTable
+  def getRow(g:String):Option[DataRow] = table.find(_ (defaultCell00) == g)//filter(row=> row.as[Grammar]("T")==g).toDataTable
   def getElement(rowS:Grammar,colE:Grammar):Option[Int]= getRow(rowS) match {
     case Some(value) => value.valueMap.get(colE.toString) match {
       case Some(value) => Some(value.asInstanceOf[Int])
@@ -213,7 +198,6 @@ case class ObservationTable(table :DataTable, A: Alphabet, S: Set[Grammar], E: S
       }
 
 
-    println(getStates)
       def getState(v: List[Int]) = getStates(v)
 
       def initState: State = getStates(getRowValues(Symbol(tau)).get)
@@ -226,14 +210,11 @@ case class ObservationTable(table :DataTable, A: Alphabet, S: Set[Grammar], E: S
         val sa = for (s <- S; a <- A.events) yield (s, a)
         sa.map {
           case (s, a) =>
-            println(s"s:$s, a$a")
             Transition(getState(getRowValues(s).get),getState(getRowValues(s + a).get),a)
-            ///(getState(getRow(s).values.asInstanceOf[List[Int]]), a) -> getState(getRow(s + a).asInstanceOf[List[Int]])
         }
       }
 
       lazy val states = getStates.values.toSet
-      //prettyPrint
 
       Automaton("Hypothesis",states, A,transitions, initState, Some(fState), Some(forbiddenStates))
   }

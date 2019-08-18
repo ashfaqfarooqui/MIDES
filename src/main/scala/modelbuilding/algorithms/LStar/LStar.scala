@@ -19,52 +19,50 @@ class LStar(teacher: Teacher, A:Alphabet,ceGen:CEGenerator) extends Logging
 
 
   @tailrec
-   private def learn(table: ObservationTable):Automaton = {
-   // debug(table.prettyPrintTable)
-    info(s"S: ${table.S.size}, E: ${table.E.size}")
-    info(s"Instance: ${table.instance}")
-   println(table.prettyPrintTable)
+   private def learn(oTable: ObservationTable):Automaton = {
+    info(s"S: ${oTable.S.size}, E: ${oTable.E.size}")
+    info(s"Instance: ${oTable.instance}")
+   debug(oTable.prettyPrintTable)
 
 
-    if (table.isClosed.nonEmpty) {
-      info(s"Table is not closed ${table.isClosed}...closing")
-      learn(updateTable(table,table.S+table.isClosed.get.head,table.E))
+    if (oTable.isClosed.nonEmpty) {
+      info(s"Table is not closed ${oTable.isClosed}...closing")
+      learn(updateTable(oTable,oTable.S+oTable.isClosed.get.head,oTable.E))
     }
     else {
       info("checking consistent")
-    val inCons = table.isConsistent
+    val inCons = oTable.isConsistent
     if (inCons.nonEmpty) {
-      ////if(!table.isConsistentOld._2){
+      info(s"Table is inconsistent")
       debug(s"Table is not consistent 1:${inCons.get._1} 2:${inCons.get._2} 3:${inCons.get._3}")
-     debug("updating table with distinguishing string")
-      learn(updateTable(table,table.S,table.E + table.getDistinguishingSuffix( inCons.get._1,inCons.get._2,inCons.get._3).get))
+      debug("updating table with distinguishing string")
+      learn(updateTable(oTable,oTable.S,oTable.E + oTable.getDistinguishingSuffix( inCons.get._1,inCons.get._2,inCons.get._3).get))
     }
 
     else
     {
-      val counterExample = teacher.isHypothesisTrue(table, ceGen)
+      val counterExample = teacher.isHypothesisTrue(oTable, ceGen)
       info(s"got CE: $counterExample")
       counterExample match {
-        case Right(bool) => table.getAutomata
+        case Right(bool) => oTable.getAutomata
         case Left(command) =>
           val toAppend: Grammar = command match {
             case w: Word => w
             case s: Symbol => s
           }
-          learn(updateTable(table,table.S ++ toAppend.getAllPrefixes, table.E))
+          learn(updateTable(oTable,oTable.S ++ toAppend.getAllPrefixes, oTable.E))
       }
     }
 
     }
-    //else {throw new Exception("Something is wrong")}
   }
 
 
 
   def startLearning()= {
-    info("Starting Learner")
+    info("Starting Lstar Learner")
     val l = learn(updateTable(obsTable(Set(t),Set(t)),Set(t),Set(t)))
-    info("Done Learner")
+    info("Done Lstar Learner")
     l
   }
 }
