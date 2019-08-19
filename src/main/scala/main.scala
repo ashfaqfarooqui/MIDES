@@ -7,7 +7,7 @@ import supremicastuff.SupremicaHelpers
 
 object ModelBuilder extends Logging {
 
-  val modelName = "CatMouseModular"
+  val modelName = "AGV"
 
   val model: Model = modelName match {
     case "TestUnit" => TestUnit.TransferLine

@@ -8,7 +8,7 @@ import modelbuilding.solvers.FrehagePlantBuilderWithPartialStates._
 object FrehagePlantBuilderWithPartialStates {
 
   def getReducedStateMap(state: StateMap, model: ModularModel, module: String): StateMap =
-    StateMap(state.name, state.state.filterKeys(s => model.stateMapping(module).states.contains(s)))
+    StateMap(state.name, state.states.filterKeys(s => model.stateMapping(module).states.contains(s)))
 
   def getReducedStateMapTransition(t: StateMapTransition, model: ModularModel, module: String): StateMapTransition =
     StateMapTransition(getReducedStateMap(t.source, model, module), getReducedStateMap(t.target, model, module), t.event)
@@ -54,7 +54,7 @@ class FrehagePlantBuilderWithPartialStates(_model: Model) extends BaseSolver {
     val modules = for {
       m <- model.modules
       states: Map[StateMap, State] = moduleStates(m).map( s => {
-        val name = (if ( s.state.forall{ case (k,v) => simulator.getInitState.state(k) == v } ) "INIT: " else "") + s.toString
+        val name = (if ( s.states.forall{ case (k,v) => simulator.getInitState.states(k) == v } ) "INIT: " else "") + s.toString
         (s,State(name))
       }).toMap
       transitions: Set[Transition] = moduleTransitions(m).map( t => Transition(states(t.source), states(t.target), t.event)).toSet

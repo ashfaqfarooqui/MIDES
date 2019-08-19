@@ -42,7 +42,7 @@ trait Specifications extends Model {
 
         val specMap: Map[String,(StateSet,Alphabet)] = specBlocks.map{ case (spec,modules) =>
           spec -> modules.foldLeft((StateSet(): StateSet, specAlphabets(spec): Alphabet)) {
-            (acc, m) => (acc._1 + modularModel.stateMapping(m), acc._2)
+            (acc, m) => (acc._1 + modularModel.stateMapping(m), acc._2 + modularModel.eventMapping(m))
           }
         }
 
@@ -52,18 +52,18 @@ trait Specifications extends Model {
   }
 
   def extendStateMap(stateMap: StateMap, specs: Set[automata.Automaton] = supremicaSpecs.values.toSet): StateMap = {
-    StateMap(states = stateMap.state, specs = specs.map(s => s.getName -> s.getInitialState.getName).toMap)
+    StateMap(states = stateMap.states, specs = specs.map(s => s.getName -> s.getInitialState.getName).toMap)
   }
 
   def evalTransition(t: StateMapTransition, specs: Set[String]): Map[String, Option[String]] = {
 
-    val sourceStates = specs.map(s => s -> t.source.specs(s))
+    val sourceStates = specs.map(s => s -> t.source.specs(s)).toMap
 
     val targetStates: Map[String, Option[String]] = sourceStates.map { case (spec, sourceState) =>
       if (!supremicaSpecs(spec).getAlphabet.contains(t.event.getCommand.toString))
         spec -> Some(sourceState)
       else {
-        val transitions = supremicaSpecs(spec).getStateSet.getState(sourceState).getOutgoingArcs.asScala
+        val transitions = supremicaSpecs(spec).getStateSet.getState(sourceState).getOutgoingArcs.asScala.filter(_.getEvent.equals(t.event.getCommand.toString))
         if (transitions.isEmpty) spec -> None
         // else if (transitions.size > 1) throw new Error("") Can never occur since we have verified that the spec is deterministic
         else spec -> Some(transitions.head.getTarget.getName)

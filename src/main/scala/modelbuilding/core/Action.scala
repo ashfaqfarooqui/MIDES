@@ -7,7 +7,7 @@ trait Action {
   {
     this match {
       case TauAction => s
-      case x if !(s.state contains x.key) => s
+      case x if !(s.states contains x.key) => s
       case Assign(k: String,v: Any) => s.next(k,v)
       case Incr(k,v) =>s.next(k, s.getOrElse(k,0).asInstanceOf[Int] + v.asInstanceOf[Int])
       case Decr(k,v) =>s.next(k,s.getOrElse(k,0).asInstanceOf[Int] - v.asInstanceOf[Int])

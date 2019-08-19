@@ -37,7 +37,7 @@ object ModularSupSolver {
   //Remove spec variable
   def getReducedState(model: ModularModel,spec:automata.Automaton)(sp:StateMap):StateMap= {
     def reducedVariables:Set[StateSet] = model.stateMapping.filterKeys(getRequiredModules(model,spec).contains).values.toSet
-    StateMap(sp.name,state = sp.state.filterKeys((reducedVariables.flatMap(_.states)+ spec.getName).contains))
+    StateMap(sp.name,states = sp.states.filterKeys((reducedVariables.flatMap(_.states)+ spec.getName).contains))
   }
 
 
@@ -91,7 +91,7 @@ class ModularSupSolver(_model:Model) extends BaseSolver with Logging {
     }
     else{
       var transitions: Map[String,Set[StateMapTransition]] = arcs
-      var visited:Map[String,Set[StateMap]] =visitedSet
+      var visited:Map[String,Set[StateMap]] = visitedSet
       var mStates:Map[String,Set[StateMap]] = moduleStates
       val currState = queue.dequeue
       var newQueue = currState._2
@@ -109,20 +109,22 @@ class ModularSupSolver(_model:Model) extends BaseSolver with Logging {
 
           val reachedStates = moduleMapping(m).events.map { e =>
             sul.getNextState(currState._1, e.getCommand) match {
-              case Some(value) => getNextSpecState(m, value, e) match {
-                case Some(v) => if (!forbiddenStates(module).contains(stateReducer(currState._1))) {
-                  transitions += (module -> (transitions(module) + StateMapTransition(stateReducer(currState._1), stateReducer(v), e)))
-                  info(s"found transition: ${StateMapTransition(stateReducer(currState._1), stateReducer(v), e)}")
-                  Some(v)
-                } else {
-                  None
-                }
-                case _ =>
-                  if (e.getCommand.isInstanceOf[Uncontrollable]) {
-                    info(s"found forbidden state: ${currState._1}")
-                    forbiddenStates += (module -> (forbiddenStates(module) + stateReducer(currState._1)))
-                  }
-                  None
+              case Some(value) =>
+                getNextSpecState(m, value, e) match {
+                  case Some(v) =>
+                    if (!forbiddenStates(module).contains(stateReducer(currState._1))) {
+                      transitions += (module -> (transitions(module) + StateMapTransition(stateReducer(currState._1), stateReducer(v), e)))
+                      info(s"found transition: ${StateMapTransition(stateReducer(currState._1), stateReducer(v), e)}")
+                      Some(v)
+                    } else {
+                      None
+                    }
+                  case _ =>
+                    if (e.getCommand.isInstanceOf[Uncontrollable]) {
+                      info(s"found forbidden state: ${currState._1}")
+                      forbiddenStates += (module -> (forbiddenStates(module) + stateReducer(currState._1)))
+                    }
+                    None
               }
               case _ =>
                 None
@@ -146,6 +148,14 @@ class ModularSupSolver(_model:Model) extends BaseSolver with Logging {
 
 
   def initModuleState: Map[String, Set[StateMap]] = moduleMapping.keySet.map(m => m.getName-> Set(getReducedState(model,m)(initState))).toMap
+
+  println("############")
+  println(initQueue)
+  initModuleState foreach println
+  initMaps[StateMap] foreach println
+  initMaps[StateMapTransition] foreach println
+  println("####################################")
+
 
   val (mStates,mTransitions) = explore(initQueue,initModuleState,initMaps[StateMap],initMaps[StateMapTransition])
 
