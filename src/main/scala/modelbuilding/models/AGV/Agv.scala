@@ -21,7 +21,7 @@ object Agv extends ModularModel with Specifications {
     "AGV2" -> StateSet("v2l", "v2p", "in3", "w3"),
     "AGV3" -> StateSet("v3l", "v3p", "w1_4", "w2"),
     "AGV4" -> StateSet("v4l", "v4p", "w1_5", "w3"),
-    "AGV5" -> StateSet("o", "v5l", "v5p"),
+    "AGV5" -> StateSet("v5l", "v5p", "out", "w1_3"),
     "WS1" -> StateSet("w1_11","w1_12","w1_2","w1_3","w1_4","w1_5", "v3l", "v3p", "v4l", "v4p", "v5l", "v5p"),
     "WS2" -> StateSet("w2", "v1l", "v1p", "v3l", "v3p"),
     "WS3" -> StateSet("w3", "v2l", "v2p", "v4l", "v4p")

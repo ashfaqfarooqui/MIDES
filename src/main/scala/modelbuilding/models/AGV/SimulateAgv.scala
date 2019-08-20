@@ -120,7 +120,7 @@ class SimulateAgv extends Simulator {
     c7 -> List(Assign(v4p, "z3")),
     c8 -> List(Assign(v4p, "z4")),
     c9 -> List(Assign(v5p, "z4")),
-    c10 -> List(Assign(v5p, "z4")),
+    c10 -> List(Assign(v5p, "zO4")),
     e10 -> List(Assign(v1l, true), Toggle(in1)),
     e11 -> List(Toggle(in1)),
     e20 -> List(Toggle(out)),
