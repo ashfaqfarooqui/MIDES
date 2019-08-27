@@ -1,6 +1,6 @@
 package modelbuilding.core.modeling
 
-import modelbuilding.core.{Alphabet, StateMap, StateSet}
+import modelbuilding.core.{Alphabet, StateMap, StateMapTransition, StateSet}
 import org.supremica.automata
 import supremicastuff.SupremicaWatersSystem
 
@@ -36,78 +36,53 @@ trait Specifications extends Model {
 
         val specBlocks = supremicaSpecs.map(s =>
           s._1 -> modularModel.eventMapping.filter(m =>
-            m._2.events.filter(!_.isControllable).map(_.getCommand.toString).intersect(s._2.eventIterator.asScala.map(_.getLabel).toSet).nonEmpty
+            m._2.events.map(_.getCommand.toString).intersect(s._2.eventIterator.asScala.map(_.getLabel).toSet).nonEmpty
           ).keys
         )
 
-        val specMap: Map[String,(StateSet,Alphabet)] = specBlocks.map{ case (spec,modules) =>
-          spec -> modules.foldLeft((StateSet(): StateSet, specAlphabets(spec): Alphabet)) {
-            (acc, m) => (acc._1 + modularModel.stateMapping(m), acc._2)
-          }
+        supremicaSpecs.keySet.map{ s =>
+          Module(
+            name = s,
+            stateSet = StateSet(
+              modularModel.eventMapping.filter{ case(m,a) =>
+                specAlphabets(s).events.exists(e => a.events.contains(e))
+              }.flatMap(x => modularModel.stateMapping(x._1).states).toSet
+            ),
+            alphabet = specAlphabets(s) + new Alphabet(
+              modularModel.eventMapping.filter{ case(m,a) =>
+                specAlphabets(s).events.exists(e => !e.isControllable && a.events.contains(e))
+              }.flatMap(_._2.events).toSet
+            ),
+            Set(s)
+          )
         }
 
-        specMap.map(s => Module(s._1, s._2._1, s._2._2, Set(s._1))).toSet
       }
     }
   }
+
+  def isAccepting(spec: String, state: String): Boolean = supremicaSpecs(spec).getStateSet.getState(state).isAccepting
 
   def extendStateMap(stateMap: StateMap, specs: Set[automata.Automaton] = supremicaSpecs.values.toSet): StateMap = {
-    StateMap(states = stateMap.state, specs = specs.map(s => s.getName -> s.getInitialState.getName).toMap)
+    StateMap(states = stateMap.states, specs = specs.map(s => s.getName -> s.getInitialState.getName).toMap)
   }
 
-  /*def evalTransition(t: StateMapTransition, specs: Set[String]): Map[String, Option[String]] = {
+  def evalTransition(t: StateMapTransition, specs: Set[String]): Map[String, Option[String]] = {
 
-    println("""##########""")
-    println(t)
-    println(specs)
+    val sourceStates = specs.map(s => s -> t.source.specs(s)).toMap
 
-    val sourceStates = specs.map(s => s -> t.source.specs(s))
-    println(sourceStates)
-
-    val targetStates = sourceStates.map { case (spec, sourceState) =>
+    val targetStates: Map[String, Option[String]] = sourceStates.map { case (spec, sourceState) =>
       if (!supremicaSpecs(spec).getAlphabet.contains(t.event.getCommand.toString))
-        sourceState
+        spec -> Some(sourceState)
       else {
-        supremicaSpecs(spec).getStateSet.getState(sourceState).getOutgoingArcs.asScala.head.getTarget
+        val transitions = supremicaSpecs(spec).getStateSet.getState(sourceState).getOutgoingArcs.asScala.filter(_.getEvent.equals(t.event.getCommand.toString))
+        if (transitions.isEmpty) spec -> None
+        // else if (transitions.size > 1) throw new Error("") Can never occur since we have verified that the spec is deterministic
+        else spec -> Some(transitions.head.getTarget.getName)
       }
-    }
+    }.toMap
 
-//    val targetStates = sourceStates.map { s =>
-//      supremicaSpecs(s).getStateSet.getState(sourceStates(s)).getOutgoingArcs.asScala.map(t => (t.getLabel, s._1, t.getTarget.getName)).toSet.
-//        union(for (e <- commands.events.map(_.getCommand.toString) if !supremicaSpecs(s._1).getAlphabet.contains(e)) yield (e, s._1, s._2))
-//    }
-    println(targetStates)
-
-    Map()
-  }*/
-
-
-
-  /*
-   * Evaluates a transition
-   */
-  /*def getOutgoingTransitionsInSpecs(stateMap: StateMap, commands: Alphabet = alphabet): Map[Symbol, Map[String,String]] = {
-
-    val individualOutgoingArcs = stateMap.specs.flatMap { s =>
-      supremicaSpecs(s._1).getStateSet.getState(s._2.toString).getOutgoingArcs.asScala.map(t => (t.getLabel, s._1, t.getTarget.getName)).toSet.
-        union(for (e <- commands.events.map(_.getCommand.toString) if !supremicaSpecs(s._1).getAlphabet.contains(e)) yield (e, s._1, s._2))
-    }
-//    individualOutgoingArcs.foreach(x=>println("#" + x))
-
-    val groupByEvent = individualOutgoingArcs.groupBy(_._1).mapValues(_.map(x => (x._2, x._3)).toMap)
-//    groupByEvent.foreach(x=>println("#%" + x))
-
-//    val filterEvents: Map[String, Map[String,String]] = groupByEvent.filter(_._2.size == stateMap.specs.size)
-//    filterEvents.foreach(x=>println("#%%" + x))
-
-    val convertEventsToSymbols: Map[Symbol, Map[String,String]] =
-      (for (e <- commands.events if groupByEvent contains e.getCommand.toString)
-      yield e -> groupByEvent(e.getCommand.toString)).toMap
-
-//    convertEventsToSymbols foreach println
-
-    convertEventsToSymbols
-
-  }*/
+    targetStates
+  }
 
 }

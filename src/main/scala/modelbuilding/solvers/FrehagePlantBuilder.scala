@@ -19,7 +19,7 @@ import scala.collection.mutable
 object FrehagePlantBuilder {
 
   def getReducedStateMap(state: StateMap, model: ModularModel, module: String): StateMap =
-    StateMap(state.name, state.state.filterKeys(s => model.stateMapping(module).states.contains(s)))
+    StateMap(state.name, state.states.filterKeys(s => model.stateMapping(module).states.contains(s)))
 
   def getReducedStateMapTransition(t: StateMapTransition, model: ModularModel, module: String): StateMapTransition =
     StateMapTransition(getReducedStateMap(t.source, model, module), getReducedStateMap(t.target, model, module), if (model.eventMapping(module).events contains t.event) t.event else Symbol(tau))
@@ -51,7 +51,7 @@ class FrehagePlantBuilder(_model: Model) extends BaseSolver {
     queue = List.empty[StateMap]
 
     next.foreach { t =>
-      val changedVars = t.target.state.keySet.filter(k => t.source.state(k) != t.target.state(k))
+      val changedVars = t.target.states.keySet.filter(k => t.source.states(k) != t.target.states(k))
       var newStateFound = false
       for (m <- model.modules if (model.stateMapping(m).states intersect changedVars).nonEmpty) {
         val tReduced = getReducedStateMapTransition(t, model, m)
@@ -69,11 +69,11 @@ class FrehagePlantBuilder(_model: Model) extends BaseSolver {
   override def getAutomata: Automata = {
     val modules = for {
       m <- model.modules
-      nonLocalVariables = moduleTransitions(m).filter(_.event.getCommand == tau).flatMap(t => t.source.state.keys.filter(k => t.source.state(k) != t.target.state(k)))
+      nonLocalVariables = moduleTransitions(m).filter(_.event.getCommand == tau).flatMap(t => t.source.states.keys.filter(k => t.source.states(k) != t.target.states(k)))
       //      nonLocalVariables = Set.empty[String]
       states: Map[StateMap, State] = moduleStates(m).map( s => {
-        val state = StateMap(s.state.filterKeys(k => !nonLocalVariables.contains(k)))
-        val name = (if ( state.state.forall{ case (k,v) => simulator.getInitState.state(k) == v } ) "INIT: " else "") + state.toString
+        val state = StateMap(s.states.filterKeys(k => !nonLocalVariables.contains(k)))
+        val name = (if ( state.states.forall{ case (k,v) => simulator.getInitState.states(k) == v } ) "INIT: " else "") + state.toString
         (getReducedStateMap(s,model,m),State(name))
       }).toMap
       transitions: Set[Transition] = moduleTransitions(m).filterNot(_.event.getCommand == tau).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]

@@ -94,9 +94,6 @@ case class Automaton(
         case Some(fs)=>fs.size
         case None => 0
       }}" +
-      s"\n" +
-      s"\n" +
-      s"\n" +
       s"\n"
 
   }

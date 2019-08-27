@@ -12,7 +12,7 @@ import scala.collection.immutable.Queue
 
 object MonolithicSupSolver {
   def extendStateMap(sp:Set[automata.Automaton],st:StateMap): StateMap ={
-    StateMap(state=st.state ++  sp.map(s=> s.getName-> s.getInitialState.getName).toMap)
+    StateMap(states=st.states ++  sp.map(s=> s.getName-> s.getInitialState.getName).toMap)
   }
 
 
@@ -46,7 +46,7 @@ class MonolithicSupSolver(_model:Model) extends BaseSolver with Logging{
   val queue: Queue[StateMap] = Queue(initState)
 
   def getNextSpecState(sp:automata.Automaton,st:StateMap, c:Symbol):Option[StateMap]={
-    val specStateInMap=st.state(sp.getName).asInstanceOf[String]
+    val specStateInMap=st.states(sp.getName).asInstanceOf[String]
     val currSpecState = sp.getStateSet.getState(specStateInMap)
     //since we know the spec is deterministic there can exist just one or none transitions
     val theTransition = currSpecState.getOutgoingArcs.asScala.filter(_.getSource.getName==specStateInMap).filter(_.getEvent.getName==c.toString)

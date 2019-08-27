@@ -19,17 +19,17 @@ case class StateSet(states: Set[String]) {
 
 
 object StateMap {
-  def apply(in: (String, Any)*) = new StateMap(state = in.toMap)
-  def apply(states: Map[String, Any]) = new StateMap(state = states)
-  def apply(states: Map[String, Any], specs: Map[String, String]) = new StateMap(state = states, specs = specs)
+  def apply(in: (String, Any)*) = new StateMap(states = in.toMap)
+  def apply(state: Map[String, Any]) = new StateMap(states = state)
+  def apply(state: Map[String, Any], specs: Map[String, String]) = new StateMap(states = state, specs = specs)
 }
-case class StateMap(name: String = "State", state: Map[String, Any], specs: Map[String, String] = Map.empty[String,String]) {
+case class StateMap(name: String = "State", states: Map[String, Any], specs: Map[String, String] = Map.empty[String,String]) {
 
-  def removeKeys(key:Set[String]) = StateMap(state=this.getState.filterKeys( !key.contains(_)))
-  def getState:Map[String,Any] = state
-  def getOrElse(key:String,default:Any): Any = this.state.getOrElse(key,default)
-  def inState(key:String): Boolean = this.state.contains(key)
-  def getKey(key:String): Option[Any] = this.state.get(key)
+  def removeKeys(key:Set[String]) = StateMap(states=this.getState.filterKeys( !key.contains(_)))
+  def getState:Map[String,Any] = states
+  def getOrElse(key:String,default:Any): Any = this.states.getOrElse(key,default)
+  def inState(key:String): Boolean = this.states.contains(key)
+  def getKey(key:String): Option[Any] = this.states.get(key)
   def get(key:String):Either[String,Any] = {
     if(inState(key)){
       Right(getKey(key).get)
@@ -38,13 +38,13 @@ case class StateMap(name: String = "State", state: Map[String, Any], specs: Map[
       Left("Key does not exist")
     }
   }
-  def next(sMap : (String,Any)) = this.copy(state = this.state + sMap)
-  def next(sMap: Map[String,Any]) = this.copy(state = this.state ++ sMap)
+  def next(sMap : (String,Any)) = this.copy(states = this.states + sMap)
+  def next(sMap: Map[String,Any]) = this.copy(states = this.states ++ sMap)
 
   def equals(o: StateMap): Boolean = this.getState.forall{p => o.getState(p._1) == p._2}
 
   override def toString: String = {
-    "StateMap(States(" + state.map(v => s"${v._1}=${v._2}").mkString(",") + ")" +
+    "StateMap(States(" + states.map(v => s"${v._1}=${v._2}").mkString(",") + ")" +
       (if (specs.nonEmpty) ", Specs(" + specs.map(v => s"${v._1}=${v._2}").mkString(",") + "))" else ")")
   }
 }
