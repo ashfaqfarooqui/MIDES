@@ -9,9 +9,8 @@ A brute force BFS that split the result into modules rather than a monolithic pl
 package modelbuilding.solvers
 
 
-import modelbuilding.core._
+import modelbuilding.core.{SUL, _}
 import modelbuilding.core.modeling.{Model, ModularModel}
-import modelbuilding.core.simulation.SUL
 import modelbuilding.solvers.FrehagePlantBuilder._
 
 import scala.collection.mutable
@@ -26,16 +25,16 @@ object FrehagePlantBuilder {
 
 }
 
-class FrehagePlantBuilder(_model: Model) extends BaseSolver {
+class FrehagePlantBuilder(_sul: SUL) extends BaseSolver {
 
+  val _model = _sul.model
   assert(_model.isModular, "modelbuilder.solver.FrehageSolver requires a modular model.")
   private val model = _model.asInstanceOf[ModularModel]
-  private val simulator: SUL = model.simulation
 
-  private var queue: List[StateMap] = List(simulator.getInitState)
+  private var queue: List[StateMap] = List(_sul.getInitState)
 
   // One queue for each module to track new states that should be explored.
-  private val moduleStates: Map[String, mutable.Set[StateMap]] = model.modules.map(m => m -> mutable.Set(getReducedStateMap(simulator.getInitState,model,m))).toMap
+  private val moduleStates: Map[String, mutable.Set[StateMap]] = model.modules.map(m => m -> mutable.Set(getReducedStateMap(_sul.getInitState,model,m))).toMap
   private val moduleTransitions: Map[String, mutable.Set[StateMapTransition]] = model.modules.map(_ -> mutable.Set.empty[StateMapTransition]).toMap
 
   var count = 0
@@ -46,7 +45,7 @@ class FrehagePlantBuilder(_model: Model) extends BaseSolver {
     queue.nonEmpty
   }) {
 
-    val next: List[StateMapTransition] = queue.flatMap(simulator.getOutgoingTransitions(_, model.alphabet))
+    val next: List[StateMapTransition] = queue.flatMap(_sul.getOutgoingTransitions(_, model.alphabet))
 
     queue = List.empty[StateMap]
 
@@ -73,14 +72,14 @@ class FrehagePlantBuilder(_model: Model) extends BaseSolver {
       //      nonLocalVariables = Set.empty[String]
       states: Map[StateMap, State] = moduleStates(m).map( s => {
         val state = StateMap(s.states.filterKeys(k => !nonLocalVariables.contains(k)))
-        val name = (if ( state.states.forall{ case (k,v) => simulator.getInitState.states(k) == v } ) "INIT: " else "") + state.toString
+        val name = (if ( state.states.forall{ case (k,v) => _sul.getInitState.states(k) == v } ) "INIT: " else "") + state.toString
         (getReducedStateMap(s,model,m),State(name))
       }).toMap
       transitions: Set[Transition] = moduleTransitions(m).filterNot(_.event.getCommand == tau).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
       //      transitions: Set[Transition] = moduleTransitions(m).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
       alphabet: Alphabet = model.eventMapping(m)
-      iState: State = states(getReducedStateMap(simulator.getInitState, model, m) )
-      fState: Option[Set[State]] = simulator.getGoalStates match {
+      iState: State = states(getReducedStateMap(_sul.getInitState, model, m) )
+      fState: Option[Set[State]] = _sul.getGoalStates match {
         case Some(gs) => Some(gs.map( s => states(getReducedStateMap(s, model, m)) ))
         case None => None
       }

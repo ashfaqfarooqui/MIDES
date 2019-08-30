@@ -1,7 +1,7 @@
 package modelbuilding.solvers
 import grizzled.slf4j.Logging
 import modelbuilding.core.modeling.{Model, ModularModel, MonolithicModel}
-import modelbuilding.core.{AND, AlwaysTrue, Automata, Automaton, EQ, OR, State, StateMap, StateMapTransition, Symbol, Transition, Uncontrollable}
+import modelbuilding.core.{AND, AlwaysTrue, Automata, Automaton, EQ, OR, SUL, State, StateMap, StateMapTransition, Symbol, Transition, Uncontrollable}
 import modelbuilding.solvers.MonolithicSupSolver._
 import org.supremica._
 import supremicastuff.SupremicaWatersSystem
@@ -18,13 +18,14 @@ object MonolithicSupSolver {
 
   }
 
-class MonolithicSupSolver(_model:Model) extends BaseSolver with Logging{
+class MonolithicSupSolver(_sul:SUL) extends BaseSolver with Logging{
 
-  assert(_model.specFilePath.isDefined, "modelbuilder.solver.MonolithicSupSolver requires a specification model.")
+  assert(_sul.specification.isDefined, "modelbuilder.solver.MonolithicSupSolver requires a specification model.")
   info("Initializing SupSolver")
 
-  val specs: Set[automata.Automaton] = SupremicaWatersSystem(_model.specFilePath.get).getSupremicaSpecs.asScala.toSet
+  val specs: Set[automata.Automaton] = _sul.specification.get.getSupremicaSpecs.values.toSet//SupremicaWatersSystem(_model.specFilePath.get).getSupremicaSpecs.asScala.toSet
 
+  val _model = _sul.model
   //lets assume single spec for simplicity
   val spec = specs.head
 
@@ -36,8 +37,7 @@ class MonolithicSupSolver(_model:Model) extends BaseSolver with Logging{
 
 
   val events:Set[Symbol] = model.alphabet.events
-  val sul = model.simulation
-  val initState = extendStateMap(specs, sul.getInitState)
+  val initState = extendStateMap(specs, _sul.getInitState)
 
 
   //experimenting with monolithin first
@@ -74,7 +74,7 @@ class MonolithicSupSolver(_model:Model) extends BaseSolver with Logging{
       info(s"VisitedSet size ${visited.size}")
 
       val reachedStates = events.map(e =>
-        sul.getNextState(currState._1, e.getCommand) match {
+        _sul.getNextState(currState._1, e.getCommand) match {
             //getNextSpecState updates the state variable in the statemap. hence use the new current state.Mo
           case Some(value) => getNextSpecState(spec, value, e) match {
             case Some(v) => if(!forbiddedStates.contains(currState._1)) {
@@ -128,7 +128,7 @@ class MonolithicSupSolver(_model:Model) extends BaseSolver with Logging{
   //val extendedGoal = if(spec.hasAcceptingState) spec.getStateSet.asScala.filter(_.isAccepting).map(a=>spec->a.getName).map(_=>sul.getGoalStates.getOrElse(State)) else sul.getGoalStates
 
   val specGoal = if(spec.hasAcceptingState) spec.getStateSet.asScala.filter(_.isAccepting).map(a=>EQ(spec.getName,a.getName)).toList else List(AlwaysTrue)
-  val extendedGoalPredicate = AND(sul.getGoalPredicate.getOrElse(AlwaysTrue),OR(specGoal))
+  val extendedGoalPredicate = AND(_sul.getGoalPredicate.getOrElse(AlwaysTrue),OR(specGoal))
   val transitions = explore(queue,Set.empty[StateMap],Set.empty[StateMapTransition])
   val allStatesAsStateMap = getStatesFromTransitions(transitions) union forbiddedStates
   val mappedStates= mapStates(allStatesAsStateMap)

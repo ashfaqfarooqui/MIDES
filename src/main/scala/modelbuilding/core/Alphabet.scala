@@ -2,9 +2,9 @@ package modelbuilding.core
 
 object Alphabet {
 
-  def apply(_a: AnyRef*): Alphabet = Alphabet(false,_a)
+  //def apply(_a: AnyRef*): Alphabet = Alphabet(false,_a)
 
-  def apply(incTau:Boolean, _a: AnyRef*): Alphabet =  {
+  def apply(_a: AnyRef*): Alphabet =  {
     if (_a.isEmpty) new Alphabet(Set.empty[Symbol])
     else {
       val a = _a.head match {
@@ -12,7 +12,7 @@ object Alphabet {
         case _: Command => _a.toSet.asInstanceOf[Set[Command]].map(Symbol)
         case t => throw new IllegalArgumentException(s"Alphabet only accept inputs of either Seq[Symbol] or Seq[Command], not `${t.getClass}`")
       }
-      new Alphabet(a,incTau)
+      new Alphabet(a)
     }
   }
 

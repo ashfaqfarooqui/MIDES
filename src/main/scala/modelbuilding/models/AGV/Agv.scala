@@ -42,9 +42,6 @@ object Agv extends ModularModel with Specifications {
     "WS3" -> Alphabet(w31, w32, w33, w34)
   )
 
-  override val simulation = new SulAgv()
-  override val specFilePath: Option[String] = Some("SupremicaModels/AGV.wmod")
-  addSpecsFromSupremica(specFilePath.get)
 
 
 }
