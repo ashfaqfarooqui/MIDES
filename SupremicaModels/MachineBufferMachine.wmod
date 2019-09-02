@@ -108,7 +108,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="p:Buffer">
+        <SimpleComponent Kind="SPEC" Name="Buffer">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="Empty">

@@ -4,6 +4,7 @@ import modelbuilding.core.modeling.{Model, ModularModel, MonolithicModel}
 import modelbuilding.core.{AND, AlwaysTrue, Automata, Automaton, EQ, OR, SUL, State, StateMap, StateMapTransition, Symbol, Transition, Uncontrollable}
 import modelbuilding.solvers.MonolithicSupSolver._
 import org.supremica._
+import org.supremica.automata.algorithms.AutomataSynchronizer._
 import supremicastuff.SupremicaWatersSystem
 
 import scala.collection.JavaConverters._
@@ -25,11 +26,16 @@ class MonolithicSupSolver(_sul:SUL) extends BaseSolver with Logging{
 
   val specs: Set[automata.Automaton] = _sul.specification.get.getSupremicaSpecs.values.toSet//SupremicaWatersSystem(_model.specFilePath.get).getSupremicaSpecs.asScala.toSet
 
+  println(s"specs $specs")
   val _model = _sul.model
-  //lets assume single spec for simplicity
-  val spec = specs.head
+  val specAutomata = new automata.Automata()
+  specAutomata.setComment("spec")
+  specs.foreach(specAutomata.addAutomaton)
+  println(s"spec automata: $specAutomata")
+  val spec = synchronizeAutomata(specAutomata)
+ // val spec = specs.head
 
-  info(s"Read Specifications ${spec.getName}")
+  info(s"Read Specifications ${spec}")
 
   val model = if (_model.isModular) {
     _model.asInstanceOf[ModularModel]
