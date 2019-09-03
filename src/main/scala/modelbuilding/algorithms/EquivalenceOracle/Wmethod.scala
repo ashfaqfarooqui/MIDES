@@ -49,7 +49,7 @@ class Wmethod(alphabets:Alphabet,nbrState: Int) extends CEGenerator with Logging
         CachecPwrA(i)
       }
       info(s"running for i: $i")
-      if (n<=0||i>=4) {
+      if (n<=0||i>=3) {
         return Right(true)
       }
 
@@ -60,7 +60,7 @@ class Wmethod(alphabets:Alphabet,nbrState: Int) extends CEGenerator with Logging
       }
       {
         val s = p+u+w
-        val sysOp = t.teacher.isMember(s)
+        val sysOp = t.isMember(s)
         val hypOp = evalString(s,h)
         debug(s"checking for ce with $p + $u + $w + ,got sys: $sysOp, and hypOp : $hypOp")
         if(sysOp != hypOp){
