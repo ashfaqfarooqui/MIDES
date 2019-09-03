@@ -1,24 +1,46 @@
 package modelbuilding.core.modeling
 
+import grizzled.slf4j.Logging
 import modelbuilding.core.{Alphabet, Grammar, StateMap, StateMapTransition, StateSet, Uncontrollable, tau}
 import org.supremica.automata
-import org.supremica.automata.{Automaton, State}
+import org.supremica.automata.algorithms.AutomataSynchronizer.synchronizeAutomata
+import org.supremica.automata.algorithms.Plantifier
 import supremicastuff.SupremicaWatersSystem
 
 import scala.collection.JavaConverters._
 
-trait Specifications {
+trait Specifications extends Logging {
 
   val specFilePath: Option[String]
+  val syncSpecName:String = "SyncSpec"
   private var supremicaSpecs: Map[String, automata.Automaton] = Map.empty[String, automata.Automaton]
-
+  private var supremicaAlphabet: automata.Alphabet = new automata.Alphabet()
   def getSupremicaSpecs: Map[String, automata.Automaton] = supremicaSpecs
+
+  def addSynchronizedSpec:Unit={
+    val specAutomata = new automata.Automata()
+    supremicaSpecs.values.foreach(specAutomata.addAutomaton)
+    val spec = synchronizeAutomata(specAutomata)
+    spec.setName(syncSpecName)
+    supremicaSpecs+=(spec.getName->spec)
+  }
+
+  def usePlantifiedSpec={
+    val specAutomata = new automata.Automata()
+    supremicaSpecs.values.foreach(specAutomata.addAutomaton)
+    specAutomata.forEach(a=>Plantifier.plantify(a,supremicaAlphabet.getUncontrollableAlphabet))
+    supremicaSpecs=Map.empty[String,automata.Automaton]
+    supremicaSpecs=specAutomata.asScala.map(a=>s"${a.getName.replace(":","")}"->a).toMap
+    info(s"plantified spec ${supremicaSpecs}")
+
+  }
 
   def addSpecsFromSupremica(fileName: String): Unit = {
     supremicaSpecs = SupremicaWatersSystem(fileName).getSupremicaSpecs.asScala.map(a => s"${a.getName}" -> a).toMap
     supremicaSpecs.foreach { case (name, aut) =>
       assert(aut.isDeterministic, s"Spec `$name` is non-deterministic.")
     }
+    supremicaAlphabet=SupremicaWatersSystem(fileName).getSupremicaAutomata.getUnionAlphabet
   }
 
   def isAccepting(spec: String, state: String): Boolean = supremicaSpecs(spec).getStateSet.getState(state).isAccepting
@@ -27,41 +49,7 @@ trait Specifications {
     StateMap(states = stateMap.states, specs = specs.map(s => s.getName -> s.getInitialState.getName).toMap)
   }
 
-  //Check-> send in a function to evaluate additionally. here I use if to check accepting nature of the reached state
-  def isSequenceAllowedInSpec(grammar: Grammar, spec: String,check: State=>Boolean):Boolean={
 
-    assert(supremicaSpecs.keySet.contains(spec), "spec should exist")
-    val automaton = supremicaSpecs(spec)
-    val s=automaton.getInitialState
-    val alphabet=automaton.getAlphabet
-    val p=grammar.getSequenceAsString.filterNot(_==tau.toString).filter(a=>alphabet.contains(a.toString))
-
-    def loop(s:State,p:List[String]):Boolean={
-      //debug(s"inloop: at $s and ${p}")
-      //debug(s"check ${check(s)}")
-      if(p.nonEmpty && s.getOutgoingArcs.asScala.exists(_.getEvent.getLabel==p.head)){
-        loop(s.getOutgoingArcs.asScala.find(_.getEvent.getLabel==p.head).get.getToState,p.tail)
-      }
-      else if(p.isEmpty && check(s)) true else {false}
-    }
-    loop(s,p)
-  }
-
-  def isSequenceControllableInSpec(sequence:Grammar, alphabet: Alphabet,specName:String):Int={
-
-    assert(supremicaSpecs.keySet.contains(specName), "spec should exist")
-    val spec = supremicaSpecs(specName)
-    val pref = sequence.getAllPrefixes
-    val ucEvents = alphabet.events.filter(_.getCommand.isInstanceOf[Uncontrollable])
-    val su = ucEvents //.flatMap(a=>ucEvents.map(a+_)).flatMap(a=>ucEvents.map(a+_))
-    val tu = pref.flatMap(t=>su.map(t+_))
-    //val tuNotCtrl = tu.filterNot(x=>hasValidPath(x,spec,_=>true)).exists(runCmdOnSULWithoutGoal(_))
- //   if(tuNotCtrl) {
-    if(true) {
-      0
-    }
-    else 2
-  }
 
 
 

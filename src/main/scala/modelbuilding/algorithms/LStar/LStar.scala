@@ -11,11 +11,11 @@ import modelbuilding.core.{Alphabet, Automaton, Grammar, Symbol, Word, tau}
 import scala.annotation.tailrec
 import scala.util.{Failure, Success}
 
-class LStar(teacher: Teacher, A:Alphabet,ceGen:CEGenerator) extends Logging
+class LStar(teacher: Teacher, spec:Option[String], A:Alphabet,ceGen:CEGenerator) extends Logging
 {
   val t = Symbol(tau)
 
-  def obsTable(S:Set[Grammar], E:Set[Grammar]) = ObservationTable(A,S,E,teacher,0)
+  def obsTable(S:Set[Grammar], E:Set[Grammar]) = ObservationTable(A,S,E,teacher.isMember(spec),0)
 
 
   @tailrec
@@ -63,6 +63,6 @@ class LStar(teacher: Teacher, A:Alphabet,ceGen:CEGenerator) extends Logging
     info("Starting Lstar Learner")
     val l = learn(updateTable(obsTable(Set(t),Set(t)),Set(t),Set(t)))
     info("Done Lstar Learner")
-    l
+    l.copy(name=s"sup_${if(spec.isDefined) spec.get else "hypothesis"}")
   }
 }

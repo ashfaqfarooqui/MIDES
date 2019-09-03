@@ -14,7 +14,7 @@ object ModelBuilder extends Logging {
   val supervisor = LearningType.SUPERVISOR
   val plant = LearningType.PLANT
 
-  val modelName = "MachineBuffer"
+  val modelName = "TestUnit"
   info(s"Starting with mode : $modelName")
 
 
@@ -29,7 +29,7 @@ object ModelBuilder extends Logging {
     case _ => throw new Exception("A model wasn't defined.")
   }
 
-  val solver: String = "monolithicSupSolver" // "modular", "mono"
+  val solver: String = "LStarSuprLearner" // "modular", "mono"
 
   def main(args: Array[String]) : Unit= {
 
@@ -42,7 +42,9 @@ object ModelBuilder extends Logging {
       case "monolithic" => new MonolithicSolver(sul)
       case "monolithicSupSolver" => new MonolithicSupSolver(sul)
       case "modularSupSolver" => new ModularSupSolver(sul)
-      case "LStarLearner" => new LStarPlantSolver(sul)
+      case "LStarPlantLearner" => new LStarPlantSolver(sul)
+      case "LStarSuprLearner" => new LStarSuprSolver(sul)
+
     }
 
     info("Learning done!")

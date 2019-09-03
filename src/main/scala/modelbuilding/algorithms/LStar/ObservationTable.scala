@@ -19,8 +19,8 @@ object ObservationTable {
     case Failure(e) => throw new Exception(s"Couldn't create an inital table: $e")
   }
 
-  def apply(table: DataTable, A: Alphabet, S: Set[Grammar], E: Set[Grammar],teacher: Teacher, instance: Int): ObservationTable = new ObservationTable(table, A, S, E,teacher, instance)
-  def apply(A: Alphabet, S: Set[Grammar], E: Set[Grammar],teacher: Teacher, instance: Int): ObservationTable = new ObservationTable(initTable, A, S, E,teacher, instance)
+  def apply(table: DataTable, A: Alphabet, S: Set[Grammar], E: Set[Grammar],isMember:Grammar=>Int, instance: Int): ObservationTable = new ObservationTable(table, A, S, E,isMember, instance)
+  def apply(A: Alphabet, S: Set[Grammar], E: Set[Grammar],isMember:Grammar=>Int, instance: Int): ObservationTable = new ObservationTable(initTable, A, S, E,isMember, instance)
   def apply(filePath:String): ObservationTable = loadtable(filePath)//new ObservationTable(table, A, S, E, instance)
 
 
@@ -57,7 +57,10 @@ object ObservationTable {
     val column1 = new DataColumn[String](defaultCell00, (newS union sa).toVector.map(_.toString))
     val columns = column1 :: newE.map {
       e =>
-        val colValues = (newS union sa).toVector.map(s => oldTable.getElement(s, e).getOrElse(oldTable.teacher.isMember(s + e)))
+        val colValues = (newS union sa).toVector.map(s => oldTable.getElement(s, e).getOrElse{
+
+          val se= s+e
+          oldTable.isMember(se)})
         val c = new DataColumn[Int](s"$e", colValues)
         c
     }.toList
@@ -68,11 +71,11 @@ object ObservationTable {
       case Success(value) => value
     }
 
-    ObservationTable(table, oldTable.A, newS, newE,oldTable.teacher, oldTable.instance + 1)
+    ObservationTable(table, oldTable.A, newS, newE,oldTable.isMember, oldTable.instance + 1)
   }
 }
 
-case class ObservationTable(table :DataTable, A: Alphabet, S: Set[Grammar], E: Set[Grammar], teacher:Teacher, instance:Int) extends Serializable with Logging{
+case class ObservationTable(table :DataTable, A: Alphabet, S: Set[Grammar], E: Set[Grammar], isMember: Grammar=>Int, instance:Int) extends Serializable with Logging{
   def prettyPrintTable:String ={
     val buf = new StringBuilder
     val maxSa = S.toList.map(_.toString.mkString(",").length).max
