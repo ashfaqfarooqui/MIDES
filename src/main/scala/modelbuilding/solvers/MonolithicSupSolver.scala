@@ -24,17 +24,15 @@ class MonolithicSupSolver(_sul:SUL) extends BaseSolver with Logging{
   assert(_sul.specification.isDefined, "modelbuilder.solver.MonolithicSupSolver requires a specification model.")
   info("Initializing SupSolver")
 
-  val specs: Set[automata.Automaton] = _sul.specification.get.getSupremicaSpecs.values.toSet//SupremicaWatersSystem(_model.specFilePath.get).getSupremicaSpecs.asScala.toSet
-
+  val specs = _sul.specification.get//SupremicaWatersSystem(_model.specFilePath.get).getSupremicaSpecs.asScala.toSet
+  specs.addSynchronizedSpec
+  //Need to use full spec...
   println(s"specs $specs")
   val _model = _sul.model
-  val specAutomata = new automata.Automata()
-  specAutomata.setComment("spec")
-  specs.foreach(specAutomata.addAutomaton)
-  println(s"spec automata: $specAutomata")
-  val spec = synchronizeAutomata(specAutomata)
+
  // val spec = specs.head
 
+  val spec = specs.getSupremicaSpecs(specs.syncSpecName)
   info(s"Read Specifications ${spec}")
 
   val model = if (_model.isModular) {
@@ -43,7 +41,7 @@ class MonolithicSupSolver(_sul:SUL) extends BaseSolver with Logging{
 
 
   val events:Set[Symbol] = model.alphabet.events
-  val initState = extendStateMap(specs, _sul.getInitState)
+  val initState = extendStateMap(Set(spec), _sul.getInitState)
 
 
   //experimenting with monolithin first
@@ -52,10 +50,15 @@ class MonolithicSupSolver(_sul:SUL) extends BaseSolver with Logging{
   val queue: Queue[StateMap] = Queue(initState)
 
   def getNextSpecState(sp:automata.Automaton,st:StateMap, c:Symbol):Option[StateMap]={
+    debug(s"getting next spec state for $sp, $st with symb $c")
     val specStateInMap=st.states(sp.getName).asInstanceOf[String]
+    debug(s"current state in map $specStateInMap")
     val currSpecState = sp.getStateSet.getState(specStateInMap)
+    debug(s"current state ${currSpecState.getOutgoingArcs}")
+
     //since we know the spec is deterministic there can exist just one or none transitions
     val theTransition = currSpecState.getOutgoingArcs.asScala.filter(_.getSource.getName==specStateInMap).filter(_.getEvent.getName==c.toString)
+    debug(s"the transition $theTransition")
     if(theTransition.isEmpty)
       None
     else{
@@ -82,7 +85,11 @@ class MonolithicSupSolver(_sul:SUL) extends BaseSolver with Logging{
       val reachedStates = events.map(e =>
         _sul.getNextState(currState._1, e.getCommand) match {
             //getNextSpecState updates the state variable in the statemap. hence use the new current state.Mo
-          case Some(value) => getNextSpecState(spec, value, e) match {
+          case Some(value) =>
+            if(spec.getAlphabet.contains(e.getCommand.toString)){
+            getNextSpecState(spec, value, e) }
+            else {Some(value) }
+            match {
             case Some(v) => if(!forbiddedStates.contains(currState._1)) {
               transitions = transitions + StateMapTransition(currState._1, v, e)
               Some(v)
