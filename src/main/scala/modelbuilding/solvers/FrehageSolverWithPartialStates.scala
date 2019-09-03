@@ -2,9 +2,9 @@ package modelbuilding.solvers
 
 import modelbuilding.core.{SUL, _}
 import modelbuilding.core.modeling.{Model, ModularModel}
-import modelbuilding.solvers.FrehagePlantBuilderWithPartialStates._
+import modelbuilding.solvers.FrehageSolverWithPartialStates._
 
-object FrehagePlantBuilderWithPartialStates {
+object FrehageSolverWithPartialStates {
 
   def getReducedStateMap(state: StateMap, model: ModularModel, module: String): StateMap =
     StateMap(state.name, state.states.filterKeys(s => model.stateMapping(module).states.contains(s)))
@@ -14,7 +14,7 @@ object FrehagePlantBuilderWithPartialStates {
 
 }
 
-class FrehagePlantBuilderWithPartialStates(_sul: SUL) extends BaseSolver {
+class FrehageSolverWithPartialStates(_sul: SUL) extends BaseSolver {
 
   val _model = _sul.model
   assert(_model.isModular, "modelbuilder.solver.FrehageSolverWithPartialStates requires a modular model.")
@@ -23,29 +23,40 @@ class FrehagePlantBuilderWithPartialStates(_sul: SUL) extends BaseSolver {
   private val model = _model.asInstanceOf[ModularModel]
   //private val simulator: SUL = model.simulation
 
+  info("Starting to build the models using modelbuilding.solvers.FrehageSolver")
+
+
+  // One queue for each module to track new states that should be explored.
   private var moduleQueue: Map[String, Set[StateMap]] = model.modules.map(_ -> Set(_sul.getInitState)).toMap
   private var moduleStates: Map[String, Set[StateMap]] = model.modules.map(_ -> Set.empty[StateMap]).toMap
-  private var moduleTransitions: Map[String, Vector[StateMapTransition]] = model.modules.map(_ -> Vector.empty[StateMapTransition]).toMap
+  private var moduleTransitions: Map[String, Set[StateMapTransition]] = model.modules.map(_ -> Set.empty[StateMapTransition]).toMap
 
-  for (m <- model.modules) {
+  var count = 0
+  // Loop until all modules are done exploring new states
+  while (moduleQueue.values.exists(q => q.nonEmpty)) {
 
-    var queue: Vector[StateMap] = Vector(getReducedStateMap(_sul.getInitState, model, m))
-    var states: Set[StateMap] = Set.empty[StateMap]
-    var transitions: Vector[StateMapTransition] = Vector.empty[StateMapTransition]
+    count += 1
+    println("#############################")
+    println(s"# Iteration $count")
+    println("Size of the data structure")
+    println("* Queues: " + moduleQueue.map(_._2.size).sum)
+    println("* States: " + moduleStates.map(_._2.size).sum)
+    println("* Transitions: " + moduleTransitions.map(_._2.size).sum)
 
-    while (queue.nonEmpty) {
+    // Iterate over the modules to process them individually
+    for (m <- model.modules) {
 
-      states ++= queue
+      moduleQueue += (m -> moduleQueue(m).filter(s => !moduleStates(m).contains(getReducedStateMap(s, model, m))))
 
-      val next = queue.flatMap(s => _sul.getOutgoingTransitions(s, model.eventMapping(m)))
-      transitions ++= next.map( t => getReducedStateMapTransition(t, model, m))
+      moduleStates += (m -> (moduleStates(m) ++ moduleQueue(m).map(s => getReducedStateMap(s, model, m))))
 
-      queue = next.map(s => s.target).filter(!states.contains(_))
+      val next = moduleQueue(m).flatMap(s => _sul.getOutgoingTransitions(s, model.eventMapping(m)))
+      moduleTransitions += (m -> (moduleTransitions(m) ++ next.map( t => getReducedStateMapTransition(t, model, m))))
+
+      moduleQueue(m).empty
+      for (m <- model.modules) moduleQueue += (m -> (moduleQueue(m) ++ next.map(s => s.target)))
 
     }
-
-    moduleStates += (m -> states)
-    moduleTransitions += (m -> transitions)
 
   }
 
@@ -57,7 +68,7 @@ class FrehagePlantBuilderWithPartialStates(_sul: SUL) extends BaseSolver {
         val name = (if ( s.states.forall{ case (k,v) => _sul.getInitState.states(k) == v } ) "INIT: " else "") + s.toString
         (s,State(name))
       }).toMap
-      transitions: Set[Transition] = moduleTransitions(m).map( t => Transition(states(t.source), states(t.target), t.event)).toSet
+      transitions: Set[Transition] = moduleTransitions(m).map( t => Transition(states(t.source), states(t.target), t.event))
       alphabet: Alphabet = model.eventMapping(m)
       iState: State = states(getReducedStateMap(_sul.getInitState, model, m) )
       fState: Option[Set[State]] = _sul.getGoalStates match {
@@ -67,7 +78,7 @@ class FrehagePlantBuilderWithPartialStates(_sul: SUL) extends BaseSolver {
     } yield Automaton(m, states.values.toSet, alphabet, transitions, iState, fState)
 
     Automata(modules)
-  }
 
+  }
 
 }

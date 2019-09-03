@@ -3,7 +3,7 @@ package  modelbuilding.models.AGV
 import modelbuilding.core.modeling._
 import modelbuilding.core.{Alphabet, StateSet}
 
-object Agv extends ModularModel with Specifications {
+object Agv extends ModularModel {
 
   override val name: String = "AGV"
   override val modules: Set[String] = Set("Input 1", "Input 3", "Output", "AGV1", "AGV2", "AGV3", "AGV4", "AGV5", "WS1", "WS2", "WS3")
@@ -28,6 +28,7 @@ object Agv extends ModularModel with Specifications {
   )
 
   override val eventMapping:Map[String,Alphabet] = Map(
+
     "Input 1" -> Alphabet(e10, e11),
     "Input 3" -> Alphabet(e30, e31),
     "Output" -> Alphabet(e20, e21),
@@ -41,9 +42,6 @@ object Agv extends ModularModel with Specifications {
     "WS3" -> Alphabet(w31, w32, w33, w34)
   )
 
-  override val simulation = new SulAgv()
 
-  override val specFilePath: Option[String] = Some("SupremicaModels/AGV.wmod")
-  addSpecsFromSupremica(specFilePath.get)
 
 }

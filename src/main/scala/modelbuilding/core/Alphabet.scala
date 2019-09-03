@@ -2,7 +2,9 @@ package modelbuilding.core
 
 object Alphabet {
 
-  def apply(_a: AnyRef*): Alphabet = {
+  //def apply(_a: AnyRef*): Alphabet = Alphabet(false,_a)
+
+  def apply(_a: AnyRef*): Alphabet =  {
     if (_a.isEmpty) new Alphabet(Set.empty[Symbol])
     else {
       val a = _a.head match {

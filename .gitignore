@@ -4,3 +4,4 @@ learner.log
 project/
 target/
 *.dot
+*.sc

@@ -1,8 +1,7 @@
 package modelbuilding.solvers
 import grizzled.slf4j.Logging
 import modelbuilding.core.modeling.{Model, ModularModel}
-import modelbuilding.core.simulation.SUL
-import modelbuilding.core.{AND, Alphabet, AlwaysTrue, Automata, Automaton, EQ, OR, State, StateMap, StateMapTransition, StateSet, Symbol, Transition, Uncontrollable}
+import modelbuilding.core.{AND, Alphabet, AlwaysTrue, Automata, Automaton, EQ, OR, SUL, State, StateMap, StateMapTransition, StateSet, Symbol, Transition, Uncontrollable}
 import modelbuilding.solvers.ModularSupSolver._
 import modelbuilding.solvers.MonolithicSupSolver.extendStateMap
 import org.supremica.automata
@@ -43,19 +42,19 @@ object ModularSupSolver {
 
 }
 
-class ModularSupSolver(_model:Model) extends BaseSolver with Logging {
+class ModularSupSolver(_sul:SUL) extends BaseSolver with Logging {
 
-  assert(_model.specFilePath.isDefined, "modelbuilder.solver.ModularSupSolver requires a specification.")
+  val _model=_sul.model
+  assert(_sul.specification.isDefined, "modelbuilder.solver.ModularSupSolver requires a specification.")
   assert(_model.isModular, "modelbuilder.solver.ModularSupSolver requires a modular model.")
 
   info("Initializing ModularSupSolver")
-  val specs: Set[automata.Automaton] = SupremicaWatersSystem(_model.specFilePath.get).getSupremicaSpecs.asScala.toSet
+  val specs: Set[automata.Automaton] = _sul.specification.get.getSupremicaSpecs.values.toSet//SupremicaWatersSystem(_sul.specification.get).getSupremicaSpecs.asScala.toSet
 
   specs.foreach(s=>info(s"Read spec for ${s.getName}"))
 
   val model: ModularModel = _model.asInstanceOf[ModularModel]
-  val sul: SUL = model.simulation
-  val initState: StateMap = extendStateMap(specs, sul.getInitState)
+  val initState: StateMap = extendStateMap(specs, _sul.getInitState)
 
 
   val initQueue: Queue[StateMap] = Queue(initState)
@@ -108,7 +107,7 @@ class ModularSupSolver(_model:Model) extends BaseSolver with Logging {
         //only iterate over reachable states
 
           val reachedStates = moduleMapping(m).events.map { e =>
-            sul.getNextState(currState._1, e.getCommand) match {
+            _sul.getNextState(currState._1, e.getCommand) match {
               case Some(value) =>
                 getNextSpecState(m, value, e) match {
                   case Some(v) =>
@@ -199,8 +198,8 @@ class ModularSupSolver(_model:Model) extends BaseSolver with Logging {
 
 
       val specGoal = if(m.hasAcceptingState) m.getStateSet.asScala.filter(_.isAccepting).map(a=>EQ(m.getName,a.getName)).toList else List(AlwaysTrue)
-      val extendedGoalPredicate = AND(sul.getGoalPredicate.getOrElse(AlwaysTrue),OR(specGoal))
-      val markedStateSet=mStates(module).filter(extendedGoalPredicate.eval(_,sul.acceptsPartialStates).get) map mappedStates
+      val extendedGoalPredicate = AND(_sul.getGoalPredicate.getOrElse(AlwaysTrue),OR(specGoal))
+      val markedStateSet=mStates(module).filter(extendedGoalPredicate.eval(_,_sul.acceptsPartialStates).get) map mappedStates
       val markedStates = if(markedStateSet.isEmpty) None else Some(markedStateSet)
 
       Automaton(module,

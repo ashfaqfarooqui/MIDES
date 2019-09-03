@@ -1,64 +1,46 @@
 package modelbuilding.core.modeling
 
-import modelbuilding.core.{Alphabet, StateMap, StateMapTransition, StateSet}
+import grizzled.slf4j.Logging
+import modelbuilding.core.{Alphabet, Grammar, StateMap, StateMapTransition, StateSet, Uncontrollable, tau}
 import org.supremica.automata
+import org.supremica.automata.algorithms.AutomataSynchronizer.synchronizeAutomata
+import org.supremica.automata.algorithms.Plantifier
 import supremicastuff.SupremicaWatersSystem
 
 import scala.collection.JavaConverters._
 
-trait Specifications extends Model {
+trait Specifications extends Logging {
 
-  override val hasSpecs: Boolean = true
-
+  val specFilePath: Option[String]
+  val syncSpecName:String = "SyncSpec"
   private var supremicaSpecs: Map[String, automata.Automaton] = Map.empty[String, automata.Automaton]
-
+  private var supremicaAlphabet: automata.Alphabet = new automata.Alphabet()
   def getSupremicaSpecs: Map[String, automata.Automaton] = supremicaSpecs
+
+  def addSynchronizedSpec:Unit={
+    val specAutomata = new automata.Automata()
+    supremicaSpecs.values.foreach(specAutomata.addAutomaton)
+    val spec = synchronizeAutomata(specAutomata)
+    spec.setName(syncSpecName)
+    supremicaSpecs+=(spec.getName->spec)
+  }
+
+  def usePlantifiedSpec={
+    val specAutomata = new automata.Automata()
+    supremicaSpecs.values.foreach(specAutomata.addAutomaton)
+    specAutomata.forEach(a=>Plantifier.plantify(a,supremicaAlphabet.getUncontrollableAlphabet))
+    supremicaSpecs=Map.empty[String,automata.Automaton]
+    supremicaSpecs=specAutomata.asScala.map(a=>s"${a.getName.replace(":","")}"->a).toMap
+    info(s"plantified spec ${supremicaSpecs}")
+
+  }
 
   def addSpecsFromSupremica(fileName: String): Unit = {
     supremicaSpecs = SupremicaWatersSystem(fileName).getSupremicaSpecs.asScala.map(a => s"${a.getName}" -> a).toMap
     supremicaSpecs.foreach { case (name, aut) =>
       assert(aut.isDeterministic, s"Spec `$name` is non-deterministic.")
     }
-  }
-
-  def getSupervisorModules: Set[Module] = {
-
-    if (!this.isModular) Set(Module(this.name, states, alphabet))
-    else {
-
-      val modularModel = this.asInstanceOf[ModularModel]
-
-      if (supremicaSpecs.isEmpty) // If no Automata specs exist the original modules can be used.
-        modularModel.modules.map(m => Module(m, modularModel.stateMapping(m), modularModel.eventMapping(m)))
-      else {
-
-        val specAlphabets: Map[String, Alphabet] = supremicaSpecs.map(s => s._1 -> new Alphabet(alphabet.events.filter(e => s._2.getAlphabet.contains(e.getCommand.toString))))
-
-        val specBlocks = supremicaSpecs.map(s =>
-          s._1 -> modularModel.eventMapping.filter(m =>
-            m._2.events.map(_.getCommand.toString).intersect(s._2.eventIterator.asScala.map(_.getLabel).toSet).nonEmpty
-          ).keys
-        )
-
-        supremicaSpecs.keySet.map{ s =>
-          Module(
-            name = s,
-            stateSet = StateSet(
-              modularModel.eventMapping.filter{ case(m,a) =>
-                specAlphabets(s).events.exists(e => a.events.contains(e))
-              }.flatMap(x => modularModel.stateMapping(x._1).states).toSet
-            ),
-            alphabet = specAlphabets(s) + new Alphabet(
-              modularModel.eventMapping.filter{ case(m,a) =>
-                specAlphabets(s).events.exists(e => !e.isControllable && a.events.contains(e))
-              }.flatMap(_._2.events).toSet
-            ),
-            Set(s)
-          )
-        }
-
-      }
-    }
+    supremicaAlphabet=SupremicaWatersSystem(fileName).getSupremicaAutomata.getUnionAlphabet
   }
 
   def isAccepting(spec: String, state: String): Boolean = supremicaSpecs(spec).getStateSet.getState(state).isAccepting
@@ -67,7 +49,15 @@ trait Specifications extends Model {
     StateMap(states = stateMap.states, specs = specs.map(s => s.getName -> s.getInitialState.getName).toMap)
   }
 
+
+
+
+
   def evalTransition(t: StateMapTransition, specs: Set[String]): Map[String, Option[String]] = {
+
+    println("""##########""")
+    println(t)
+    println(specs)
 
     val sourceStates = specs.map(s => s -> t.source.specs(s)).toMap
 
