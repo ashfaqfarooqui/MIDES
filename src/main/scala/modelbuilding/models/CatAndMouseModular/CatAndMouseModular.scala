@@ -3,7 +3,7 @@ package modelbuilding.models.CatAndMouseModular
 import modelbuilding.core._
 import modelbuilding.core.modeling._
 
-object CatAndMouseModular extends ModularModel with Specifications {
+object CatAndMouseModular extends ModularModel {
 
   override val name: String = "CatAndMouseModular"
   override val alphabet = Alphabet(c1,c2,c3,c4,c5,c6,c7,m1,m2,m3,m4,m5,m6)

@@ -3,7 +3,7 @@ package  modelbuilding.models.AGV
 import modelbuilding.core.modeling._
 import modelbuilding.core.{Alphabet, StateSet}
 
-object Agv extends ModularModel with Specifications {
+object Agv extends ModularModel {
 
   override val name: String = "AGV"
   override val modules: Set[String] = Set("Input 1", "Input 3", "Output", "AGV1", "AGV2", "AGV3", "AGV4", "AGV5", "WS1", "WS2", "WS3")

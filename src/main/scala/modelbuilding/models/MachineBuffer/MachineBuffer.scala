@@ -3,7 +3,7 @@ package modelbuilding.models.MachineBuffer
 import modelbuilding.core._
 import modelbuilding.core.modeling._
 
-object MachineBuffer extends ModularModel with Specifications {
+object MachineBuffer extends ModularModel {
 
   override val name: String = "MachineBufferMachine"
   override val modules: Set[String] = Set("Machine1", "Machine2")
