@@ -45,11 +45,11 @@ object ModularSupSolver {
 class ModularSupSolver(_sul:SUL) extends BaseSolver with Logging {
 
   val _model=_sul.model
-  assert(_model.specFilePath.isDefined, "modelbuilder.solver.ModularSupSolver requires a specification.")
+  assert(_sul.specification.isDefined, "modelbuilder.solver.ModularSupSolver requires a specification.")
   assert(_model.isModular, "modelbuilder.solver.ModularSupSolver requires a modular model.")
 
   info("Initializing ModularSupSolver")
-  val specs: Set[automata.Automaton] = SupremicaWatersSystem(_model.specFilePath.get).getSupremicaSpecs.asScala.toSet
+  val specs: Set[automata.Automaton] = _sul.specification.get.getSupremicaSpecs.values.toSet//SupremicaWatersSystem(_sul.specification.get).getSupremicaSpecs.asScala.toSet
 
   specs.foreach(s=>info(s"Read spec for ${s.getName}"))
 
