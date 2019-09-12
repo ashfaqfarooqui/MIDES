@@ -113,7 +113,7 @@ class FrehageModularSupSynthesis(sul: SUL) extends BaseSolver {
   // Loop until all modules are done exploring new states
   while ( {
     count += 1
-    if (count%1 == 0) println(s"Iteration: $count, queue size: ${queue.size}")
+    if (count%1000 == 0) println(s"Iteration: $count, queue size: ${queue.size}")
     queue.nonEmpty
   }) {
 
@@ -179,10 +179,34 @@ class FrehageModularSupSynthesis(sul: SUL) extends BaseSolver {
     }
   }
 
-  // Remove all uncontrollable states
+  /*
+   * PROCESS THE OUTPUT
+   * 1) Identify all `Non Local Variables`
+   * 2) Remove `Non Local Variables` from states and transitions
+   * 3) Remove all uncontrollable states and connected transitions
+   */
+  private var reducedModuleInitStates: Map[String, StateMap] = Map.empty[String, StateMap]
+  private val reducedModuleStates: Map[String, mutable.Set[StateMap]] = modules.map(m => m.name -> mutable.Set.empty[StateMap]).toMap
+  private val reducedModuleForbidden: Map[String, mutable.Set[StateMap]] = modules.map(m => m.name -> mutable.Set.empty[StateMap]).toMap
+  private val reducedModuleTransitions: Map[String, mutable.Set[StateMapTransition]] = modules.map(_.name -> mutable.Set.empty[StateMapTransition]).toMap
+
   for (m <- modules) {
-    moduleStates(m.name) --= moduleForbidden(m.name)
-    moduleTransitions(m.name) --= moduleTransitions(m.name).filter(t => moduleForbidden(m.name).contains(t.source) || moduleForbidden(m.name).contains(t.target))
+    // 1
+    val nonLocalVariables =
+      moduleTransitions(m.name).filter(_.event.getCommand == tau).flatMap(t => t.source.states.keys.filter(k => t.source.states(k) != t.target.states(k)))
+
+    println(m.name, nonLocalVariables)
+
+    // 2
+    def reduce(s: StateMap) = StateMap(s.states.filterKeys(k => !nonLocalVariables.contains(k)), s.specs)
+    reducedModuleInitStates += (m.name -> reduce(getReducedStateMap(initState, m)))
+    reducedModuleStates(m.name) ++= moduleStates(m.name).map(reduce)
+    reducedModuleForbidden(m.name) ++= moduleForbidden(m.name).map(reduce)
+    reducedModuleTransitions(m.name) ++= moduleTransitions(m.name).map(t => StateMapTransition(reduce(t.source), reduce(t.target), t.event))
+
+    // 3
+    reducedModuleStates(m.name) --= reducedModuleForbidden(m.name)
+    reducedModuleTransitions(m.name) --= reducedModuleTransitions(m.name).filter(t => reducedModuleForbidden(m.name).contains(t.source) || reducedModuleForbidden(m.name).contains(t.target))
   }
 
   println("DONE!")
@@ -193,27 +217,24 @@ class FrehageModularSupSynthesis(sul: SUL) extends BaseSolver {
 
     val automatons = for {
       m <- modules
-      nonLocalVariables =
-        moduleTransitions(m.name).filter(_.event.getCommand == tau).flatMap(t => t.source.states.keys.filter(k => t.source.states(k) != t.target.states(k)))
 
-      states: Map[StateMap, State] = moduleStates(m.name).map( s => {
-        val state = StateMap(s.states.filterKeys(k => !nonLocalVariables.contains(k)), s.specs)
+      states: Map[StateMap, State] = reducedModuleStates(m.name).map( s => {
         val name = (
-          (if (state.states.forall{ case (k,v) => initState.states(k) == v }
-            && state.specs.forall{ case (k,v) => initState.specs(k) == v }) "INIT: " else "")
-          + state.toString )
+          (if (s.states.forall{ case (k,v) => initState.states(k) == v }
+            && s.specs.forall{ case (k,v) => initState.specs(k) == v }) "INIT: " else "")
+          + s.toString )
         (s, State(name))
       }).toMap
-      transitions: Set[Transition] = moduleTransitions(m.name).filterNot(_.event.getCommand == tau).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
+      transitions: Set[Transition] = reducedModuleTransitions(m.name).filterNot(_.event.getCommand == tau).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
       alphabet: Alphabet = m.alphabet
-      iState: State = states(getReducedStateMap(initState, m) )
+      iState: State = states(reducedModuleInitStates(m.name))
       fStates: Option[Set[State]] =
         Some(states.filter(s => s._1.specs.forall(spec => specifications.isAccepting(spec._1,spec._2.toString))).values.toSet)
-//      forbiddenStates = moduleForbidden(m.name).map(states(_)) match {
-//        case x if x.nonEmpty => Some(x.toSet)
-//        case _ => None
-//      }
-    } yield Automaton(m.name, states.values.toSet, alphabet, transitions, iState, fStates)
+      forbiddenStates = reducedModuleForbidden(m.name).intersect(reducedModuleStates(m.name)).map(states(_)) match {
+        case x if x.nonEmpty => Some(x.toSet)
+        case _ => None
+      }
+    } yield Automaton(m.name, states.values.toSet, alphabet, transitions, iState, fStates, forbiddenStates)
     Automata(automatons)
 
   }

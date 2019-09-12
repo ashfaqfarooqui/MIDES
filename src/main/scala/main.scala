@@ -9,10 +9,10 @@ import supremicastuff.SupremicaHelpers
 
 object ModelBuilder extends Logging {
 
-  val supervisor = LearningType.SUPERVISOR
-  val plant = LearningType.PLANT
+  val supervisor: LearningType.Value = LearningType.SUPERVISOR
+  val plant: LearningType.Value = LearningType.PLANT
 
-  val modelName = "CatMouseModular"
+  val modelName: String = "AGV"
   info(s"Starting with mode : $modelName")
 
 
