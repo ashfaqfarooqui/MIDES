@@ -1,12 +1,10 @@
 
 import grizzled.slf4j.Logging
 import modelbuilding.core.{LearningType, SUL}
-import modelbuilding.core.modeling.Model
 import modelbuilding.models.TestUnit.TLSpecifications
 import modelbuilding.models._
 import modelbuilding.solvers._
 import supremicastuff.SupremicaHelpers
-import supremicastuff.SupremicaHelpers._
 
 
 object ModelBuilder extends Logging {
@@ -14,7 +12,7 @@ object ModelBuilder extends Logging {
   val supervisor = LearningType.SUPERVISOR
   val plant = LearningType.PLANT
 
-  val modelName = "TestUnit"
+  val modelName = "CatMouseModular"
   info(s"Starting with mode : $modelName")
 
 
@@ -29,7 +27,7 @@ object ModelBuilder extends Logging {
     case _ => throw new Exception("A model wasn't defined.")
   }
 
-  val solver: String = "LStarSuprLearner" // "modular", "mono"
+  val solver: String = "frehage3" // "modular", "mono"
 
   def main(args: Array[String]) : Unit= {
 

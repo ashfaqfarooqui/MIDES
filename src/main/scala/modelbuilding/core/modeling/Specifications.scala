@@ -1,7 +1,7 @@
 package modelbuilding.core.modeling
 
 import grizzled.slf4j.Logging
-import modelbuilding.core.{Alphabet, Grammar, StateMap, StateMapTransition, StateSet, Uncontrollable, tau}
+import modelbuilding.core.{StateMap, StateMapTransition}
 import org.supremica.automata
 import org.supremica.automata.algorithms.AutomataSynchronizer.synchronizeAutomata
 import org.supremica.automata.algorithms.Plantifier
@@ -54,10 +54,6 @@ trait Specifications extends Logging {
 
 
   def evalTransition(t: StateMapTransition, specs: Set[String]): Map[String, Option[String]] = {
-
-    println("""##########""")
-    println(t)
-    println(specs)
 
     val sourceStates = specs.map(s => s -> t.source.specs(s)).toMap
 
