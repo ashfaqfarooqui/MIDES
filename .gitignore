@@ -5,3 +5,5 @@ project/
 target/
 *.dot
 *.sc
+/.bloop
+/.metals/

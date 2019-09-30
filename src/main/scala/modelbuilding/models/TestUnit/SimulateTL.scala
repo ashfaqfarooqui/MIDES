@@ -1,9 +1,9 @@
 package modelbuilding.models.TestUnit
 
 import modelbuilding.core._
-import modelbuilding.core.simulation.Simulator
+import modelbuilding.core.simulation.{CodeSimulator, Simulator}
 
-class SimulateTL extends Simulator {
+class SimulateTL extends CodeSimulator {
 
   val m1 = "m1"
   val m2 = "m2"

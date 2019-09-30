@@ -1,9 +1,9 @@
 package  modelbuilding.models.AGV
 
 import modelbuilding.core._
-import modelbuilding.core.simulation.Simulator
+import modelbuilding.core.simulation.{CodeSimulator, Simulator}
 
-class SimulateAgv extends Simulator {
+class SimulateAgv extends CodeSimulator {
 
   val in1 = "in1"
   val in3 = "in3"

@@ -22,10 +22,10 @@ class Wmethod(alphabets:Alphabet,nbrState: Int) extends CEGenerator with Logging
     val reachedState=loop(a.getInitialState,s.getSequenceAsList)
     //debug(s"reachedstate: $reachedState")
     if(a.getMarkedState.nonEmpty && a.getMarkedState.get.contains(reachedState)){
-      return 2
+      2
     }else {
       if(reachedState.s!="dump:"){
-        return 1
+        1
       } else 0
     }
   }
