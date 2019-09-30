@@ -1,9 +1,9 @@
 package modelbuilding.models.CatAndMouseModular
 
 import modelbuilding.core._
-import modelbuilding.core.simulation.Simulator
+import modelbuilding.core.simulation.{CodeSimulator, Simulator}
 
-class SimulateCatAndMouseModular extends Simulator{
+class SimulateCatAndMouseModular extends CodeSimulator{
 
   import Rooms._
 

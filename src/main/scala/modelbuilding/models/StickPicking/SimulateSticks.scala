@@ -1,9 +1,9 @@
 package modelbuilding.models.StickPicking
 
 import modelbuilding.core._
-import modelbuilding.core.simulation.Simulator
+import modelbuilding.core.simulation.{CodeSimulator, Simulator}
 
-class SimulateSticks(sticks: Int) extends Simulator {
+class SimulateSticks(sticks: Int) extends CodeSimulator {
 
   val Ssticks = "sticks"
   val player = "player"

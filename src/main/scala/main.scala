@@ -13,8 +13,8 @@ object ModelBuilder extends Logging {
 
   val supervisor = LearningType.SUPERVISOR
   val plant = LearningType.PLANT
-
-  val modelName = "TestUnit"
+  
+  val modelName = "LaneChange"
   info(s"Starting with mode : $modelName")
 
 
@@ -26,11 +26,13 @@ object ModelBuilder extends Logging {
     case "RoboticArm" => SUL(RobotArm.Arm, new RobotArm.SimulateArm(3,3),None,plant,false)
     case "Sticks" => SUL(StickPicking.Sticks, new StickPicking.SimulateSticks(5),None,plant,false)
     case "AGV" => SUL(AGV.Agv,new AGV.SimulateAgv,Some(AGV.AGVSpecifications()),supervisor,false)
+    case "LaneChange" => SUL(ZenuityLaneChange.LaneChange,ZenuityLaneChange.LaneChangeSimulate(),None,plant,false)
     case _ => throw new Exception("A model wasn't defined.")
   }
 
-  val solver: String = "LStarSuprLearner" // "modular", "mono"
+  val solver: String = "monolithicPlantSolver" // "modular", "mono"
 
+  
   def main(args: Array[String]) : Unit= {
 
     info(s"Running sul: $sul")
@@ -39,7 +41,7 @@ object ModelBuilder extends Logging {
       case "frehage1" => new FrehagePlantBuilderWithPartialStates(sul)
       case "frehage2" => new FrehagePlantBuilder(sul)
       case "frehage3" => new FrehageModularSupSynthesis(sul)
-      case "monolithic" => new MonolithicSolver(sul)
+      case "monolithicPlantSolver" => new MonolithicSolver(sul)
       case "monolithicSupSolver" => new MonolithicSupSolver(sul)
       case "modularSupSolver" => new ModularSupSolver(sul)
       case "LStarPlantLearner" => new LStarPlantSolver(sul)
@@ -51,6 +53,7 @@ object ModelBuilder extends Logging {
 
     val automata = result.getAutomata
 
+    
     automata.modules foreach println
     automata.modules.foreach(_.createDotFile)
     SupremicaHelpers.exportAsSupremicaAutomata(automata, name=modelName)

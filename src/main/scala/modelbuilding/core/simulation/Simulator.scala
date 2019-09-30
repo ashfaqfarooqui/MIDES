@@ -3,58 +3,40 @@ package modelbuilding.core.simulation
 import grizzled.slf4j.Logging
 import modelbuilding.core._
 
-trait Simulator extends Logging{
+/** This is a trait for the simulator. All simulators must extend from this trait. Since the [[SUL]]
+ * accepts a simulator as an input
+ */
+trait Simulator extends Logging {
 
   val initState: StateMap
   val goalStates: Option[Set[StateMap]]
-  val goalPredicate:Option[Predicate] = None
+  val goalPredicate: Option[Predicate] = None
 
-  val guards: Map[Command,Predicate]
-  val actions: Map[Command,List[Action]]
+  val guards: Map[Command, Predicate]
+  val actions: Map[Command, List[Action]]
 
-  def evalCommandToRun(c: Command, s: StateMap, acceptPartialStates: Boolean = false): Option[Boolean] =
-    c match {
-      case `reset` => Some(true)
-      case `tau` => Some(true)
-      case x if guards contains x => guards(x).eval(s, acceptPartialStates)
-      case y => throw new IllegalArgumentException(s"Unknown command: `$y`")
-    }
+  /**
+   * Evaluates if a given command is allowed to be executed on the simulator. This is mainly true for code simulation,
+   * and needs to change for external client simulations. A point to think about is if all commands must always be allowed to
+   * run in the simulator or not.
+   *
+   * @param c The command to evaluate
+   * @param s current state of the system
+   * @param acceptPartialStates
+   * @return
+   */
+  def evalCommandToRun(c: Command, s: StateMap, acceptPartialStates: Boolean = false): Option[Boolean]
 
-  def translateCommand(c: Command): List[Action] =
-    c match {
-      case `reset` => initState.getState.toList.map(x => Assign(x._1,x._2))
-      case `tau` => List(TauAction)
-      case x if guards contains x => actions(x)
-      case y => throw new IllegalArgumentException(s"Unknown command: `$y`")
-    }
+  /**
+   * Converts the command to a list of actions that will transform the state. These actions are then applied to the
+   * state of the simulator.
+   *
+   * @param c - the command
+   * @return List of [[Action]]
+   */
+  def translateCommand(c: Command): List[Action]
 
-  def runCommand(c:Command, s:StateMap, acceptPartialStates: Boolean = false):Either[StateMap,StateMap] =
-    evalCommandToRun(c,s,acceptPartialStates) match {
-      case Some(true) => Right(translateCommand(c).foldLeft(s)((st,a)=>a.next(st)))
-      case Some(false) => Left(s)
-      case None => throw new IllegalArgumentException(s"Can not evaluate Command `$c`, since Partial state `$s` does not include all affected variables.")
-    }
+  def runCommand(c: Command, s: StateMap, acceptPartialStates: Boolean = false): Either[StateMap, StateMap]
 
-
-  def runListOfCommands(commands: List[Command],s :StateMap):Either[StateMap,StateMap] ={
-
-    def runList(c:List[Command],ns: StateMap):Either[StateMap,StateMap]= {
-
-      c match {
-
-        case x::xs =>
-
-          runCommand (x, ns) match {
-            case Right (n) => runList (xs, n)
-            case Left (n) => Left (n)
-          }
-        case Nil => Right(ns)
-      }
-
-    }
-    runList(commands,s)
-
-  }
-
-
+  def runListOfCommands(commands: List[Command], s: StateMap): Either[StateMap, StateMap]
 }
