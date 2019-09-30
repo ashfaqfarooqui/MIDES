@@ -6,7 +6,7 @@ trait Uncontrollable
 trait Command {
   override def toString: String = this match {
     case `reset` => "reset"
-    case `tau` => "tou"
+    case `tau` => "tau"
 
   }
 

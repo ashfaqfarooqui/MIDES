@@ -1,14 +1,13 @@
 package modelbuilding.models.TestUnit
 
 import modelbuilding.core._
-import modelbuilding.core.modeling.{ModularModel, Specifications}
+import modelbuilding.core.modeling.ModularModel
 
 
-object TransferLine extends ModularModel with Specifications {
+object TransferLine extends ModularModel {
 
   override val name: String = "TransferLine"
   override val alphabet = Alphabet(start1,start2,finish1,finish2,accept,reject,test)
-  override val simulation = new SULTransferLine()
 
   override val modules: Set[String] = Set.empty
 
@@ -26,6 +25,4 @@ object TransferLine extends ModularModel with Specifications {
     "M2"->Alphabet(finish2,start2)
   )
 
-  override val specFilePath: Option[String] = Some("SupremicaModels/TransferLineFull.wmod")
-  addSpecsFromSupremica(specFilePath.get)
 }

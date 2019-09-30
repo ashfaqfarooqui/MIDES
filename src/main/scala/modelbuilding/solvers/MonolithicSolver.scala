@@ -1,15 +1,16 @@
 package modelbuilding.solvers
 
 import modelbuilding.core.modeling.Model
-import modelbuilding.core.{Automata, Automaton, State, StateMap, StateMapTransition, Symbol, Transition}
+import modelbuilding.core.{Automata, Automaton, SUL, State, StateMap, StateMapTransition, Symbol, Transition}
 
 import scala.collection.immutable.Queue
 
 
-class MonolithicSolver(model:Model) extends BaseSolver {
+class MonolithicSolver(sul:SUL) extends BaseSolver {
 
-  val sul = model.simulation
+  //val simulation = sul.simulation
   val initState = sul.getInitState
+  val model = sul.model
 
   val events:Set[Symbol] = model.alphabet.events
   val visitedStates = Set.empty[StateMap]

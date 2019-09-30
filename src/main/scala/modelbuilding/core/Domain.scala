@@ -1,6 +1,6 @@
 package modelbuilding.core
 
-sealed abstract trait Grammar{
+sealed abstract trait Grammar extends Serializable {
 def +(b:Grammar):Grammar
 
   def length:Int = this match {

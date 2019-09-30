@@ -1,13 +1,11 @@
 package modelbuilding.core.modeling
 
-import modelbuilding.core.simulation.SUL
-import modelbuilding.core.{Alphabet, StateSet}
+import modelbuilding.core.{Alphabet, SUL, StateSet}
 
 trait Model{
 
   val name: String
   val alphabet: Alphabet
-  val simulation: SUL
   val states: StateSet
 
   val specFilePath: Option[String] = None // Depricated, used before the introduction of modelbuilding.core.modeling.Specifications

@@ -3,7 +3,7 @@ package modelbuilding.models.MachineBuffer
 import modelbuilding.core._
 import modelbuilding.core.modeling._
 
-object MachineBuffer extends ModularModel with Specifications {
+object MachineBuffer extends ModularModel {
 
   override val name: String = "MachineBufferMachine"
   override val modules: Set[String] = Set("Machine1", "Machine2")
@@ -23,10 +23,6 @@ object MachineBuffer extends ModularModel with Specifications {
     "Machine2" -> Alphabet(load2,unload2)
   )
 
-  override val simulation = new SULMachineBuffer()
 
-  // Add all specifications available to the model
-  override val specFilePath: Option[String] = Some("SupremicaModels/MachineBufferMachine.wmod")
-  addSpecsFromSupremica(specFilePath.get)
 
 }

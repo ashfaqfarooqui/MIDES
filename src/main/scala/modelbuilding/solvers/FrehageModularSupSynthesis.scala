@@ -9,13 +9,14 @@ A brute force BFS that split the result into modules rather than a monolithic pl
 package modelbuilding.solvers
 
 
-import modelbuilding.core._
+import modelbuilding.core.{SUL, _}
 import modelbuilding.core.modeling.{Model, ModularModel, Module, Specifications}
-import modelbuilding.core.simulation.SUL
 
 import scala.collection.mutable
-
 import FrehageModularSupSynthesis._
+import org.supremica.automata
+import scala.collection.JavaConverters._
+
 
 object FrehageModularSupSynthesis {
 
@@ -31,16 +32,58 @@ object FrehageModularSupSynthesis {
 
 }
 
-class FrehageModularSupSynthesis(_model: Model) extends BaseSolver {
+class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
 
-  assert(_model.hasSpecs, "modelbuilder.solver.ModularSupSolver requires a specification.")
+  val _model = _sul.model
+
+  assert(_sul.specification.isDefined, "modelbuilder.solver.ModularSupSolver requires a specification.")
   assert(_model.isModular, "modelbuilder.solver.FrehageModularSupSynthesis requires a modular model.")
 
+  private val specifications = _sul.specification.get
   private val model = _model.asInstanceOf[ModularModel]
-  private val specifications = _model.asInstanceOf[Specifications]
-  private val simulator: SUL = model.simulation
+  //private val simulator: SUL = model.simulation
 
-  private val specModules: Set[Module] = specifications.getSupervisorModules
+  def getSupervisorModules(supremicaSpecs:Map[String, automata.Automaton] ): Set[Module] = {
+
+    if (!model.isModular) Set(Module(model.name, model.states, model.alphabet))
+    else {
+
+      val modularModel = model.asInstanceOf[ModularModel]
+
+      if (supremicaSpecs.isEmpty) // If no Automata specs exist the original modules can be used.
+        modularModel.modules.map(m => Module(m, modularModel.stateMapping(m), modularModel.eventMapping(m)))
+      else {
+
+        val specAlphabets: Map[String, Alphabet] = supremicaSpecs.map(s => s._1 -> new Alphabet(model.alphabet.events.filter(e => s._2.getAlphabet.contains(e.getCommand.toString))))
+
+        val specBlocks = supremicaSpecs.map(s =>
+          s._1 -> modularModel.eventMapping.filter(m =>
+            m._2.events.map(_.getCommand.toString).intersect(s._2.eventIterator.asScala.map(_.getLabel).toSet).nonEmpty
+          ).keys
+        )
+
+        supremicaSpecs.keySet.map{ s =>
+          Module(
+            name = s,
+            stateSet = StateSet(
+              modularModel.eventMapping.filter{ case(m,a) =>
+                specAlphabets(s).events.exists(e => a.events.contains(e))
+              }.flatMap(x => modularModel.stateMapping(x._1).states).toSet
+            ),
+            alphabet = specAlphabets(s) + new Alphabet(
+              modularModel.eventMapping.filter{ case(m,a) =>
+                specAlphabets(s).events.exists(e => !e.isControllable && a.events.contains(e))
+              }.flatMap(_._2.events).toSet
+            ),
+            Set(s)
+          )
+        }
+
+      }
+    }
+  }
+
+  private val specModules: Set[Module] = getSupervisorModules(specifications.getSupremicaSpecs)
   private val remainingPlantModules: Set[String] = model.modules.filterNot(m => specModules.exists(s => model.eventMapping(m).events.subsetOf(s.alphabet.events)))
   private val plantModules: Set[Module] = remainingPlantModules.map(m => Module(m, model.stateMapping(m), model.eventMapping(m)))
 //  private val plantModules: Set[Module] = Set.empty[Module]
@@ -48,7 +91,7 @@ class FrehageModularSupSynthesis(_model: Model) extends BaseSolver {
 
   modules foreach println
 
-  private val initState: StateMap = specifications.extendStateMap(simulator.getInitState)
+  private val initState: StateMap = specifications.extendStateMap(_sul.getInitState)
 
   private var queue: List[StateMap] = List(initState)
   private val history: mutable.Set[StateMap] = mutable.Set(initState)
@@ -68,7 +111,7 @@ class FrehageModularSupSynthesis(_model: Model) extends BaseSolver {
     val state = queue.head
     queue = queue.tail
 
-    val outgoingTransitionsInPlant: List[StateMapTransition] = simulator.getOutgoingTransitions(state, model.alphabet)
+    val outgoingTransitionsInPlant: List[StateMapTransition] = _sul.getOutgoingTransitions(state, model.alphabet)
 
     for ( t <- outgoingTransitionsInPlant )  {
 

@@ -19,7 +19,7 @@ case class Automaton(
                       transitions: Set[Transition],
                       iState: State,
                       fState: Option[Set[State]] = None,
-                      forbiddenStates: Option[Set[State]] = None
+                      forbiddenStates:Option[Set[State]]=None
                     ){
 
   lazy val transitionFunction: Map[(State, Symbol),State] = transitions.map( t => (t.source, t.event) -> t.target ).toMap
@@ -70,6 +70,37 @@ case class Automaton(
   def getInitialState: State = iState
   def getMarkedState: Option[Set[State]] = fState
 
+  def removeDumpState={
+    Automaton(name,states.filterNot(_.s=="dump:"),
+      alphabet,
+      transitions.filterNot(t=>t.target.s=="dump:"||t.source.s=="dump:"),
+      iState,
+      fState match {
+        case Some(value) => Some(value.filterNot(_.s=="dump:"))
+        case None => None
+      },
+      forbiddenStates match {
+        case Some(value) => Some(value.filterNot(_.s=="dump:"))
+        case None => None
+      })
+  }
+
+  def removeTauEvents = {
+    Automaton(name,
+      states,
+      new Alphabet(alphabet.events - Symbol(tau)),
+      transitions.filterNot(_.event.getCommand==tau),
+      iState,
+      fState,
+      forbiddenStates
+
+    )
+  }
+  def removeTauAndDump ={
+    removeDumpState.removeTauEvents
+  }
+
+
   override def toString: String = {
 
     s"Automaton( $name, " +
@@ -85,7 +116,8 @@ case class Automaton(
         case Some(fs) => "(" + fs.map(_.s).mkString(",") + ")"
         case None => "None"
       }}) )" +
-    s" Properties:" +
+      s"\n" +
+    s" Properties:\n" +
     s"${name}" +
       s"\n Number of Transitions: ${transitions.size}" +
       s"\n Number of States: ${states.size}" +
@@ -94,7 +126,7 @@ case class Automaton(
         case Some(fs)=>fs.size
         case None => 0
       }}" +
-      s"\n"
+      s"\n \n \n"
 
   }
 

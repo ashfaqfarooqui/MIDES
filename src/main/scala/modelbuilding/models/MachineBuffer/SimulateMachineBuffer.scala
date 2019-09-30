@@ -9,7 +9,7 @@ class SimulateMachineBuffer extends Simulator {
   val m2="m2"
 
   override val initState: StateMap = StateMap(m1->false,m2->false)
-  override val goalStates: Option[Set[StateMap]] = None
+  override val goalStates: Option[Set[StateMap]] = Some(Set(initState))
 
   override val guards: Map[Command,Predicate] = Map(
     load1 -> EQ(m1,false),
