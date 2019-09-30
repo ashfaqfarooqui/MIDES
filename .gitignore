@@ -1,4 +1,6 @@
 .idea/
+.metals/
+.bloop/
 Output/
 learner.log
 project/
