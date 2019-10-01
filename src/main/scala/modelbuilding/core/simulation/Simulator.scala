@@ -7,6 +7,8 @@ import modelbuilding.core._
  * accepts a simulator as an input
  */
 trait Simulator extends Logging {
+  /** List of variables to subscribe on the PLC end. Use this with OPC communication */
+  val variableList:Option[List[String]]=None
 
   val initState: StateMap
   val goalStates: Option[Set[StateMap]]
