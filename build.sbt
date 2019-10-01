@@ -17,11 +17,14 @@ libraryDependencies ++= Seq(
   "com.github.tototoshi" %% "scala-csv" % "1.3.5",
   "com.github.martincooper" %% "scala-datatable" % "0.8.0",
   "org.scalactic" %% "scalactic" % "3.0.5",
-  "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.5" % "test",
+  "nl.vroste" %% "scala-ads-client" % "0.1.0-SNAPSHOT"
+
 )
 
 
 resolvers ++= Seq(
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/Releases",
   "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
-  "sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/")
+  "sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
+    Resolver.mavenLocal)
