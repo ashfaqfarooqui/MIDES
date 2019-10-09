@@ -1,70 +1,70 @@
-package  modelbuilding.models.AGV
+package modelbuilding.models.AGV
 
 import modelbuilding.core._
-import modelbuilding.core.simulation.{CodeSimulator, Simulator}
+import modelbuilding.core.simulators.{CodeSimulator, Simulator}
 
 class SimulateAgv extends CodeSimulator {
 
-  val in1 = "in1"
-  val in3 = "in3"
-  val out = "out"
-  val v1l = "v1l"
-  val v2l = "v2l"
-  val v3l = "v3l"
-  val v4l = "v4l"
-  val v5l = "v5l"
-  val v1p = "v1p"
-  val v2p = "v2p"
-  val v3p = "v3p"
-  val v4p = "v4p"
-  val v5p = "v5p"
+  val in1   = "in1"
+  val in3   = "in3"
+  val out   = "out"
+  val v1l   = "v1l"
+  val v2l   = "v2l"
+  val v3l   = "v3l"
+  val v4l   = "v4l"
+  val v5l   = "v5l"
+  val v1p   = "v1p"
+  val v2p   = "v2p"
+  val v3p   = "v3p"
+  val v4p   = "v4p"
+  val v5p   = "v5p"
   val w1_11 = "w1_11"
   val w1_12 = "w1_12"
-  val w1_2 = "w1_2"
-  val w1_3 = "w1_3"
-  val w1_4 = "w1_4"
-  val w1_5 = "w1_5"
-  val w2 = "w2"
-  val w3 = "w3"
+  val w1_2  = "w1_2"
+  val w1_3  = "w1_3"
+  val w1_4  = "w1_4"
+  val w1_5  = "w1_5"
+  val w2    = "w2"
+  val w3    = "w3"
 
   override val initState: StateMap =
     StateMap(
-      in1 -> true,
-      in3 -> false,
-      out -> false,
-      v1l -> false,
-      v2l -> false,
-      v3l -> false,
-      v4l -> false,
-      v5l -> false,
-      v1p -> "i1",
-      v2p -> "w3i",
-      v3p -> "z2",
-      v4p -> "w1i2",
-      v5p -> "o",
+      in1   -> true,
+      in3   -> false,
+      out   -> false,
+      v1l   -> false,
+      v2l   -> false,
+      v3l   -> false,
+      v4l   -> false,
+      v5l   -> false,
+      v1p   -> "i1",
+      v2p   -> "w3i",
+      v3p   -> "z2",
+      v4p   -> "w1i2",
+      v5p   -> "o",
       w1_11 -> true,
       w1_12 -> true,
-      w1_2 -> false,
-      w1_3 -> false,
-      w1_4 -> false,
-      w1_5 -> false,
-      w2 -> "w21",
-      w3 -> "w31"
+      w1_2  -> false,
+      w1_3  -> false,
+      w1_4  -> false,
+      w1_5  -> false,
+      w2    -> "w21",
+      w3    -> "w31"
     )
 
   override val goalStates: Option[Set[StateMap]] = None
 
-  override val guards: Map[Command,Predicate] = Map(
-    c1 -> AND( EQ(v1p, "i1"), EQ(v1l, true)),
-    c2 -> AND( EQ(v1p, "w2i"), EQ(v1l, false)),
-    c3 -> AND( EQ(v2p, "i3"), EQ(v2l, true)),
-    c4 -> AND( EQ(v2p, "w3i"), EQ(v2l, false)),
-    c5 -> AND( EQ(v3p, "w1i1"), EQ(v3l, false)),
-    c6 -> AND( EQ(v3p, "w2o"), EQ(v3l, true)),
-    c7 -> AND( EQ(v4p, "w1i2"), EQ(v4l, false)),
-    c8 -> AND( EQ(v4p, "w3o"), EQ(v4l, true)),
-    c9 -> AND( EQ(v5p, "w1o"), EQ(v5l, true)),
-    c10 -> AND( EQ(v5p, "o"), EQ(v5l, false)),
+  override val guards: Map[Command, Predicate] = Map(
+    c1  -> AND(EQ(v1p, "i1"), EQ(v1l, true)),
+    c2  -> AND(EQ(v1p, "w2i"), EQ(v1l, false)),
+    c3  -> AND(EQ(v2p, "i3"), EQ(v2l, true)),
+    c4  -> AND(EQ(v2p, "w3i"), EQ(v2l, false)),
+    c5  -> AND(EQ(v3p, "w1i1"), EQ(v3l, false)),
+    c6  -> AND(EQ(v3p, "w2o"), EQ(v3l, true)),
+    c7  -> AND(EQ(v4p, "w1i2"), EQ(v4l, false)),
+    c8  -> AND(EQ(v4p, "w3o"), EQ(v4l, true)),
+    c9  -> AND(EQ(v5p, "w1o"), EQ(v5l, true)),
+    c10 -> AND(EQ(v5p, "o"), EQ(v5l, false)),
     e10 -> AND(EQ(v1p, "i1"), EQ(v1l, false), EQ(in1, true)),
     e11 -> EQ(in1, false),
     e20 -> EQ(out, true),
@@ -95,7 +95,7 @@ class SimulateAgv extends CodeSimulator {
     u51 -> AND(EQ(v5p, "z4"), EQ(v5l, false)),
     u52 -> AND(EQ(v5p, "z4"), EQ(v5l, true)),
     u53 -> EQ(v5p, "z4O"),
-    w11 -> AND(EQ(w1_11,true), EQ(w1_12,true)),
+    w11 -> AND(EQ(w1_11, true), EQ(w1_12, true)),
     w12 -> EQ(w1_2, true),
     w13 -> AND(EQ(v5p, "w1o"), EQ(v5l, false), EQ(w1_3, true)),
     w14 -> AND(EQ(v3p, "w1i1"), EQ(v3l, true), EQ(w1_4, true)),
@@ -107,19 +107,19 @@ class SimulateAgv extends CodeSimulator {
     w31 -> AND(EQ(v4p, "w3o"), EQ(v4l, false), EQ(w3, "w31")),
     w32 -> AND(EQ(v2p, "w3i"), EQ(v2l, true), EQ(w3, "w32")),
     w33 -> EQ(w3, "w33"),
-    w34 -> EQ(w3, "w34"),
+    w34 -> EQ(w3, "w34")
   )
 
-  override val actions: Map[Command,List[Action]] = Map(
-    c1 -> List(Assign(v1p, "z1")),
-    c2 -> List(Assign(v1p, "z1")),
-    c3 -> List(Assign(v2p, "z1")),
-    c4 -> List(Assign(v2p, "z3")),
-    c5 -> List(Assign(v3p, "z2")),
-    c6 -> List(Assign(v3p, "z2")),
-    c7 -> List(Assign(v4p, "z3")),
-    c8 -> List(Assign(v4p, "z4")),
-    c9 -> List(Assign(v5p, "z4")),
+  override val actions: Map[Command, List[Action]] = Map(
+    c1  -> List(Assign(v1p, "z1")),
+    c2  -> List(Assign(v1p, "z1")),
+    c3  -> List(Assign(v2p, "z1")),
+    c4  -> List(Assign(v2p, "z3")),
+    c5  -> List(Assign(v3p, "z2")),
+    c6  -> List(Assign(v3p, "z2")),
+    c7  -> List(Assign(v4p, "z3")),
+    c8  -> List(Assign(v4p, "z4")),
+    c9  -> List(Assign(v5p, "z4")),
     c10 -> List(Assign(v5p, "zO4")),
     e10 -> List(Assign(v1l, true), Toggle(in1)),
     e11 -> List(Toggle(in1)),
@@ -163,7 +163,7 @@ class SimulateAgv extends CodeSimulator {
     w31 -> List(Assign(v4l, true), Assign(w3, "w32")),
     w32 -> List(Assign(v2l, false), Assign(w3, "w33")),
     w33 -> List(Assign(w3, "w34")),
-    w34 -> List(Assign(w3, "w31")),
+    w34 -> List(Assign(w3, "w31"))
   )
 
 }
