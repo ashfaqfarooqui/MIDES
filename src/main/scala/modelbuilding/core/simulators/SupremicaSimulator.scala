@@ -1,11 +1,12 @@
-package modelbuilding.core.simulation
+package modelbuilding.core.simulators
+
 import grizzled.slf4j.Logging
 import modelbuilding.core.{Action, Command, Predicate, StateMap}
-import com.mathworks.engine.MatlabEngine
-import modelbuilding.core.externalClients.ZenuityClient
-trait  ZenuitySimulator extends Simulator with Logging {
+import supremicastuff.SupremicaWatersSystem
 
-  override def evalCommandToRun(c: Command, s: StateMap, acceptPartialStates: Boolean): Option[Boolean] = Some(true)
+trait SupremicaSimulator extends Simulator with Logging {
+
+  override def evalCommandToRun(c: Command, s: StateMap, acceptPartialStates: Boolean): Option[Boolean] = ???
 
   override def translateCommand(c: Command): List[Action] = ???
 
