@@ -5,10 +5,10 @@ version := "1.0"
 scalaVersion := "2.12.9"
 
 libraryDependencies ++= Seq(
-  "org.scala-graph" %% "graph-core" % "1.12.1",
-  "org.scala-graph" %% "graph-dot" % "1.12.1",
-  "org.eclipse.milo" % "sdk-client" % "0.3.3",
-  "org.eclipse.milo" % "stack-client" % "0.3.3",
+  "org.scala-graph"        %% "graph-core"  % "1.12.1",
+  "org.scala-graph"        %% "graph-dot"   % "1.12.1",
+  "org.eclipse.milo"       % "sdk-client"   % "0.3.3",
+  "org.eclipse.milo"       % "stack-client" % "0.3.3",
   "com.github.nscala-time" %% "nscala-time" % "2.18.0",
   //"ch.qos.logback" % "logback-classic" % "1.2.3",
   "org.clapper"             %% "grizzled-slf4j"  % "1.3.2",
@@ -25,4 +25,5 @@ resolvers ++= Seq(
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/Releases",
   "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
   "sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
-    Resolver.mavenLocal)
+  Resolver.mavenLocal
+)
