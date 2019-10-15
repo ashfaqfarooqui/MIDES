@@ -63,11 +63,11 @@ class BeckhoffADS extends AdsCodecs with Logging {
   }
 
   /**
-    * I guess we can subscribe to only one type at a time, for now.
-    * @param nodes
-    * @tparam T
-    * @return
-    */
+ * I guess we can subscribe to only one type at a time, for now.
+ * @param nodes
+ * @tparam T
+ * @return
+ */
   def subscribeTo[T](
       nodes: List[(String, Codec[T])],
       callback: (String, T) => Unit = updActiveNodes
@@ -115,4 +115,4 @@ class BeckhoffADS extends AdsCodecs with Logging {
 object BeckhoffADS {
   def apply(): BeckhoffADS = new BeckhoffADS()
 }
-*/
+ */

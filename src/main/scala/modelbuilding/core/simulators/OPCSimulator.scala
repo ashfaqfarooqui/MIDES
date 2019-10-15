@@ -28,11 +28,27 @@ trait OPCSimulator
     //val v = variableList.get.map(_._1)
 
     println(s"client $getClient")
-    getClient.subscribeToNodes(List("GVL.R1","GVL.R2", "GVL.R3", "GVL.R4",
-      "GVL.Load_R1_initial","GVL.Load_R1_execute","GVL.Load_R1_finish",
-      "GVL.Unload_R1_initial","GVL.Unload_R1_execute","GVL.Unload_R1_finish",
-      "GVL.Load_R2_initial","GVL.Load_R2_execute","GVL.Load_R2_finish",
-      "GVL.Unload_R2_initial","GVL.Unload_R2_execute","GVL.Unload_R2_finish", "GVL.RESET"))
+    getClient.subscribeToNodes(
+      List(
+        "GVL.R1",
+        "GVL.R2",
+        "GVL.R3",
+        "GVL.R4",
+        "GVL.Load_R1_initial",
+        "GVL.Load_R1_execute",
+        "GVL.Load_R1_finish",
+        "GVL.Unload_R1_initial",
+        "GVL.Unload_R1_execute",
+        "GVL.Unload_R1_finish",
+        "GVL.Load_R2_initial",
+        "GVL.Load_R2_execute",
+        "GVL.Load_R2_finish",
+        "GVL.Unload_R2_initial",
+        "GVL.Unload_R2_execute",
+        "GVL.Unload_R2_finish",
+        "GVL.RESET"
+      )
+    )
   }
 
   /**
@@ -40,12 +56,12 @@ trait OPCSimulator
     * @return
     */
   def resetSystem = {
-    getClient.write("GVL.RESET",true)
+    getClient.write("GVL.RESET", true)
   }
 
   def initializeSystem = {
     getClient.connect()
-    while(!getClient.isConnected){}
+    while (!getClient.isConnected) {}
     subscribeToAllVars
 
     resetSystem
@@ -77,7 +93,6 @@ trait OPCSimulator
   }
 
   override def translateCommand(c: Command): List[Action] =
-
     c match {
       case `reset`                 => List(ResetAction)
       case `tau`                   => List(TauAction)
@@ -85,9 +100,11 @@ trait OPCSimulator
       case y                       => throw new IllegalArgumentException(s"Unknown command: `$y`")
     }
 
-  def isCommandDone(c: Command,acceptPartialState:Boolean) = {
-    println(s"evaluating  command $c, with guard ${postGuards(c)} and statemap ${getClient.getState}")
-    postGuards(c).eval(getClient.getState,acceptPartialState).get
+  def isCommandDone(c: Command, acceptPartialState: Boolean) = {
+    println(
+      s"evaluating  command $c, with guard ${postGuards(c)} and statemap ${getClient.getState}"
+    )
+    postGuards(c).eval(getClient.getState, acceptPartialState).get
   }
 
   override def runCommand(
@@ -115,7 +132,7 @@ trait OPCSimulator
             import scala.concurrent.duration._
 
             val deadline = 10.seconds.fromNow
-            while (!isCommandDone(c,acceptPartialStates) && deadline.hasTimeLeft()) {
+            while (!isCommandDone(c, acceptPartialStates) && deadline.hasTimeLeft()) {
               println("waiting....")
               Thread.sleep(6000)
             }
@@ -127,7 +144,7 @@ trait OPCSimulator
               getClient.setState(newState)
               Thread.sleep(6000)
               Right(getClient.getState)
-            }else{
+            } else {
 
               Thread.sleep(5000)
               val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
@@ -151,7 +168,7 @@ trait OPCSimulator
       commands: List[Command],
       s: StateMap
     ): Either[StateMap, StateMap] = {
-resetSystem
+    resetSystem
     def runList(c: List[Command], ns: StateMap): Either[StateMap, StateMap] = {
 
       c match {

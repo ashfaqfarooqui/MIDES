@@ -2,7 +2,15 @@ package modelbuilding.models.ZenuityLaneChange
 
 import modelbuilding.core
 import modelbuilding.core.externalClients.ZenuityClient
-import modelbuilding.core.{Action, AlwaysTrue, Assign, AssignInMap, Command, Predicate, StateMap}
+import modelbuilding.core.{
+  Action,
+  AlwaysTrue,
+  Assign,
+  AssignInMap,
+  Command,
+  Predicate,
+  StateMap
+}
 import modelbuilding.core.simulators.ZenuitySimulator
 
 import scala.collection.JavaConverters._
@@ -23,7 +31,15 @@ class LaneChangeSimulate extends ZenuitySimulator {
   val b7             = "b7"
 
   val initialDecisionMap =
-    Map(b1 -> false, b2 -> false, b3 -> false, b4 -> false, b5 -> false, b6 -> false, b7 -> false)
+    Map(
+      b1 -> false,
+      b2 -> false,
+      b3 -> false,
+      b4 -> false,
+      b5 -> false,
+      b6 -> false,
+      b7 -> false
+    )
 
   /**
     * if this is queried anytime after the execution has begun the value will be wrong.
@@ -31,7 +47,8 @@ class LaneChangeSimulate extends ZenuitySimulator {
     */
   // val intialInternalState = getState
   println(client.getEngine.feval(3, "gcd", Int.box(40), Int.box(60)))
-  override val initState: StateMap               = StateMap(laneChgRequest -> CANCEL, decVar -> initialDecisionMap)
+  override val initState: StateMap =
+    StateMap(laneChgRequest -> CANCEL, decVar -> initialDecisionMap)
   override val goalStates: Option[Set[StateMap]] = None
   override val guards: Map[Command, Predicate] = Map(
     goRight       -> AlwaysTrue,

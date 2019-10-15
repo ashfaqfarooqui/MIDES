@@ -5,7 +5,8 @@ import modelbuilding.core.modeling.MonolithicModel
 
 object LaneChange extends MonolithicModel {
   override val name: String = "LaneChange"
-  override val alphabet: Alphabet = Alphabet(goRight,
+  override val alphabet: Alphabet = Alphabet(
+    goRight,
     goLeft,
     cancelRequest,
     b1true,
@@ -21,6 +22,7 @@ object LaneChange extends MonolithicModel {
     b4false,
     b5false,
     b6false,
-    b7false)
+    b7false
+  )
   override val states: StateSet = StateSet("laneChg")
 }

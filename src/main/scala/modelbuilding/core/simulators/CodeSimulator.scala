@@ -10,7 +10,11 @@ trait CodeSimulator extends Simulator with TwoStateOperation with Logging {
   override val goalStates: Option[Set[StateMap]]
   override val goalPredicate: Option[Predicate] = None
 
-  def evalCommandToRun(c: Command, s: StateMap, acceptPartialStates: Boolean = false): Option[Boolean] =
+  def evalCommandToRun(
+      c: Command,
+      s: StateMap,
+      acceptPartialStates: Boolean = false
+    ): Option[Boolean] =
     c match {
       case `reset`                => Some(true)
       case `tau`                  => Some(true)
@@ -26,7 +30,11 @@ trait CodeSimulator extends Simulator with TwoStateOperation with Logging {
       case y                      => throw new IllegalArgumentException(s"Unknown command: `$y`")
     }
 
-  def runCommand(c: Command, s: StateMap, acceptPartialStates: Boolean = false): Either[StateMap, StateMap] =
+  def runCommand(
+      c: Command,
+      s: StateMap,
+      acceptPartialStates: Boolean = false
+    ): Either[StateMap, StateMap] =
     evalCommandToRun(c, s, acceptPartialStates) match {
       case Some(true)  => Right(translateCommand(c).foldLeft(s)((st, a) => a.next(st)))
       case Some(false) => Left(s)
@@ -36,7 +44,10 @@ trait CodeSimulator extends Simulator with TwoStateOperation with Logging {
         )
     }
 
-  def runListOfCommands(commands: List[Command], s: StateMap): Either[StateMap, StateMap] = {
+  def runListOfCommands(
+      commands: List[Command],
+      s: StateMap
+    ): Either[StateMap, StateMap] = {
 
     def runList(c: List[Command], ns: StateMap): Either[StateMap, StateMap] = {
 

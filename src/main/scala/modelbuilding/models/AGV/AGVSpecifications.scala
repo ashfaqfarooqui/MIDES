@@ -6,6 +6,6 @@ class AGVSpecifications extends Specifications {
   override val specFilePath: Option[String] = Some("SupremicaModels/AGV.wmod")
   addSpecsFromSupremica(specFilePath.get)
 }
-object AGVSpecifications{
+object AGVSpecifications {
   def apply(): AGVSpecifications = new AGVSpecifications()
 }

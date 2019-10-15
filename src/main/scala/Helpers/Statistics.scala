@@ -14,15 +14,15 @@ class Statistics {
 
   def eqQueries: BigInt = _eqQueries
 
-   def eqQueries_=(value: BigInt): Unit = {
+  def eqQueries_=(value: BigInt): Unit = {
     _eqQueries = value
   }
 
   private var _membcache: BigInt = 0
 
-   def membcache: BigInt = _membcache
+  def membcache: BigInt = _membcache
 
-   def membcache_=(value: BigInt): Unit = {
+  def membcache_=(value: BigInt): Unit = {
     _membcache = value
   }
 

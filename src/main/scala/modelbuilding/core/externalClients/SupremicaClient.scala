@@ -1,9 +1,5 @@
 package modelbuilding.core.externalClients
 
-class SupremicaClient {
+class SupremicaClient {}
 
-}
-
-object SupremicaClient {
-
-}
+object SupremicaClient {}

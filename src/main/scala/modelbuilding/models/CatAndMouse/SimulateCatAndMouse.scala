@@ -13,7 +13,8 @@ class SimulateCatAndMouse extends CodeSimulator {
   val r3 = "r3"
   val r4 = "r4"
 
-  override val initState: StateMap               = StateMap(r0 -> EMPTY, r1 -> EMPTY, r2 -> CAT, r3 -> EMPTY, r4 -> MOUSE)
+  override val initState: StateMap =
+    StateMap(r0 -> EMPTY, r1 -> EMPTY, r2 -> CAT, r3 -> EMPTY, r4 -> MOUSE)
   override val goalStates: Option[Set[StateMap]] = None
 
   override val guards: Map[Command, Predicate] = Map(
