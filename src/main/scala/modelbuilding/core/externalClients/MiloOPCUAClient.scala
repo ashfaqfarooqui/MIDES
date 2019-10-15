@@ -1,9 +1,10 @@
 package modelbuilding.core.externalClients
 
+import grizzled.slf4j.Logging
 import modelbuilding.core.StateMap
 import org.eclipse.milo.opcua.stack.client.DiscoveryClient
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 // Milo
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient
@@ -38,7 +39,7 @@ object MiloOPCUAClient {
 }
 
 
-class MiloOPCUAClient {
+class MiloOPCUAClient extends Logging{
   var client: UaClient = null
   var clientHandles: AtomicLong = new AtomicLong(1L);
   var availableNodes: Map[String, UaVariableNode] = Map()
@@ -62,7 +63,7 @@ class MiloOPCUAClient {
 
   def isConnected = client != null
 
-  def connect(url: String = "opc.tcp://localhost:4840"): Boolean = {
+  def connect(url: String = "opc.tcp://s149870:4840"): Boolean = {
     try {
       val configBuilder: OpcUaClientConfigBuilder = new OpcUaClientConfigBuilder();
       val endpoints = DiscoveryClient.getEndpoints(url)
@@ -83,7 +84,7 @@ class MiloOPCUAClient {
     }
     catch {
       case e: Exception =>
-        println("OPCUA - " + e.getMessage())
+        //println("OPCUA - " + e.getMessage())
         client = null;
         false
     }
@@ -100,7 +101,8 @@ class MiloOPCUAClient {
         if(!availableNodes.exists(_._1 == identifier))
           availableNodes += (identifier -> x.asInstanceOf[UaVariableNode])
         else
-          println(s"OPCUA - Node ${identifier} already exists, skipping!")
+          {}
+          //println(s"OPCUA - Node ${identifier} already exists, skipping!")
       }
       populateNodes(nodeid)
     }
@@ -134,12 +136,15 @@ class MiloOPCUAClient {
     val subscription = client.getSubscriptionManager.createSubscription(samplingInterval).get()
 
     val filtered = identifiers.filter(availableNodes.contains(_))
+   // println(filtered)
     identifiers.filterNot(availableNodes.contains(_)).foreach { s => println("OPCUA - key does not exist! skipping: " + s) }
 
     val requests = filtered.map { i =>
-      val n = availableNodes(i).getNodeId().get()
+      val node = availableNodes(i)
+      val n = node.getNodeId().get()
       def readValueId = new ReadValueId(n, AttributeId.Value.uid(), null, QualifiedName.NULL_VALUE)
       def parameters = new MonitoringParameters(uint(clientHandles.getAndIncrement()), samplingInterval, null, uint(10), true)
+      activeState = activeState + (i -> node.getValue.get())
       new MonitoredItemCreateRequest(readValueId, MonitoringMode.Reporting, parameters)
     }
 
@@ -182,7 +187,7 @@ class MiloOPCUAClient {
   def toDataValue(value: Any, targetType: NodeId): Try[DataValue] = {
     Try {
       val c = BuiltinDataType.getBackingClass(targetType)
-      println("milo backing type: " + c.toString)
+      //info("milo backing type: " + c.toString)
       c match {
         case q if q == classOf[java.lang.Integer] => new DataValue(new Variant(value.asInstanceOf[Int]))
         case q if q == classOf[UByte] => new DataValue(new Variant(ubyte(value.asInstanceOf[Byte])))
@@ -191,7 +196,7 @@ class MiloOPCUAClient {
 
         case q if q == classOf[String] => new DataValue(new Variant(value.asInstanceOf[String]))
         case q if q == classOf[ByteString] => new DataValue(new Variant(ByteString.of(value.asInstanceOf[String].getBytes())))
-        case q if q == classOf[java.lang.Boolean] => new DataValue(new Variant(value.asInstanceOf[Boolean]))
+        case q if q == classOf[java.lang.Boolean] => new DataValue(new Variant(value.asInstanceOf[Boolean]),null,null,null)
         case q if q == classOf[java.lang.Double] => new DataValue(new Variant(value.asInstanceOf[Double]))
         case _ => println(s"need to add type: ${c}"); new DataValue(new Variant(false))
       }
@@ -201,10 +206,28 @@ class MiloOPCUAClient {
   def write(nodeIdentifier: String, value: Any): Boolean = {
     availableNodes.get(nodeIdentifier) match {
       case Some(n) =>
-        val typeid = n.getDataType().get()
+        val typeid = n.getDataType.get()
+        /*val typeid2 = n.getNodeId().get()
+        println(s"The typeid in the case is $typeid2")
+        val typeid3 = n.getNodeId().get().getIdentifier
+        println(s"The typeid should maybe be $typeid3")*/
         val dv = toDataValue(value, typeid)
-        println("trying to write: " + dv)
-        dv.map { d =>
+        //info("trying to write: " + dv)
+
+        dv match {
+          case Failure(exception) => throw new Exception(s"could not convert datavalue $dv, throwing exception $exception")
+          case Success(value) =>
+            val w = client.writeValue(n.getNodeId.get,value).get
+            if (w.isGood) {
+            //info("OPCUA - value written")
+            true
+          }
+          else {
+            //println(s"OPCUA - Failed to write to node ${nodeIdentifier} - probably wrong datatype, should be: " + typeid)
+            false
+          }
+        }
+        /*dv.map { d =>
           if (client.writeValue(n.getNodeId().get(), d).get().isGood()) {
             println("OPCUA - value written")
             true
@@ -213,7 +236,7 @@ class MiloOPCUAClient {
             println(s"OPCUA - Failed to write to node ${nodeIdentifier} - probably wrong datatype, should be: " + typeid)
             false
           }
-        }.getOrElse(false)
+        }.getOrElse(false)*/
       case None => println(s"OPCUA No such node ${nodeIdentifier}"); false
     }
   }

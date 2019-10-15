@@ -1,4 +1,4 @@
-package modelbuilding.core.simulators
+/*package modelbuilding.core.simulators
 import modelbuilding.core._
 import grizzled.slf4j.Logging
 import modelbuilding.core.externalClients.BeckhoffADS
@@ -124,3 +124,4 @@ trait TwinCatSimulator extends Simulator with ThreeStateOperation with Logging {
     ): Either[StateMap, StateMap] = ???
 
 }
+*/

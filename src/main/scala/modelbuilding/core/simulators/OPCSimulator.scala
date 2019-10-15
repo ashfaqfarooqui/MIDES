@@ -25,19 +25,30 @@ trait OPCSimulator
   }
 
   def subscribeToAllVars = {
-    getClient.subscribeToNodes(variableList.get.map(_._1))
+    //val v = variableList.get.map(_._1)
+
+    println(s"client $getClient")
+    getClient.subscribeToNodes(List("GVL.R1","GVL.R2", "GVL.R3", "GVL.R4",
+      "GVL.Load_R1_initial","GVL.Load_R1_execute","GVL.Load_R1_finish",
+      "GVL.Unload_R1_initial","GVL.Unload_R1_execute","GVL.Unload_R1_finish",
+      "GVL.Load_R2_initial","GVL.Load_R2_execute","GVL.Load_R2_finish",
+      "GVL.Unload_R2_initial","GVL.Unload_R2_execute","GVL.Unload_R2_finish", "GVL.RESET"))
   }
 
   /**
     * Use this function to reset the system.
     * @return
     */
-  def resetSystem = ???
+  def resetSystem = {
+    getClient.write("GVL.RESET",true)
+  }
 
   def initializeSystem = {
     getClient.connect()
+    while(!getClient.isConnected){}
     subscribeToAllVars
 
+    resetSystem
   }
 
   /**
@@ -46,8 +57,7 @@ trait OPCSimulator
     */
   def getInitialState = {
     initializeSystem
-    resetSystem
-    wait(2)
+    //resetSystem
     getClient.getState
   }
 
@@ -67,6 +77,7 @@ trait OPCSimulator
   }
 
   override def translateCommand(c: Command): List[Action] =
+
     c match {
       case `reset`                 => List(ResetAction)
       case `tau`                   => List(TauAction)
@@ -74,8 +85,11 @@ trait OPCSimulator
       case y                       => throw new IllegalArgumentException(s"Unknown command: `$y`")
     }
 
-  def isCommandDone(c: Command) =
-    postGuards(c).eval(getClient.getState).get
+  def isCommandDone(c: Command,acceptPartialState:Boolean) = {
+    println(s"evaluating  command $c, with guard ${postGuards(c)} and statemap ${getClient.getState}")
+    postGuards(c).eval(getClient.getState,acceptPartialState).get
+  }
+
   override def runCommand(
       c: Command,
       s: StateMap,
@@ -83,6 +97,8 @@ trait OPCSimulator
     ): Either[StateMap, StateMap] = {
     evalCommandToRun(c, s, acceptPartialStates) match {
       case Some(true) =>
+        println(s"running command $c")
+
         c match {
           case `reset` =>
             resetSystem
@@ -98,19 +114,29 @@ trait OPCSimulator
             getClient.setState(currState)
             import scala.concurrent.duration._
 
-            val deadline = 5.seconds.fromNow
-            while (!isCommandDone(c) && deadline.hasTimeLeft()) {
-              wait(1)
+            val deadline = 10.seconds.fromNow
+            while (!isCommandDone(c,acceptPartialStates) && deadline.hasTimeLeft()) {
+              println("waiting....")
+              Thread.sleep(6000)
             }
             if (deadline.hasTimeLeft()) {
-              wait(1)
-              postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
+              Thread.sleep(6000)
+              val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
                 ac.next(acc)
               }
-              getClient.setState(currState)
+              getClient.setState(newState)
+              Thread.sleep(6000)
               Right(getClient.getState)
+            }else{
+
+              Thread.sleep(5000)
+              val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
+                ac.next(acc)
+              }
+              getClient.setState(newState)
+              Thread.sleep(6000)
+              Left(getClient.getState)
             }
-            Left(getClient.getState)
         }
       case Some(false) => Left(getClient.getState)
       case None =>
@@ -125,12 +151,13 @@ trait OPCSimulator
       commands: List[Command],
       s: StateMap
     ): Either[StateMap, StateMap] = {
-
+resetSystem
     def runList(c: List[Command], ns: StateMap): Either[StateMap, StateMap] = {
 
       c match {
-
         case x :: xs =>
+          //println(s"running element of the list $c ")
+
           runCommand(x, ns) match {
             case Right(n) => runList(xs, n)
             case Left(n)  => Left(n)
@@ -139,6 +166,7 @@ trait OPCSimulator
       }
 
     }
+    println(s"running list $commands")
     runList(commands, s)
 
   }

@@ -25,7 +25,9 @@ object SupremicaWatersSystem {
   def apply(iFilePath: String): SupremicaWatersSystem = {
     try {
       val fileUri = new File(iFilePath).toURI
+      println(fileUri)
       val marshaller = new JAXBModuleMarshaller(new ModuleSubjectFactory(), CompilerOperatorTable.getInstance())
+      println(marshaller)
       new SupremicaWatersSystem( marshaller.unmarshal(fileUri).asInstanceOf[ModuleSubject] )
     } catch {
       case t: Throwable => throw new IllegalArgumentException(s"Could not generate SupremicaWatersSystem from file `$iFilePath`, error: $t")
@@ -43,6 +45,7 @@ class SupremicaWatersSystem(
   lazy val mParser = new ExpressionParser(mFactory, mOptable)
   lazy val mDocumentManager = new DocumentManager()
 
+  println("created sup model")
   lazy val getSupremicaAutomata: Automata = {
     try {
       val proj = new ProjectBuildFromWaters(new DocumentManager())

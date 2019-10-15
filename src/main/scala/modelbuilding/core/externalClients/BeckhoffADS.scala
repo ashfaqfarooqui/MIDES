@@ -1,4 +1,4 @@
-package modelbuilding.core.externalClients
+/*package modelbuilding.core.externalClients
 
 import grizzled.slf4j.Logging
 import modelbuilding.core.StateMap
@@ -115,3 +115,4 @@ class BeckhoffADS extends AdsCodecs with Logging {
 object BeckhoffADS {
   def apply(): BeckhoffADS = new BeckhoffADS()
 }
+*/
