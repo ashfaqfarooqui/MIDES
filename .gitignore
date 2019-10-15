@@ -3,7 +3,6 @@
 .bloop/
 Output/
 learner.log
-project/
 target/
 *.dot
 *.sc
