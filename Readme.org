@@ -16,9 +16,19 @@ The model files are created under the [[file:src/main/scala/modelbuilding/models
 
 Provide the name of the model [[file:src/main/scala/main.scala::val%20modelName%20=%20"TestUnit"][here]] and the solver you want to use [[file:src/main/scala/main.scala::val%20solver:%20String%20=%20"LStarSuprLearner"%20//%20"modular",%20"mono"][here]] and run the program using ~sbt run.~
 
+* Contributing
+
+** Scala Style
+
+This project uses Scalafmt to enforce some of the code style rules.
+
+It's recommended to enable Scalafmt formatting in IntelliJ. Use version 2019.1 or later. In Preferences > Editor > Code Style > Scala, select Scalafmt as formatter and enable "Reformat on file save". IntelliJ will then use the same settings and version as defined in .scalafmt.conf file. Then it's not needed to use sbt ~scalafmtAll~ when editing with IntelliJ.
+
+If you edit the code without Intellij, it is always a good practice to run ~sbt scalafmtall~ before pushing commiting your code.
 * Contributors
 - [[https://github.com/ashfaqfarooqui][Ashfaq Farooqui]]
 - [[https://github.com/frehage][Fredrik Hagebring]]
 - [[https://github.com/ramontijsseclaase][Ramon Tijsse Claase]]
+
 * License
-The project is licensed under the [[./License][ GNU General Public License version 3 (or newer).]]
+The project is licensed under the [[./LICENSE][ GNU General Public License version 3 (or newer).]]

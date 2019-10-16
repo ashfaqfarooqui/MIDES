@@ -1,6 +1,7 @@
 package modelbuilding.models.ZenuityLaneChange
 
 import modelbuilding.core.{Command, Controllable}
+import scala.collection.JavaConverters._
 
 trait LaneChangeDomain {
   override def toString: String = this match {
@@ -21,6 +22,12 @@ trait LaneChangeDomain {
     case `b5false`       => "b5false"
     case `b6false`       => "b6false"
     case `b7false`       => "b7false"
+    case `b8false`       => "b8false"
+    case `b9false`       => "b9false"
+    case `b10false`      => "b10false"
+    case `b8true`        => "b8true"
+    case `b9true`        => "b9true"
+    case `b10true`       => "b10true"
   }
 }
 
@@ -41,8 +48,22 @@ case object b4false       extends Command with LaneChangeDomain with Controllabl
 case object b5false       extends Command with LaneChangeDomain with Controllable
 case object b6false       extends Command with LaneChangeDomain with Controllable
 case object b7false       extends Command with LaneChangeDomain with Controllable
+case object b8false       extends Command with LaneChangeDomain with Controllable
+case object b9false       extends Command with LaneChangeDomain with Controllable
+case object b10false      extends Command with LaneChangeDomain with Controllable
+case object b8true        extends Command with LaneChangeDomain with Controllable
+case object b9true        extends Command with LaneChangeDomain with Controllable
+case object b10true       extends Command with LaneChangeDomain with Controllable
 
-sealed trait Request
+sealed trait Request {
+  override def toString: String = {
+    this match {
+      case LEFT   => "left"
+      case RIGHT  => "right"
+      case CANCEL => "none"
+    }
+  }
+}
 case object LEFT   extends Request
 case object RIGHT  extends Request
 case object CANCEL extends Request
