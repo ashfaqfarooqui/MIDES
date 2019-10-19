@@ -12,7 +12,7 @@ object ModelBuilder extends Logging {
   val supervisor = LearningType.SUPERVISOR
   val plant      = LearningType.PLANT
 
-  val modelName = "MachineBufferNoSpec"
+  val modelName = "Sticks"
   info(s"Starting with mode : $modelName")
 
   val sul: SUL = modelName match {
@@ -60,6 +60,14 @@ object ModelBuilder extends Logging {
       SUL(RobotArm.Arm, new RobotArm.SimulateArm(3, 3), None, plant, false)
     case "Sticks" =>
       SUL(StickPicking.Sticks, new StickPicking.SimulateSticks(5), None, plant, false)
+    case "lane" =>
+      SUL(
+        ZenuityLaneChange.LaneChange,
+        new ZenuityLaneChange.LaneChangeSimulate,
+        None,
+        plant,
+        false
+      )
     case "AGV" =>
       SUL(AGV.Agv, new AGV.SimulateAgv, Some(AGV.AGVSpecifications()), supervisor, false)
     case _ => throw new Exception("A model wasn't defined.")
