@@ -5,7 +5,6 @@ import modelbuilding.core.{AND, Alphabet, AlwaysTrue, Automata, Automaton, EQ, O
 import modelbuilding.solvers.ModularSupSolver._
 import modelbuilding.solvers.MonolithicSupSolver.extendStateMap
 import org.supremica.automata
-import supremicastuff.SupremicaWatersSystem
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
