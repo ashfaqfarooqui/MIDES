@@ -7,5 +7,5 @@ target/
 *.log
 *.dot
 *.sc
-/.bloop/
-/.metals/
+/.bloop
+

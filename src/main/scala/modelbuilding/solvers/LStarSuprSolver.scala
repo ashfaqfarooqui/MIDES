@@ -62,8 +62,8 @@ class LStarSuprSolver(_sul:SUL) extends BaseSolver with Logging {
     val alphabet = alphabetMapping(s._2)
       info(s"learning for ${s._1} with alphabet $alphabet")
       */
-
-    val runner = new LStar(teacher,Some(specs.syncSpecName),alphabet, Wmethod(alphabet,50)).startLearning().removeTauAndDump
+//TODO: The Wmethod does not have information about the speck, this will not work for supervisors.....
+    val runner = new LStar(teacher,Some(specs.syncSpecName),alphabet, Wmethod(teacher,alphabet,50)).startLearning().removeTauAndDump
   //}.toMap
 
 
