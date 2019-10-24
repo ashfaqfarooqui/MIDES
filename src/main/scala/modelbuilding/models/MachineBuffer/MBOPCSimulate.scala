@@ -18,19 +18,17 @@ class MBOPCSimulate extends OPCSimulator {
   override val stateExecVariable: String = "GVL.S1"
   override val stateExecFinishedValue: String = "true"
 
-  override val variableList= Some(List(("GVL.R1",string),("GVL.R2",string),("GVL.R3",string),("GVL.R4",string)
-    ,("GVL.Load_R1_initial",string),("GVL.Load_R1_execute",string),("GVL.Load_R1_finish",string)
-    ,("GVL.Unload_R1_initial",string),("GVL.Unload_R1_execute",string),("GVL.Unload_R1_finish",string)
-    ,("GVL.Load_R2_initial",string),("GVL.Load_R2_execute",string),("GVL.Load_R2_finish",string)
-    ,("GVL.Unload_R2_initial",string),("GVL.Unload_R2_execute",string),("GVL.Unload_R2_finish",string),("GVL.RESET",string)))
+  override val variableList = Some(List(("GVL.R1", string), ("GVL.R2", string)
+    , ("GVL.S1", string), ("GVL.S2", string), ("S3", string)
+    , ("GVL.RESET", string)))
 
 
   override val goalStates: Option[Set[StateMap]] = None
 
 
   override val guards: Map[Command, Predicate] = Map(
-    load1 -> EQ("GVL.Load_R1_initial",true), //make guard to be such that state is initial
-    unload1 -> EQ("GVL.Unload_R1_initial",true),
+    load1 -> AND(EQ("GVL.S1", true), EQ("GVL.S2", false)), //make guard to be such that state is initial
+    unload1 -> AND(EQ("GVL.S2", true), EQ("GVL.S3", false)),
     load2 ->  EQ("GVL.Load_R2_initial",true),
     unload2 -> EQ("GVL.Unload_R2_initial",true)
   )
@@ -43,8 +41,8 @@ class MBOPCSimulate extends OPCSimulator {
   )
 
   override val postGuards: Map[Command, Predicate] = Map(
-    load1 -> EQ("GVL.Load_R1_finish",true), //make guard to be such that state is initial
-    unload1 -> EQ("GVL.Unload_R1_finish",true),
+    load1 -> EQ("GVL.S2", true), //make guard to be such that state is initial
+    unload1 -> EQ("GVL.S3", true),
     load2 -> EQ("GVL.Load_R2_finish",true),
     unload2 -> EQ("GVL.Unload_R2_finish",true)
   )
