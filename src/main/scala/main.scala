@@ -1,20 +1,18 @@
+import Helpers.ConfigHelper
 import grizzled.slf4j.Logging
 import modelbuilding.core.{LearningType, SUL}
-import modelbuilding.core.modeling.Model
 import modelbuilding.models.TestUnit.TLSpecifications
 import modelbuilding.models._
 import modelbuilding.solvers._
 import supremicastuff.SupremicaHelpers
-import supremicastuff.SupremicaHelpers._
-import Helpers.ConfigHelper._
 
 object ModelBuilder extends Logging {
 
   val supervisor = LearningType.SUPERVISOR
   val plant      = LearningType.PLANT
 
-  val modelName      = getConfigAsString("main.Model")  //"MachineBufferNoSpec"
-  val solver: String = getConfigAsString("main.Solver") //"LStarPlantLearner" // "modular", "mono"
+  val modelName      = ConfigHelper.model  //"MachineBufferNoSpec"
+  val solver: String = ConfigHelper.solver //"LStarPlantLearner" // "modular", "mono"
 
   val sul: SUL = modelName match {
     case "TestUnit" =>
@@ -49,7 +47,7 @@ object ModelBuilder extends Logging {
         supervisor,
         false
       )
-    case "MachineBufferNoSpec" =>
+    case "MachineBufferNoSpecOpc" =>
       SUL(
         MachineBuffer.MachineBuffer,
         new MachineBuffer.MBOPCSimulate,
@@ -57,7 +55,14 @@ object ModelBuilder extends Logging {
         supervisor,
         true
       )
-    //case "MachineBufferNoSpec" => SUL(MachineBuffer.MachineBuffer, new MachineBuffer.SimulateMachineBuffer,None,supervisor,true)
+    case "MachineBufferNoSpec" =>
+      SUL(
+        MachineBuffer.MachineBuffer,
+        new MachineBuffer.SimulateMachineBuffer,
+        None,
+        supervisor,
+        true
+      )
     case "RoboticArm" =>
       SUL(RobotArm.Arm, new RobotArm.SimulateArm(3, 3), None, plant, false)
     case "Sticks" =>
