@@ -48,6 +48,24 @@ object ModelBuilder extends Logging {
         supervisor,
         false
       )
+    case "RoboticArm" =>
+      SUL(RobotArm.Arm, new RobotArm.SimulateArm(3, 3), None, plant, false)
+    case "Sticks" =>
+      SUL(
+        StickPicking.Sticks,
+        new StickPicking.SimulateSticks(5),
+        None,
+        plant,
+        false
+      )
+    case "AGV" =>
+      SUL(
+        AGV.Agv,
+        new AGV.SimulateAgv,
+        Some(AGV.AGVSpecifications()),
+        supervisor,
+        false
+      )
     case "MachineBufferNoSpec" =>
       SUL(
         MachineBuffer.MachineBuffer,
@@ -56,13 +74,7 @@ object ModelBuilder extends Logging {
         supervisor,
         true
       )
-    //case "MachineBufferNoSpec" => SUL(MachineBuffer.MachineBuffer, new MachineBuffer.SimulateMachineBuffer,None,supervisor,true)
-    case "RoboticArm" =>
-      SUL(RobotArm.Arm, new RobotArm.SimulateArm(3, 3), None, plant, false)
-    case "Sticks" =>
-      SUL(StickPicking.Sticks, new StickPicking.SimulateSticks(5), None, plant, false)
-    case "AGV" =>
-      SUL(AGV.Agv, new AGV.SimulateAgv, Some(AGV.AGVSpecifications()), supervisor, false)
+
     case _ => throw new Exception("A model wasn't defined.")
   }
 
@@ -73,14 +85,15 @@ object ModelBuilder extends Logging {
     info(s"Running sul: $sul")
 
     val result = solver match {
-      case "frehage1" => new FrehagePlantBuilderWithPartialStates(sul)
-      case "frehage2" => new FrehagePlantBuilder(sul)
-      case "frehage3" => new FrehageModularSupSynthesis(sul)
-      case "monolithicPlantSolver" => new MonolithicSolver(sul)
+      case "frehage1"            => new FrehagePlantBuilderWithPartialStates(sul)
+      case "frehage2"            => new FrehagePlantBuilder(sul)
+      case "frehage3"            => new FrehageModularSupSynthesis(sul)
+      case "monolithic"          => new MonolithicSolver(sul)
+
       case "monolithicSupSolver" => new MonolithicSupSolver(sul)
-      case "modularSupSolver" => new ModularSupSolver(sul)
-      case "LStarPlantLearner" => new LStarPlantSolver(sul)
-      case "LStarSuprLearner" => new LStarSuprSolver(sul)
+      case "modularSupSolver"    => new ModularSupSolver(sul)
+      case "LStarPlantLearner"   => new LStarPlantSolver(sul)
+      case "LStarSuprLearner"    => new LStarSuprSolver(sul)
 
     }
 
