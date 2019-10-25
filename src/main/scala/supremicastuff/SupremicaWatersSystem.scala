@@ -61,6 +61,7 @@ class SupremicaWatersSystem(
   lazy val mParser = new ExpressionParser(mFactory, mOptable)
   lazy val mDocumentManager = new DocumentManager()
 
+  println("created sup model")
   lazy val getSupremicaAutomata: Automata = {
     try {
       val proj = new ProjectBuildFromWaters(new DocumentManager())

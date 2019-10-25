@@ -10,9 +10,9 @@ import supremicastuff.SupremicaHelpers._
 object ModelBuilder extends Logging {
 
   val supervisor = LearningType.SUPERVISOR
-  val plant = LearningType.PLANT
+  val plant      = LearningType.PLANT
 
-  val modelName = "TestUnit"
+  val modelName = "MachineBufferNoSpec"
   info(s"Starting with mode : $modelName")
 
   val sul: SUL = modelName match {
@@ -66,10 +66,19 @@ object ModelBuilder extends Logging {
         supervisor,
         false
       )
+    case "MachineBufferNoSpec" =>
+      SUL(
+        MachineBuffer.MachineBuffer,
+        new MachineBuffer.MBOPCSimulate,
+        None,
+        supervisor,
+        true
+      )
+
     case _ => throw new Exception("A model wasn't defined.")
   }
 
-  val solver: String = "LStarSuprLearner" // "modular", "mono"
+  val solver: String = "LStarPlantLearner" // "modular", "mono"
 
   def main(args: Array[String]): Unit = {
 
@@ -80,6 +89,7 @@ object ModelBuilder extends Logging {
       case "frehage2"            => new FrehagePlantBuilder(sul)
       case "frehage3"            => new FrehageModularSupSynthesis(sul)
       case "monolithic"          => new MonolithicSolver(sul)
+
       case "monolithicSupSolver" => new MonolithicSupSolver(sul)
       case "modularSupSolver"    => new ModularSupSolver(sul)
       case "LStarPlantLearner"   => new LStarPlantSolver(sul)

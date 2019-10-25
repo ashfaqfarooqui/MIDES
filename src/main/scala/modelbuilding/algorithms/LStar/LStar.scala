@@ -22,7 +22,7 @@ class LStar(teacher: Teacher, spec:Option[String], A:Alphabet,ceGen:CEGenerator)
    private def learn(oTable: ObservationTable):Automaton = {
     info(s"S: ${oTable.S.size}, E: ${oTable.E.size}")
     info(s"Instance: ${oTable.instance}")
-   debug(oTable.prettyPrintTable)
+    info(oTable.prettyPrintTable)
 
 
     if (oTable.isClosed.nonEmpty) {
@@ -36,11 +36,13 @@ class LStar(teacher: Teacher, spec:Option[String], A:Alphabet,ceGen:CEGenerator)
       info(s"Table is inconsistent")
       debug(s"Table is not consistent 1:${inCons.get._1} 2:${inCons.get._2} 3:${inCons.get._3}")
       debug("updating table with distinguishing string")
+      info(oTable.getAutomata.toString)
       learn(updateTable(oTable,oTable.S,oTable.E + oTable.getDistinguishingSuffix( inCons.get._1,inCons.get._2,inCons.get._3).get))
     }
 
-    else
-    {
+    else {
+      info(oTable.getAutomata.toString)
+      oTable.getAutomata.createDotFile
       val counterExample = teacher.isHypothesisTrue(oTable, ceGen)
       info(s"got CE: $counterExample")
       counterExample match {

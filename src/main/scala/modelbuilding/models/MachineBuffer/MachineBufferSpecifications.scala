@@ -4,7 +4,7 @@ import modelbuilding.core.modeling.Specifications
 
 class MachineBufferSpecifications extends Specifications{
   // Add all specifications available to the model
-  override val specFilePath: Option[String] = Some("SupremicaModels/MachineBufferMachine.wmod")
+  override val specFilePath: Option[String] = Some("SupremicaModels\\MachineBufferMachine.wmod")
   addSpecsFromSupremica(specFilePath.get)
 }
 object MachineBufferSpecifications{

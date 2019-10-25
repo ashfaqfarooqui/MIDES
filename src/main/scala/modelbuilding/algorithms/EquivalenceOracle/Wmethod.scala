@@ -19,17 +19,16 @@
 package modelbuilding.algorithms.EquivalenceOracle
 
 import grizzled.slf4j.Logging
+import modelbuilding.algorithms.LStar.ObservationTable
+import modelbuilding.core.modelInterfaces.Teacher
 import modelbuilding.core.{Alphabet, Automaton, Grammar, State, Symbol}
 
-object Wmethod {
-  def apply(alphabets: Alphabet, nbrState: Int): Wmethod =
-    new Wmethod(alphabets, nbrState)
+object Wmethod{
+  def apply(teacher:Teacher, alphabets: Alphabet, nbrState: Int): Wmethod = new Wmethod(teacher,alphabets, nbrState)
 }
 
-class Wmethod(alphabets: Alphabet, nbrState: Int)
-    extends CEGenerator
-    with Logging {
-  var CachecPwrA: Map[Int, Set[Grammar]] = Map(0 -> Set.empty[Grammar])
+class Wmethod(teacher:Teacher,alphabets:Alphabet,nbrState: Int) extends CEGenerator with Logging {
+  var CachecPwrA :Map[Int,Set[Grammar]] = Map(0->Set.empty[Grammar])
 
   private def evalString(s: Grammar, a: Automaton): Int = {
     def loop(currState: State, stringToTraverse: List[Symbol]): State = {
@@ -42,13 +41,12 @@ class Wmethod(alphabets: Alphabet, nbrState: Int)
 
     val reachedState = loop(a.getInitialState, s.getSequenceAsList)
     //debug(s"reachedstate: $reachedState")
-    if (a.getMarkedState.nonEmpty && a.getMarkedState.get.contains(
-          reachedState
-        )) {
-      return 2
-    } else {
-      if (reachedState.s != "dump:") {
-        return 1
+
+    if(a.getMarkedState.nonEmpty && a.getMarkedState.get.contains(reachedState)){
+      2
+    }else {
+      if(reachedState.s!="dump:"){
+        1
       } else 0
     }
   }
@@ -95,6 +93,7 @@ class Wmethod(alphabets: Alphabet, nbrState: Int)
           s"checking for ce with $p + $u + $w + ,got sys: $sysOp, and hypOp : $hypOp"
         )
         if (sysOp != hypOp) {
+
           return Left(s)
         }
       }
