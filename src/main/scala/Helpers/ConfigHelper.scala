@@ -19,11 +19,13 @@
 package Helpers
 import com.github.andr83.scalaconfig._
 import com.typesafe.config.ConfigFactory
+import grizzled.slf4j.Logging
 
-object ConfigHelper {
+object ConfigHelper extends Logging {
   val config: ScalaConfig = ConfigFactory.load()
 
-  lazy val model: String  = config.asUnsafe[String]("main.Model")
-  lazy val solver: String = config.asUnsafe[String]("main.Solver")
+  println(s"loaded config $config")
+  lazy val model: String  = config.asUnsafe[String]("main.Model.value")
+  lazy val solver: String = config.asUnsafe[String]("main.Solver.value")
 
 }

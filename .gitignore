@@ -2,10 +2,13 @@
 .metals/
 .bloop/
 Output/
+learner.log
 logs/
 target/
 *.log
 *.dot
 *.sc
-/.bloop
 
+logs/app.log
+src/main/java/
+src/main/scala-2.12/
