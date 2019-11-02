@@ -79,7 +79,10 @@ case class ObservationTable(table :DataTable, A: Alphabet, S: Set[Grammar], E: S
   def prettyPrintTable:String ={
     val buf = new StringBuilder
     val maxSa = S.toList.map(_.toString.mkString(",").length).max
-    val sufStr = E.toList.map(_.toString).mkString(" | ")
+    val sufStr = table.columns
+      .filter(_.name != defaultCell00)
+      .map(_.name)
+      .mkString(" | ")
     val div = "|"+ "-" * (1 + maxSa + 1 + sufStr.length) + "|\n"
     buf ++= " \n|T" + " " * (maxSa - 1)+ " | "
     buf ++= sufStr

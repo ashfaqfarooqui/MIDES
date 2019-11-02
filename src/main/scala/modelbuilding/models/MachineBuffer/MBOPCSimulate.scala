@@ -27,6 +27,10 @@ class MBOPCSimulate extends OPCSimulator {
 
 
   override val guards: Map[Command, Predicate] = Map(
+    /*   load1 -> AND(EQ("GVL.S1", true), EQ("GVL.S2", false)), //make guard to be such that state is initial
+       unload1 -> EQ("GVL.S2", true),
+       load2 -> AND(EQ("GVL.S3", true), EQ("GVL.S4", false)),
+       unload2 -> EQ("GVL.S4", true), */
     load1 -> AND(EQ("GVL.S1", true), EQ("GVL.S2", false)), //make guard to be such that state is initial
     unload1 -> AND(EQ("GVL.S2", true), EQ("GVL.S3", false)),
     load2 -> AND(EQ("GVL.S3", true), EQ("GVL.S4", false)),
@@ -41,6 +45,10 @@ class MBOPCSimulate extends OPCSimulator {
   )
 
   override val postGuards: Map[Command, Predicate] = Map(
+    /*load1 -> EQ("GVL.S1", false), //make guard to be such that state is initial
+    unload1 -> EQ("GVL.S2", false),
+    load2 -> EQ("GVL.S3", false),
+    unload2 -> EQ("GVL.S4", false), */
     load1 -> EQ("GVL.S2", true), //make guard to be such that state is initial
     unload1 -> EQ("GVL.S3", true),
     load2 -> EQ("GVL.S4", true),
