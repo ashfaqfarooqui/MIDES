@@ -49,18 +49,27 @@ object ModelBuilder extends Logging {
         supervisor,
         false
       )
-    case "MachineBufferNoSpecOpc" =>
+
+    case "MachineBufferOPC" =>
       SUL(
         MachineBuffer.MachineBuffer,
         new MachineBuffer.MBOPCSimulate,
-        None,
+        Some(MachineBuffer.MachineBufferSpecifications()),
         supervisor,
-        true
+        false
       )
     case "MachineBufferNoSpec" =>
       SUL(
         MachineBuffer.MachineBuffer,
         new MachineBuffer.SimulateMachineBuffer,
+        None,
+        supervisor,
+        true
+      )
+    case "MachineBufferNoSpecOPC" =>
+      SUL(
+        MachineBuffer.MachineBuffer,
+        new MachineBuffer.MBOPCSimulate,
         None,
         supervisor,
         true

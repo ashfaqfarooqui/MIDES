@@ -122,23 +122,23 @@ trait OPCSimulator
             }
             if (deadline.hasTimeLeft()) {
               println(s"command $c is finished, wait to set postactions.")
-              Thread.sleep(750)
+              Thread.sleep(800)
               val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
                 ac.next(acc)
               }
               getClient.setState(newState)
               //println("Postactions are set.")
-              Thread.sleep(750)
+              Thread.sleep(800)
               Right(getClient.getState)
             }else{
               println(s"command $c has not finished in time, wait for return.")
-              Thread.sleep(750)
+              Thread.sleep(800)
               val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
                 ac.next(acc)
               }
               getClient.setState(newState)
               //println("Postactions are set.")
-              Thread.sleep(750)
+              Thread.sleep(800)
               Left(getClient.getState)
             }
         }
@@ -157,7 +157,7 @@ trait OPCSimulator
     ): Either[StateMap, StateMap] = {
 resetSystem
     println("The system has reset.")
-    Thread.sleep(750)
+    Thread.sleep(800)
     def runList(c: List[Command], ns: StateMap): Either[StateMap, StateMap] = {
 
       c match {
