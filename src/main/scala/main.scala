@@ -11,8 +11,10 @@ object ModelBuilder extends Logging {
   val supervisor = LearningType.SUPERVISOR
   val plant      = LearningType.PLANT
 
+
   val modelName      = ConfigHelper.model  //"MachineBufferNoSpec"
   val solver: String = ConfigHelper.solver //"LStarPlantLearner" // "modular", "mono"
+
 
   val sul: SUL = modelName match {
     case "TestUnit" =>

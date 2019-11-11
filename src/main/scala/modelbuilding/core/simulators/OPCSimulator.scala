@@ -28,8 +28,7 @@ trait OPCSimulator
     //val v = variableList.get.map(_._1)
 
     println(s"client $getClient")
-    getClient.subscribeToNodes(List("GVL.R1", "GVL.R2", "GVL.S1", "GVL.S2", "GVL.S3",
-      "GVL.RESET"))
+    getClient.subscribeToNodes(List("GVL.R1", "GVL.R2", "GVL.R3", "GVL.R4", "GVL.S1", "GVL.S2", "GVL.S3", "GVL.S4", "GVL.S5", "GVL.RESET"))
   }
 
   /**
@@ -123,23 +122,23 @@ trait OPCSimulator
             }
             if (deadline.hasTimeLeft()) {
               println(s"command $c is finished, wait to set postactions.")
-              Thread.sleep(500)
+              Thread.sleep(750)
               val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
                 ac.next(acc)
               }
               getClient.setState(newState)
               //println("Postactions are set.")
-              Thread.sleep(500)
+              Thread.sleep(750)
               Right(getClient.getState)
             }else{
               println(s"command $c has not finished in time, wait for return.")
-              Thread.sleep(500)
+              Thread.sleep(750)
               val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
                 ac.next(acc)
               }
               getClient.setState(newState)
               //println("Postactions are set.")
-              Thread.sleep(500)
+              Thread.sleep(750)
               Left(getClient.getState)
             }
         }
@@ -158,7 +157,7 @@ trait OPCSimulator
     ): Either[StateMap, StateMap] = {
 resetSystem
     println("The system has reset.")
-    Thread.sleep(1000)
+    Thread.sleep(750)
     def runList(c: List[Command], ns: StateMap): Either[StateMap, StateMap] = {
 
       c match {
