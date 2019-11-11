@@ -11,16 +11,18 @@ libraryDependencies ++= Seq(
   "org.eclipse.milo"       % "stack-client" % "0.3.3",
   "com.github.nscala-time" %% "nscala-time" % "2.18.0",
   //"ch.qos.logback" % "logback-classic" % "1.2.3",
-  "org.clapper" %% "grizzled-slf4j" % "1.3.2",
-  "org.slf4j" % "slf4j-api" % "1.7.25",
+  "org.clapper" %% "grizzled-slf4j" % "1.3.4",
+  "org.slf4j"   % "slf4j-api"       % "1.7.25",
   //"org.slf4j" % "slf4j-simple" % "1.7.25",
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.12.1",
-  "org.apache.logging.log4j" % "log4j-api" % "2.12.1",
-  "org.apache.logging.log4j" % "log4j-core" % "2.12.1",
-  "com.github.tototoshi" %% "scala-csv" % "1.3.5",
-  "com.github.martincooper" %% "scala-datatable" % "0.8.0",
-  "org.scalactic"           %% "scalactic"       % "3.0.5",
-  "org.scalatest"           %% "scalatest"       % "3.0.5" % "test"
+  "org.apache.logging.log4j" % "log4j-api"        % "2.12.1",
+  "org.apache.logging.log4j" % "log4j-core"       % "2.12.1",
+  "com.github.tototoshi"     %% "scala-csv"       % "1.3.5",
+  "com.github.andr83"        %% "scalaconfig"     % "0.4",
+  "com.typesafe"             % "config"           % "1.4.0",
+  "com.github.martincooper"  %% "scala-datatable" % "0.8.0",
+  "org.scalactic"            %% "scalactic"       % "3.0.5",
+  "org.scalatest"            %% "scalatest"       % "3.0.5" % "test"
   // "nl.vroste"               %% "scala-ads-client" % "0.1.0-SNAPSHOT"
 )
 

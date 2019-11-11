@@ -16,17 +16,14 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package modelbuilding.algorithms.EquivalenceOracle
+package Helpers
+import com.github.andr83.scalaconfig._
+import com.typesafe.config.ConfigFactory
 
-import grizzled.slf4j.Logging
-import modelbuilding.core.{Alphabet, Automaton, Grammar}
+object ConfigHelper {
+  val config: ScalaConfig = ConfigFactory.load()
 
-trait CEGenerator extends Logging {
-  def findCE(accessorString: Set[Grammar],
-             distinguishingStrings: Set[Grammar],
-             alphabet: Alphabet,
-             hypAutomaton: Automaton,
-             memberQuery: Grammar => Int): Either[Grammar, Boolean]
+  lazy val model: String  = config.asUnsafe[String]("main.Model")
+  lazy val solver: String = config.asUnsafe[String]("main.Solver")
 
-  // def findCE(t: ObservationTable): Either[Grammar, Boolean]
 }
