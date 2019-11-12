@@ -22,19 +22,20 @@ class MBOPCSimulate extends OPCSimulator {
     , ("GVL.S1", string), ("GVL.S2", string), ("GVL.S3", string), ("GVL.S4", string), ("GVL.S5", string)
     , ("GVL.RESET", string)))
 
-
   override val goalStates: Option[Set[StateMap]] = None
 
-
   override val guards: Map[Command, Predicate] = Map(
-    /*   load1 -> AND(EQ("GVL.S1", true), EQ("GVL.S2", false)), //make guard to be such that state is initial
+    // The guards below were used for the case that there is no connection between machine 1 and machine 2
+    load1 -> AND(EQ("GVL.S1", true), EQ("GVL.S2", false)), //make guard to be such that state is initial
        unload1 -> EQ("GVL.S2", true),
        load2 -> AND(EQ("GVL.S3", true), EQ("GVL.S4", false)),
-       unload2 -> EQ("GVL.S4", true), */
-    load1 -> AND(EQ("GVL.S1", true), EQ("GVL.S2", false)), //make guard to be such that state is initial
+    unload2 -> EQ("GVL.S4", true),
+
+    // The guards below were used when there is a connection between machine 1 and machine 2
+    /*load1 -> AND(EQ("GVL.S1", true), EQ("GVL.S2", false)), //make guard to be such that state is initial
     unload1 -> AND(EQ("GVL.S2", true), EQ("GVL.S3", false)),
     load2 -> AND(EQ("GVL.S3", true), EQ("GVL.S4", false)),
-    unload2 -> AND(EQ("GVL.S4", true), EQ("GVL.S5", false)),
+    unload2 -> AND(EQ("GVL.S4", true), EQ("GVL.S5", false)),*/
   )
 
   override val actions: Map[Command, List[Action]] = Map(
@@ -45,18 +46,20 @@ class MBOPCSimulate extends OPCSimulator {
   )
 
   override val postGuards: Map[Command, Predicate] = Map(
-    /*load1 -> EQ("GVL.S1", false), //make guard to be such that state is initial
+    // The guards below were used for the case that there is no connection between machine 1 and machine 2
+    load1 -> EQ("GVL.S1", false), //make guard to be such that state is initial
     unload1 -> EQ("GVL.S2", false),
     load2 -> EQ("GVL.S3", false),
-    unload2 -> EQ("GVL.S4", false), */
-    load1 -> EQ("GVL.S2", true), //make guard to be such that state is initial
+    unload2 -> EQ("GVL.S4", false),
+
+    // The guards below were used when there is a connection between machine 1 and machine 2
+    /*oad1 -> EQ("GVL.S2", true), //make guard to be such that state is initial
     unload1 -> EQ("GVL.S3", true),
     load2 -> EQ("GVL.S4", true),
-    unload2 -> EQ("GVL.S5", true),
+    unload2 -> EQ("GVL.S5", true), */
   )
 
-
-  //Remember: this can be if the action succeds or fails
+  //Remember: this can be if the action success or fails
   override val postActions: Map[Command, List[Action]] = Map(
     load1 -> List(Assign("GVL.R1", false)),
     unload1 -> List(Assign("GVL.R2",false)),
