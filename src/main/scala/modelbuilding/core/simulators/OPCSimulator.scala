@@ -28,7 +28,8 @@ trait OPCSimulator
     //val v = variableList.get.map(_._1)
 
     println(s"client $getClient")
-    getClient.subscribeToNodes(List("GVL.R1", "GVL.R2", "GVL.R3", "GVL.R4", "GVL.S1", "GVL.S2", "GVL.S3", "GVL.S4", "GVL.S5", "GVL.RESET"))
+    //getClient.subscribeToNodes(List("GVL.R1", "GVL.R2", "GVL.R3", "GVL.R4", "GVL.S1", "GVL.S2", "GVL.S3", "GVL.S4", "GVL.S5", "GVL.RESET"))    //Nodes for MB
+    getClient.subscribeToNodes(List("GVL.R1", "GVL.R2", "GVL.R3", "GVL.R4", "GVL.R5", "GVL.R6", "GVL.R7", "GVL.S1", "GVL.S2", "GVL.S3", "GVL.S4", "GVL.S5", "GVL.S6", "GVL.S7", "GVL.S8", "GVL.RESET")) //Nodes for TL
   }
 
   /**
@@ -118,27 +119,29 @@ trait OPCSimulator
             val deadline = 10.seconds.fromNow
             while (!isCommandDone(c,acceptPartialStates) && deadline.hasTimeLeft()) {
               //println(s"command $c executed, wait for simulation to complete.")
-              //Thread.sleep(500)
+              //Thread.sleep(1000)
             }
             if (deadline.hasTimeLeft()) {
               println(s"command $c is finished, wait to set postactions.")
-              Thread.sleep(800)
+              Thread.sleep(900)
               val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
                 ac.next(acc)
               }
               getClient.setState(newState)
               //println("Postactions are set.")
-              Thread.sleep(800)
+              Thread.sleep(900)
               Right(getClient.getState)
             }else{
-              println(s"command $c has not finished in time, wait for return.")
-              Thread.sleep(800)
+              println(s"Error: command $c has not finished in time, wait for return.")
+              info(s"Command $c has not finished in time, stop simulation.")
+              Thread.sleep(900)
+              System.exit(1)
               val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
                 ac.next(acc)
               }
               getClient.setState(newState)
               //println("Postactions are set.")
-              Thread.sleep(800)
+              Thread.sleep(900)
               Left(getClient.getState)
             }
         }
@@ -157,7 +160,7 @@ trait OPCSimulator
     ): Either[StateMap, StateMap] = {
 resetSystem
     println("The system has reset.")
-    Thread.sleep(800)
+    Thread.sleep(900)
     def runList(c: List[Command], ns: StateMap): Either[StateMap, StateMap] = {
 
       c match {
