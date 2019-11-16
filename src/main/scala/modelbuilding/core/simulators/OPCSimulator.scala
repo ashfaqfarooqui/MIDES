@@ -1,4 +1,6 @@
 package modelbuilding.core.simulators
+
+import Helpers.ConfigHelper
 import grizzled.slf4j.Logging
 import modelbuilding.core._
 import modelbuilding.core.externalClients.MiloOPCUAClient
@@ -123,25 +125,25 @@ trait OPCSimulator
             }
             if (deadline.hasTimeLeft()) {
               println(s"command $c is finished, wait to set postactions.")
-              Thread.sleep(900)
+              Thread.sleep(ConfigHelper.runner_timeout)
               val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
                 ac.next(acc)
               }
               getClient.setState(newState)
               //println("Postactions are set.")
-              Thread.sleep(900)
+              Thread.sleep(ConfigHelper.runner_timeout)
               Right(getClient.getState)
             }else{
               println(s"Error: command $c has not finished in time, wait for return.")
               info(s"Command $c has not finished in time, stop simulation.")
-              Thread.sleep(900)
+              Thread.sleep(ConfigHelper.runner_timeout)
               System.exit(1)
               val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
                 ac.next(acc)
               }
               getClient.setState(newState)
               //println("Postactions are set.")
-              Thread.sleep(900)
+              Thread.sleep(ConfigHelper.runner_timeout)
               Left(getClient.getState)
             }
         }
@@ -160,7 +162,7 @@ trait OPCSimulator
     ): Either[StateMap, StateMap] = {
 resetSystem
     println("The system has reset.")
-    Thread.sleep(900)
+    Thread.sleep(ConfigHelper.runner_timeout)
     def runList(c: List[Command], ns: StateMap): Either[StateMap, StateMap] = {
 
       c match {
