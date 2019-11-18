@@ -9,3 +9,4 @@ target/
 *.sc
 /.bloop
 
+src/main/resources/application.conf
