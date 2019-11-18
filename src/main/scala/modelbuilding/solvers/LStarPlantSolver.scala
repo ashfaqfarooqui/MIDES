@@ -12,7 +12,7 @@ class LStarPlantSolver(_sul:SUL) extends BaseSolver with Logging{
   val _model = _sul.model
   val teacher = _sul
   val alphabet = _model.alphabet + Alphabet(Symbol(tau))
-  val runner = new LStar(teacher,None,alphabet, Wmethod(alphabet,50)).startLearning().removeTauAndDump
+  val runner = new LStar(teacher,None,alphabet, Wmethod(teacher,alphabet,50)).startLearning().removeTauAndDump
 
 
 
