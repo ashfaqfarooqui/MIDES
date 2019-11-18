@@ -1,9 +1,9 @@
 package modelbuilding.models.MachineBuffer
 
 import modelbuilding.core._
-import modelbuilding.core.simulation.Simulator
+import modelbuilding.core.simulators.{CodeSimulator, Simulator}
 
-class SimulateMachineBufferWithControl extends Simulator {
+class SimulateMachineBufferWithControl extends  CodeSimulator {
 
   val m1 = "m1"
   val m2 = "m2"

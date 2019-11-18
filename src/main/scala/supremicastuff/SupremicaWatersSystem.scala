@@ -4,14 +4,23 @@ import java.io.File
 import java.util.Calendar
 
 import grizzled.slf4j.Logging
-import net.sourceforge.waters.model.compiler.{CompilerOperatorTable, ModuleCompiler}
+import net.sourceforge.waters.model.base.EventKind
+import net.sourceforge.waters.model.compiler.{
+  CompilerOperatorTable,
+  ModuleCompiler
+}
 import net.sourceforge.waters.model.des.ProductDESProxy
 import net.sourceforge.waters.model.expr.ExpressionParser
-import net.sourceforge.waters.model.marshaller.{DocumentManager, JAXBModuleMarshaller}
+import net.sourceforge.waters.model.marshaller.{
+  DocumentManager,
+  SAXModuleMarshaller
+}
 import net.sourceforge.waters.model.module.EventDeclProxy
 import net.sourceforge.waters.plain.des.ProductDESElementFactory
-import net.sourceforge.waters.subject.module.{ModuleSubject, ModuleSubjectFactory}
-import net.sourceforge.waters.xsd.base.EventKind
+import net.sourceforge.waters.subject.module.{
+  ModuleSubject,
+  ModuleSubjectFactory
+}
 import org.supremica.automata
 import org.supremica.automata.Automata
 import org.supremica.automata.IO.ProjectBuildFromWaters
@@ -25,24 +34,34 @@ object SupremicaWatersSystem {
   def apply(iFilePath: String): SupremicaWatersSystem = {
     try {
       val fileUri = new File(iFilePath).toURI
-      val marshaller = new JAXBModuleMarshaller(new ModuleSubjectFactory(), CompilerOperatorTable.getInstance())
-      new SupremicaWatersSystem( marshaller.unmarshal(fileUri).asInstanceOf[ModuleSubject] )
+      val marshaller = new SAXModuleMarshaller(
+        new ModuleSubjectFactory(),
+        CompilerOperatorTable.getInstance()
+      )
+      new SupremicaWatersSystem(
+        marshaller.unmarshal(fileUri).asInstanceOf[ModuleSubject]
+      )
     } catch {
-      case t: Throwable => throw new IllegalArgumentException(s"Could not generate SupremicaWatersSystem from file `$iFilePath`, error: $t")
+      case t: Throwable =>
+        throw new IllegalArgumentException(
+          s"Could not generate SupremicaWatersSystem from file `$iFilePath`, error: $t"
+        )
     }
   }
 }
 class SupremicaWatersSystem(
-                       val mModule: ModuleSubject /* e.g. ReadSystemFromWmodFile("supremicaFiles/controlabilitytest.xml") */
-                     ) extends SimpleModuleFactory with Logging {
+  val mModule: ModuleSubject /* e.g. ReadSystemFromWmodFile("supremicaFiles/controlabilitytest.xml") */
+) extends SimpleModuleFactory
+    with Logging {
 
-  assert (mModule!=null, "The ModuleSubject must be non null")
+  assert(mModule != null, "The ModuleSubject must be non null")
 
   lazy val mFactory = new ModuleSubjectFactory()
   lazy val mOptable: CompilerOperatorTable = CompilerOperatorTable.getInstance()
   lazy val mParser = new ExpressionParser(mFactory, mOptable)
   lazy val mDocumentManager = new DocumentManager()
 
+  println("created sup model")
   lazy val getSupremicaAutomata: Automata = {
     try {
       val proj = new ProjectBuildFromWaters(new DocumentManager())
@@ -53,15 +72,25 @@ class SupremicaWatersSystem(
     }
   }
   lazy val getSupremicaPlants: Automata = getSupremicaAutomata.getPlantAutomata
-  lazy val getSupremicaSpecs: Automata = getSupremicaAutomata.getSpecificationAutomata
+  lazy val getSupremicaSpecs: Automata =
+    getSupremicaAutomata.getSpecificationAutomata
 
-  def getComment: String = if (mModule.getComment == null) "" else s"${mModule.getComment}\n"
+  def getComment: String =
+    if (mModule.getComment == null) "" else s"${mModule.getComment}\n"
 
-  def saveToWMODFile(iFilePath: String, iModule: ModuleSubject = mModule): Boolean = {
+  def saveToWMODFile(iFilePath: String,
+                     iModule: ModuleSubject = mModule): Boolean = {
     try {
-      val file = new File(iFilePath + (if (!iFilePath.endsWith(".wmod")) iModule.getName + ".wmod" else ""))
-      val marshaller = new JAXBModuleMarshaller(mFactory, mOptable)
-      iModule.setComment((if (getComment != null) getComment + "\n" else "") + "File generated: " + Calendar.getInstance().getTime)
+      val file = new File(
+        iFilePath + (if (!iFilePath.endsWith(".wmod")) iModule.getName + ".wmod"
+                     else "")
+      )
+      val marshaller = new SAXModuleMarshaller(mFactory, mOptable)
+      iModule.setComment(
+        (if (getComment != null) getComment + "\n" else "") + "File generated: " + Calendar
+          .getInstance()
+          .getTime
+      )
       marshaller.marshal(iModule, file)
       return true
     } catch {
@@ -83,7 +112,8 @@ class SupremicaWatersSystem(
     }
   }*/
 
-  def getModule(module: ModuleSubject = mModule, hasProperties: Boolean = false): ProductDESProxy = {
+  def getModule(module: ModuleSubject = mModule,
+                hasProperties: Boolean = false): ProductDESProxy = {
 
     val expand = Config.EXPAND_EXTENDED_AUTOMATA.isTrue
     val factory = ProductDESElementFactory.getInstance
@@ -98,7 +128,10 @@ class SupremicaWatersSystem(
     compiler.compile()
   }
 
-  def verifyControllability(hypothesis: automata.Automaton, specs: Automata = getSupremicaSpecs): (Boolean, String) = {
+  def verifyControllability(
+    hypothesis: automata.Automaton,
+    specs: Automata = getSupremicaSpecs
+  ): (Boolean, String) = {
     info("Verifying.....")
 
     if (specs.nbrOfAutomata == 0) {
@@ -112,7 +145,12 @@ class SupremicaWatersSystem(
       verificationOptions.setAlgorithmType(VerificationAlgorithm.MODULAR)
       verificationOptions.setVerificationType(VerificationType.CONTROLLABILITY)
 
-      val verifier = new AutomataVerifier(sys, verificationOptions, new SynchronizationOptions(), new MinimizationOptions())
+      val verifier = new AutomataVerifier(
+        sys,
+        verificationOptions,
+        new SynchronizationOptions(),
+        new MinimizationOptions()
+      )
       (verifier.verify(), verifier.getTheMessage)
     }
   }
@@ -120,21 +158,30 @@ class SupremicaWatersSystem(
 
 //To create a new Module Subject....
 trait SimpleModuleFactory {
-  def moduleFactory(iModuleName: String, iModuleComment: Option[String] = None): ModuleSubject = {
+  def moduleFactory(iModuleName: String,
+                    iModuleComment: Option[String] = None): ModuleSubject = {
     val ms = new ModuleSubject(iModuleName, null)
     iModuleComment match {
       case Some(comment) => ms.setComment(comment)
-      case _ =>
+      case _             =>
     }
     ms
   }
 
   def initModule(ms: ModuleSubject): ModuleSubject = { //Add marking to module
-    ms.getEventDeclListModifiable.add(new ModuleSubjectFactory().createEventDeclProxy(new ModuleSubjectFactory().createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME), EventKind.PROPOSITION))
+    ms.getEventDeclListModifiable.add(
+      new ModuleSubjectFactory().createEventDeclProxy(
+        new ModuleSubjectFactory()
+          .createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME),
+        EventKind.PROPOSITION
+      )
+    )
     ms
   }
 
 }
 object SimpleModuleFactory extends SimpleModuleFactory {
-  def apply(iModuleName: String, iModuleComment: Option[String] = None): ModuleSubject = initModule(moduleFactory(iModuleName, iModuleComment))
+  def apply(iModuleName: String,
+            iModuleComment: Option[String] = None): ModuleSubject =
+    initModule(moduleFactory(iModuleName, iModuleComment))
 }
