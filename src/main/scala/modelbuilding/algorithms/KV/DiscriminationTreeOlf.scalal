@@ -1,0 +1,167 @@
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package modelbuilding.algorithms.KV
+
+import scala.annotation.tailrec
+import modelbuilding.core.Grammar
+import org.apache.logging.log4j.core.net.DatagramSocketManager
+
+trait DiscriminationTree {
+
+  def value: Option[Grammar] = this match {
+    case n: Node => Some(n.v)
+    case l: Leaf => Some(l.v)
+    //    case Empty      => None
+  }
+
+  def left: Option[DiscriminationTree] = this match {
+    case n: Node => Some(n.l)
+    case l: Leaf => None
+    //    case Empty      => None
+  }
+
+  def right: Option[DiscriminationTree] = this match {
+    case n: Node => Some(n.r)
+    case l: Leaf => None
+    //   case Empty      => None
+  }
+
+  def update(
+      leafToUpdate: Grammar,
+      newLeaf: Grammar,
+      discriminator: Grammar,
+      isMember: Grammar => Int
+    ): DiscriminationTree = {
+    this match {
+      case Leaf(v) =>
+        //TODO: FIx the ordering here
+
+        if (isMember(leafToUpdate + discriminator) > 0)
+          Node(discriminator, Leaf(leafToUpdate), Leaf(newLeaf))
+        else
+          Node(discriminator, Leaf(newLeaf), Leaf(leafToUpdate))
+
+      case node @ Node(v, l, r) =>
+        //Im not fully sure of this isMember logic
+        if (isMember(leafToUpdate + v) > 0) {
+          node.copy(l = l.update(leafToUpdate, newLeaf, discriminator + v, isMember))
+        } else {
+          node.copy(r = r.update(leafToUpdate, newLeaf, discriminator + v, isMember))
+        }
+    }
+  }
+
+  //States
+  def getLeafValues: Set[Grammar] = {
+    @tailrec
+    def loop(a: List[DiscriminationTree], acc: Set[Grammar]): Set[Grammar] = {
+      a match {
+        case Nil             => acc
+        case (n: Node) :: tl => loop(n.left.get :: n.right.get :: tl, acc)
+        case (l: Leaf) :: tl => loop(tl, acc + l.value.get)
+        case _ :: tl         => loop(tl, acc)
+      }
+    }
+
+    loop(List(this), Set.empty[Grammar])
+  }
+
+  //Discriminators
+  def getNodeValues: Set[Grammar] = {
+
+    @tailrec
+    def loop(a: List[DiscriminationTree], acc: Set[Grammar]): Set[Grammar] = {
+      a match {
+        case Nil => acc
+        case (n: Node) :: tl =>
+          loop(n.left.get :: n.right.get :: tl, acc + n.value.get)
+        case (l: Leaf) :: tl => loop(tl, acc)
+        case _ :: tl         => loop(tl, acc)
+      }
+    }
+
+    loop(List(this), Set.empty[Grammar])
+  }
+
+  def toDot: String = ???
+
+  final def rendered: String = {
+    def leftOrRight(isLeft: Boolean, isFirst: Boolean): String =
+      if (isFirst)
+        ""
+      else if (isLeft)
+        "└── "
+      else
+        "├── "
+
+    def leftOrRightParent(isLeft: Boolean, isFirst: Boolean): String =
+      if (isFirst)
+        " "
+      else if (isLeft)
+        "    "
+      else
+        "│   "
+
+    def loop(
+        prefix: String,
+        isLeft: Boolean,
+        isFirst: Boolean,
+        tree: DiscriminationTree
+      ): String = {
+      tree match {
+        case Leaf(v) =>
+          s"l(${v.toString})"
+
+        case Node(d, left, right) =>
+          +leftOrRight(isLeft, isFirst) + s"n($d)" + "\n" +
+            loop(
+              prefix + leftOrRightParent(isLeft, isFirst),
+              isLeft = false,
+              isFirst = false,
+              right
+            ) +
+            loop(
+              prefix + leftOrRightParent(isLeft, isFirst),
+              isLeft = true,
+              isFirst = false,
+              left
+            )
+      }
+    }
+
+    loop(
+      prefix = "",
+      isLeft = true,
+      isFirst = true,
+      tree = this
+    )
+  }
+
+  override def toString: String = {
+    rendered
+  }
+
+}
+
+case class Node(v: Grammar, l: DiscriminationTree, r: DiscriminationTree)
+    extends DiscriminationTree
+
+case class Leaf(v: Grammar) extends DiscriminationTree {}
+
+//case object Empty extends DiscriminationTree[Nothing]

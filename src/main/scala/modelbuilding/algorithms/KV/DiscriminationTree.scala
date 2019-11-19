@@ -1,92 +1,128 @@
-/*
- * Learning Automata for Supervisory Synthesis
- *  Copyright (C) 2019
- *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-package modelbuilding.algorithms.KV
-
-import scala.annotation.tailrec
-
-trait DiscriminationTree[A] {
-
-  def value: Option[A] = this match {
-    case n: Node[A] => Some(n.v)
-    case l: Leaf[A] => Some(l.v)
-    //    case Empty      => None
-  }
-
-  def left: Option[DiscriminationTree[A]] = this match {
-    case n: Node[A] => Some(n.l)
-    case l: Leaf[A] => None
-    //    case Empty      => None
-  }
-
-  def right: Option[DiscriminationTree[A]] = this match {
-    case n: Node[A] => Some(n.r)
-    case l: Leaf[A] => None
-    //   case Empty      => None
-  }
-
-  //States
-  def getLeafValues: Set[A] = {
-    @tailrec
-    def loop(a: List[DiscriminationTree[A]], acc: Set[A]): Set[A] = {
-      a match {
-        case Nil                => acc
-        case (n: Node[A]) :: tl => loop(n.left.get :: n.right.get :: tl, acc)
-        case (l: Leaf[A]) :: tl => loop(tl, acc + l.value.get)
-        case _ :: tl            => loop(tl, acc)
-      }
-    }
-
-    loop(List(this), Set.empty[A])
-  }
-
-  //Discriminators
-  def getNodeValues: Set[A] = {
-
-    @tailrec
-    def loop(a: List[DiscriminationTree[A]], acc: Set[A]): Set[A] = {
-      a match {
-        case Nil => acc
-        case (n: Node[A]) :: tl =>
-          loop(n.left.get :: n.right.get :: tl, acc + n.value.get)
-        case (l: Leaf[A]) :: tl => loop(tl, acc)
-        case _ :: tl            => loop(tl, acc)
-      }
-    }
-
-    loop(List(this), Set.empty[A])
-  }
-
-  /*
-Like `foldRight` for lists, `fold` receives a "handler" for each of the data constructors of the type, and recursively
-accumulates some value using these handlers. As with `foldRight`, `fold(t)(Leaf(_))(Branch(_,_)) == t`, and we can use
-this function to implement just about any recursive function that would otherwise be defined by pattern matching.
-   */
-  def fold[A, B](t: DiscriminationTree[A])(f: A => B)(g: (B, B) => B): B = t match {
-    case Leaf(a)       => f(a)
-    case Node(v, l, r) => g(fold(l)(f)(g), fold(r)(f)(g))
-  }
-
-}
-
-case class Node[A](v: A, l: DiscriminationTree[A], r: DiscriminationTree[A])
-    extends DiscriminationTree[A]
-
-case class Leaf[A](v: A) extends DiscriminationTree[A] {}
-
-//case object Empty extends DiscriminationTree[Nothing]
+//
+///*
+// * Learning Automata for Supervisory Synthesis
+// *  Copyright (C) 2019
+// *
+// *     This program is free software: you can redistribute it and/or modify
+// *     it under the terms of the GNU General Public License as published by
+// *     the Free Software Foundation, either version 3 of the License, or
+// *     (at your option) any later version.
+// *
+// *     This program is distributed in the hope that it will be useful,
+// *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+// *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// *     GNU General Public License for more details.
+// *
+// *     You should have received a copy of the GNU General Public License
+// *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// */
+//
+//package modelbuilding.algorithms.KV
+//
+//case class Element[+A](val value: A, count: Int = 1) {
+//  override def toString = s"(${value},$count)"
+//}
+//
+///**
+//  * A tree definition, support for add, delete, search, size, height and pretty print
+//  */
+//sealed abstract class Tree[+A] {
+//  val size: Int
+//  val height: Int
+//
+//  def add[B >: A](b: B)(implicit ismember: B => Int): Tree[B]
+//
+//  def search[B >: A](b: B)(implicit ismember: B => Int): Boolean
+//
+//  protected def printLevel0(): Unit
+//
+//  protected def printOtherLevel(subLevel: Int): Unit
+//
+//  private[tree] def printGivenLevel(level: Int): Unit = level match {
+//    case 0 => printLevel0()
+//    case _ => printOtherLevel(level - 1)
+//  }
+//
+//  def prettyPrint(): Unit = (0 to height + 1) foreach { h =>
+//    printGivenLevel(h)
+//    println()
+//  }
+//}
+//
+//object Tree {
+//  def binaryTree[A](l: List[A])(implicit ordering: Ordering[A]) =
+//    l.foldLeft(Empty: Tree[A])((b, a) => b.add(a))
+//}
+//
+///**
+//  * Act a stopper for the tree branches
+//  */
+//sealed case class Leaf[+A](v: A) extends Tree[A] {
+//  val size   = 0
+//  val height = -1
+//
+//  def add[A](b: A, d: A)(implicit ismember: A => Int) =
+//    if (ismember(b + d) > 0)
+//      Node(Element(b + d), Leaf(v), Leaf(b))
+//    else
+//      Node(Element(b + d), Leaf(b), Leaf(v))
+//
+//  def search[A >: Nothing](b: A)(implicit ismember: A => Int) = false
+//
+//  protected def printLevel0() = print("E")
+//
+//  protected def printOtherLevel(level: Int) = {
+//    printGivenLevel(level)
+//    print(" ")
+//    printGivenLevel(level)
+//  }
+//}
+//
+//sealed case class Node[+A](el: Element[A], left: Tree[A], right: Tree[A])
+//    extends Tree[A] {
+//  val size   = 1 + left.size + right.size
+//  val height = 1 + math.max(left.height, right.height)
+//
+//  /**
+//    * If value already exists then increment count value
+//    * If bigger then continue in the right subtree
+//    * else in the left subtree
+//    */
+//  def add[B >: A](b: B)(implicit ismember: B => Int) = {
+//    import ordering._
+//    if (b == el.value) Node(Element(el.value, el.count + 1), left, right)
+//    else if (b > el.value) Node(el, left, right.add(b))
+//    else Node(el, left.add(b), right)
+//  }
+//
+//  /**
+//    * Found if same value otherwise
+//    * if bigger, search in right subtree
+//    * else search in left subtree
+//    */
+//  def search[B >: A](b: B)(implicit ismember: B => Int) = {
+//    import ordering._
+//    if (b == el.value) true
+//    else if (b < el.value) left.search(b)
+//    else right.search(b)
+//  }
+//
+//  /**
+//    * Pop the maximum element from the right subtree
+//    * and return the max value and the new subtree
+//    */
+//  def popMaximum: (Element[A], Tree[A]) = right match {
+//    case Empty => (el, left)
+//    case nRight: Node[A] =>
+//      val (max, t) = nRight.popMaximum
+//      (max, Node(el, left, t))
+//  }
+//
+//  protected def printLevel0() = print(el)
+//
+//  protected def printOtherLevel(level: Int) = {
+//    left.printGivenLevel(level)
+//    print(" ")
+//    right.printGivenLevel(level)
+//  }
+//}

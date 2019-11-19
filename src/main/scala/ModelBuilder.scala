@@ -110,7 +110,7 @@ object ModelBuilder extends App with Logging {
       case "modularSupSolver"        => new ModularSupSolver(sul)
       case "LStarPlantLearner"       => new LStarPlantSolver(sul)
       case "LStarSuprLearner"        => new LStarSuprSolver(sul)
-
+      // case "KV"                      => new KVSolver(sul)
     }
 
     info("Learning done!, writing results")
