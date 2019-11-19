@@ -1,17 +1,25 @@
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package modelbuilding.models.MachineBuffer
 
-import modelbuilding.core.{
-  Action,
-  AlwaysTrue,
-  Assign,
-  Command,
-  EQ,
-  Predicate,
-  StateMap,
-  Toggle,
-  AND
-}
 import modelbuilding.core.simulators.OPCSimulator
+import modelbuilding.core._
 
 class MBOPCSimulate extends OPCSimulator {
 
@@ -32,20 +40,9 @@ class MBOPCSimulate extends OPCSimulator {
     List(
       ("GVL.R1", string),
       ("GVL.R2", string),
-      ("GVL.R3", string),
-      ("GVL.R4", string),
-      ("GVL.Load_R1_initial", string),
-      ("GVL.Load_R1_execute", string),
-      ("GVL.Load_R1_finish", string),
-      ("GVL.Unload_R1_initial", string),
-      ("GVL.Unload_R1_execute", string),
-      ("GVL.Unload_R1_finish", string),
-      ("GVL.Load_R2_initial", string),
-      ("GVL.Load_R2_execute", string),
-      ("GVL.Load_R2_finish", string),
-      ("GVL.Unload_R2_initial", string),
-      ("GVL.Unload_R2_execute", string),
-      ("GVL.Unload_R2_finish", string),
+      ("GVL.S1", string),
+      ("GVL.S2", string),
+      ("S3", string),
       ("GVL.RESET", string)
     )
   )
@@ -53,8 +50,8 @@ class MBOPCSimulate extends OPCSimulator {
   override val goalStates: Option[Set[StateMap]] = None
 
   override val guards: Map[Command, Predicate] = Map(
-    load1   -> EQ("GVL.Load_R1_initial", true), //make guard to be such that state is initial
-    unload1 -> EQ("GVL.Unload_R1_initial", true),
+    load1   -> AND(EQ("GVL.S1", true), EQ("GVL.S2", false)), //make guard to be such that state is initial
+    unload1 -> AND(EQ("GVL.S2", true), EQ("GVL.S3", false)),
     load2   -> EQ("GVL.Load_R2_initial", true),
     unload2 -> EQ("GVL.Unload_R2_initial", true)
   )
@@ -67,8 +64,8 @@ class MBOPCSimulate extends OPCSimulator {
   )
 
   override val postGuards: Map[Command, Predicate] = Map(
-    load1   -> EQ("GVL.Load_R1_finish", true), //make guard to be such that state is initial
-    unload1 -> EQ("GVL.Unload_R1_finish", true),
+    load1   -> EQ("GVL.S2", true), //make guard to be such that state is initial
+    unload1 -> EQ("GVL.S3", true),
     load2   -> EQ("GVL.Load_R2_finish", true),
     unload2 -> EQ("GVL.Unload_R2_finish", true)
   )

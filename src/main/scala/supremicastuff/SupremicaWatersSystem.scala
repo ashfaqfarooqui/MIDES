@@ -1,17 +1,35 @@
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package supremicastuff
 
 import java.io.File
 import java.util.Calendar
 
 import grizzled.slf4j.Logging
+import net.sourceforge.waters.model.base.EventKind
 import net.sourceforge.waters.model.compiler.{CompilerOperatorTable, ModuleCompiler}
 import net.sourceforge.waters.model.des.ProductDESProxy
 import net.sourceforge.waters.model.expr.ExpressionParser
-import net.sourceforge.waters.model.marshaller.{DocumentManager, JAXBModuleMarshaller}
+import net.sourceforge.waters.model.marshaller.{DocumentManager, SAXModuleMarshaller}
 import net.sourceforge.waters.model.module.EventDeclProxy
 import net.sourceforge.waters.plain.des.ProductDESElementFactory
 import net.sourceforge.waters.subject.module.{ModuleSubject, ModuleSubjectFactory}
-import net.sourceforge.waters.xsd.base.EventKind
 import org.supremica.automata
 import org.supremica.automata.Automata
 import org.supremica.automata.IO.ProjectBuildFromWaters
@@ -25,13 +43,13 @@ object SupremicaWatersSystem {
   def apply(iFilePath: String): SupremicaWatersSystem = {
     try {
       val fileUri = new File(iFilePath).toURI
-      println(fileUri)
-      val marshaller = new JAXBModuleMarshaller(
+      val marshaller = new SAXModuleMarshaller(
         new ModuleSubjectFactory(),
         CompilerOperatorTable.getInstance()
       )
-      println(marshaller)
-      new SupremicaWatersSystem(marshaller.unmarshal(fileUri).asInstanceOf[ModuleSubject])
+      new SupremicaWatersSystem(
+        marshaller.unmarshal(fileUri).asInstanceOf[ModuleSubject]
+      )
     } catch {
       case t: Throwable =>
         throw new IllegalArgumentException(
@@ -63,7 +81,8 @@ class SupremicaWatersSystem(
     }
   }
   lazy val getSupremicaPlants: Automata = getSupremicaAutomata.getPlantAutomata
-  lazy val getSupremicaSpecs: Automata  = getSupremicaAutomata.getSpecificationAutomata
+  lazy val getSupremicaSpecs: Automata =
+    getSupremicaAutomata.getSpecificationAutomata
 
   def getComment: String =
     if (mModule.getComment == null) "" else s"${mModule.getComment}\n"
@@ -71,9 +90,10 @@ class SupremicaWatersSystem(
   def saveToWMODFile(iFilePath: String, iModule: ModuleSubject = mModule): Boolean = {
     try {
       val file = new File(
-        iFilePath + (if (!iFilePath.endsWith(".wmod")) iModule.getName + ".wmod" else "")
+        iFilePath + (if (!iFilePath.endsWith(".wmod")) iModule.getName + ".wmod"
+                     else "")
       )
-      val marshaller = new JAXBModuleMarshaller(mFactory, mOptable)
+      val marshaller = new SAXModuleMarshaller(mFactory, mOptable)
       iModule.setComment(
         (if (getComment != null) getComment + "\n" else "") + "File generated: " + Calendar
           .getInstance()

@@ -10,7 +10,7 @@ sbt run
 
 ** Running
 
-Configure the SUL in the main file [[file:src/main/scala/main.scala::val%20sul:%20SUL%20=%20modelName%20match%20{][here]]. The SUL takes as parameters: the model, a simulator, specifications if needed, a flag stating if the intention is to learn a plant or a supervisor (this flag is currently redundant) and a boolean value if the model is supposed to accept partial states.
+Configure the SUL in the main file [[file:src/main/scala/main.scala::val%20sul:%20SUL%20=%20modelName%20match%20{][here]]. The SUL takes as parameters: the model, a simulator, specifications if needed, a flag stating if the intention is to learn a plant or a supervisor (this flag is currently redundant) and a boolean value if the model is supposed to accept partial states. Set the model to learn, solver name and other relevant configuration in the [[file://src/main/resources/application.conf][application.conf]].
 
 The model files are created under the [[file:src/main/scala/modelbuilding/models][models folder]] using traits specified in [[file:src/main/scala/modelbuilding/core][core folder]].
 

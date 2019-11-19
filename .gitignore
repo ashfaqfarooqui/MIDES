@@ -2,8 +2,9 @@
 .metals/
 .bloop/
 Output/
-learner.log
+logs/
 target/
+*.log
 *.dot
 *.sc
 /.bloop

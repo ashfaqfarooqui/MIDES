@@ -1,3 +1,21 @@
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package modelbuilding.core.simulators
 import grizzled.slf4j.Logging
 import modelbuilding.core._
@@ -29,25 +47,7 @@ trait OPCSimulator
 
     println(s"client $getClient")
     getClient.subscribeToNodes(
-      List(
-        "GVL.R1",
-        "GVL.R2",
-        "GVL.R3",
-        "GVL.R4",
-        "GVL.Load_R1_initial",
-        "GVL.Load_R1_execute",
-        "GVL.Load_R1_finish",
-        "GVL.Unload_R1_initial",
-        "GVL.Unload_R1_execute",
-        "GVL.Unload_R1_finish",
-        "GVL.Load_R2_initial",
-        "GVL.Load_R2_execute",
-        "GVL.Load_R2_finish",
-        "GVL.Unload_R2_initial",
-        "GVL.Unload_R2_execute",
-        "GVL.Unload_R2_finish",
-        "GVL.RESET"
-      )
+      List("GVL.R1", "GVL.R2", "GVL.S1", "GVL.S2", "GVL.S3", "GVL.RESET")
     )
   }
 
@@ -65,6 +65,7 @@ trait OPCSimulator
     subscribeToAllVars
 
     resetSystem
+    println("The system has initialized.")
   }
 
   /**
@@ -101,9 +102,7 @@ trait OPCSimulator
     }
 
   def isCommandDone(c: Command, acceptPartialState: Boolean) = {
-    println(
-      s"evaluating  command $c, with guard ${postGuards(c)} and statemap ${getClient.getState}"
-    )
+    //println(s"evaluating  command $c, with guard ${postGuards(c)} and statemap ${getClient.getState}")
     postGuards(c).eval(getClient.getState, acceptPartialState).get
   }
 
@@ -114,13 +113,17 @@ trait OPCSimulator
     ): Either[StateMap, StateMap] = {
     evalCommandToRun(c, s, acceptPartialStates) match {
       case Some(true) =>
-        println(s"running command $c")
+        //println(s"running command $c")
 
         c match {
           case `reset` =>
             resetSystem
+            println("The system has reset now.")
             Right(getClient.getState)
-          case `tau` => Right(getClient.getState)
+          case `tau` =>
+            //Thread.sleep(100)
+            //println(s"command $c executed.")
+            Right(getClient.getState)
           case _ =>
             getClient.setState(s)
 
@@ -133,25 +136,28 @@ trait OPCSimulator
 
             val deadline = 10.seconds.fromNow
             while (!isCommandDone(c, acceptPartialStates) && deadline.hasTimeLeft()) {
-              println("waiting....")
-              Thread.sleep(6000)
+              //println(s"command $c executed, wait for simulation to complete.")
+              //Thread.sleep(500)
             }
             if (deadline.hasTimeLeft()) {
-              Thread.sleep(6000)
+              println(s"command $c is finished, wait to set postactions.")
+              Thread.sleep(500)
               val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
                 ac.next(acc)
               }
               getClient.setState(newState)
-              Thread.sleep(6000)
+              //println("Postactions are set.")
+              Thread.sleep(500)
               Right(getClient.getState)
             } else {
-
-              Thread.sleep(5000)
+              println(s"command $c has not finished in time, wait for return.")
+              Thread.sleep(500)
               val newState = postActions(c).foldLeft(getClient.getState) { (acc, ac) =>
                 ac.next(acc)
               }
               getClient.setState(newState)
-              Thread.sleep(6000)
+              //println("Postactions are set.")
+              Thread.sleep(500)
               Left(getClient.getState)
             }
         }
@@ -169,6 +175,8 @@ trait OPCSimulator
       s: StateMap
     ): Either[StateMap, StateMap] = {
     resetSystem
+    println("The system has reset.")
+    Thread.sleep(1000)
     def runList(c: List[Command], ns: StateMap): Either[StateMap, StateMap] = {
 
       c match {
@@ -184,7 +192,12 @@ trait OPCSimulator
 
     }
     println(s"running list $commands")
-    runList(commands, s)
+    val returnvalue = runList(commands, s)
+    if (returnvalue.isLeft) {
+      debug(s"We got a return value for $commands: ${returnvalue}")
+
+    }
+    returnvalue
 
   }
 

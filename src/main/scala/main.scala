@@ -1,19 +1,36 @@
+import Helpers.ConfigHelper
 import grizzled.slf4j.Logging
 import modelbuilding.core.{LearningType, SUL}
-import modelbuilding.core.modeling.Model
 import modelbuilding.models.TestUnit.TLSpecifications
 import modelbuilding.models._
 import modelbuilding.solvers._
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import supremicastuff.SupremicaHelpers
-import supremicastuff.SupremicaHelpers._
 
 object ModelBuilder extends Logging {
 
   val supervisor = LearningType.SUPERVISOR
   val plant      = LearningType.PLANT
 
-  val modelName = "Sticks"
-  info(s"Starting with mode : $modelName")
+  val modelName      = ConfigHelper.model  //"MachineBufferNoSpec"
+  val solver: String = ConfigHelper.solver //"LStarPlantLearner" // "modular", "mono"
 
   val sul: SUL = modelName match {
     case "TestUnit" =>
@@ -48,10 +65,18 @@ object ModelBuilder extends Logging {
         supervisor,
         false
       )
-    case "MachineBufferNoSpec" =>
+    case "MachineBufferNoSpecOpc" =>
       SUL(
         MachineBuffer.MachineBuffer,
         new MachineBuffer.MBOPCSimulate,
+        None,
+        supervisor,
+        true
+      )
+    case "MachineBufferNoSpec" =>
+      SUL(
+        MachineBuffer.MachineBuffer,
+        new MachineBuffer.SimulateMachineBuffer,
         None,
         supervisor,
         true
@@ -60,38 +85,29 @@ object ModelBuilder extends Logging {
       SUL(RobotArm.Arm, new RobotArm.SimulateArm(3, 3), None, plant, false)
     case "Sticks" =>
       SUL(StickPicking.Sticks, new StickPicking.SimulateSticks(5), None, plant, false)
-    case "lane" =>
-      SUL(
-        ZenuityLaneChange.LaneChange,
-        new ZenuityLaneChange.LaneChangeSimulate,
-        None,
-        plant,
-        false
-      )
     case "AGV" =>
       SUL(AGV.Agv, new AGV.SimulateAgv, Some(AGV.AGVSpecifications()), supervisor, false)
     case _ => throw new Exception("A model wasn't defined.")
   }
 
-  val solver: String = "LStarPlantLearner" // "modular", "mono"
-
   def main(args: Array[String]): Unit = {
 
-    info(s"Running sul: $sul")
+    //info(s"Running sul: $sul")
+    info(s"Starting learner for : $modelName, using $solver as solver")
 
     val result = solver match {
-      case "frehage1"              => new FrehagePlantBuilderWithPartialStates(sul)
-      case "frehage2"              => new FrehagePlantBuilder(sul)
-      case "frehage3"              => new FrehageModularSupSynthesis(sul)
-      case "monolithicPlantSolver" => new MonolithicSolver(sul)
-      case "monolithicSupSolver"   => new MonolithicSupSolver(sul)
-      case "modularSupSolver"      => new ModularSupSolver(sul)
-      case "LStarPlantLearner"     => new LStarPlantSolver(sul)
-      case "LStarSuprLearner"      => new LStarSuprSolver(sul)
+      case "frehage1"                => new FrehagePlantBuilderWithPartialStates(sul)
+      case "frehage2"                => new FrehagePlantBuilder(sul)
+      case "frehage3"                => new FrehageModularSupSynthesis(sul)
+      case "monolithicPlantSolver99" => new MonolithicSolver(sul)
+      case "monolithicSupSolver"     => new MonolithicSupSolver(sul)
+      case "modularSupSolver"        => new ModularSupSolver(sul)
+      case "LStarPlantLearner"       => new LStarPlantSolver(sul)
+      case "LStarSuprLearner"        => new LStarSuprSolver(sul)
 
     }
 
-    info("Learning done!")
+    info("Learning done!, writing results")
 
     val automata = result.getAutomata
 
