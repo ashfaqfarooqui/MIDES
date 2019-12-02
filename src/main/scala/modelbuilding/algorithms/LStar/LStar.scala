@@ -40,7 +40,7 @@ class LStar(
   private def learn(oTable: ObservationTable): Automaton = {
     info(s"S: ${oTable.S.size}, E: ${oTable.E.size}")
     info(s"Instance: ${oTable.instance}")
-    info(oTable.prettyPrintTable)
+    debug(oTable.prettyPrintTable)
 
     if (oTable.isClosed.nonEmpty) {
       info(s"Table is not closed ${oTable.isClosed}...closing")
@@ -54,7 +54,7 @@ class LStar(
           s"Table is not consistent 1:${inCons.get._1} 2:${inCons.get._2} 3:${inCons.get._3}"
         )
         debug("updating table with distinguishing string")
-        info(oTable.getAutomata.toString)
+//        info(oTable.getAutomata.toString)
         learn(
           updateTable(
             oTable,

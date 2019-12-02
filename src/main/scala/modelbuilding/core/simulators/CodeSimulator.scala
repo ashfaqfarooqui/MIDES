@@ -9,7 +9,7 @@ trait CodeSimulator extends Simulator with TwoStateOperation with Logging {
   override val initState: StateMap
   override val goalStates: Option[Set[StateMap]]
   override val goalPredicate: Option[Predicate] = None
-
+  
   def evalCommandToRun(
       c: Command,
       s: StateMap,

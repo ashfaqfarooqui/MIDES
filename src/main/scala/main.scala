@@ -87,6 +87,14 @@ object ModelBuilder extends Logging {
       SUL(StickPicking.Sticks, new StickPicking.SimulateSticks(5), None, plant, false)
     case "AGV" =>
       SUL(AGV.Agv, new AGV.SimulateAgv, Some(AGV.AGVSpecifications()), supervisor, false)
+    case "LaneChange" =>
+      SUL(
+        ZenuityLaneChange.LaneChange,
+        new ZenuityLaneChange.LaneChangeSimulate,
+        None,
+        plant,
+        false
+      )
     case _ => throw new Exception("A model wasn't defined.")
   }
 
@@ -99,7 +107,7 @@ object ModelBuilder extends Logging {
       case "frehage1"                => new FrehagePlantBuilderWithPartialStates(sul)
       case "frehage2"                => new FrehagePlantBuilder(sul)
       case "frehage3"                => new FrehageModularSupSynthesis(sul)
-      case "monolithicPlantSolver99" => new MonolithicSolver(sul)
+      case "monolithicPlantSolver" => new MonolithicSolver(sul)
       case "monolithicSupSolver"     => new MonolithicSupSolver(sul)
       case "modularSupSolver"        => new ModularSupSolver(sul)
       case "LStarPlantLearner"       => new LStarPlantSolver(sul)
