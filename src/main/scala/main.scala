@@ -25,6 +25,14 @@ object ModelBuilder extends Logging {
         supervisor,
         true
       )
+    case "TestUnitOPC" =>
+      SUL(
+        TestUnit.TransferLine,
+        new TestUnit.TLOPCSimulate,
+        Some(TLSpecifications()),
+        supervisor,
+        true
+      )
     case "TestUnitNoSpec" =>
       SUL(
         TestUnit.TransferLine,
