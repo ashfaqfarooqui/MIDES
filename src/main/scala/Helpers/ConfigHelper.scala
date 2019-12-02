@@ -25,5 +25,6 @@ object ConfigHelper {
 
   lazy val model: String  = config.asUnsafe[String]("main.Model")
   lazy val solver: String = config.asUnsafe[String]("main.Solver")
-
+  lazy val url: String = config.asUnsafe[String]("opc.url")
+  lazy val runner_timeout: Int = config.asUnsafe[Int]("opc.runner_timeout")
 }

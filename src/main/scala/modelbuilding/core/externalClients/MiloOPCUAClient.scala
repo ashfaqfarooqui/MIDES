@@ -1,5 +1,6 @@
 package modelbuilding.core.externalClients
 
+import Helpers.ConfigHelper
 import grizzled.slf4j.Logging
 import modelbuilding.core.StateMap
 import org.eclipse.milo.opcua.stack.client.DiscoveryClient
@@ -63,7 +64,7 @@ class MiloOPCUAClient extends Logging{
 
   def isConnected = client != null
 
-  def connect(url: String = "opc.tcp://s149870:4840"): Boolean = {
+  def connect(url: String = ConfigHelper.url): Boolean = {
     try {
       val configBuilder: OpcUaClientConfigBuilder = new OpcUaClientConfigBuilder();
       val endpoints = DiscoveryClient.getEndpoints(url)

@@ -24,6 +24,30 @@ object ModelBuilder extends Logging {
         supervisor,
         true
       )
+    case "TestUnitOPC" =>
+      SUL(
+        TestUnit.TransferLine,
+        new TestUnit.TLOPCSimulate,
+        Some(TLSpecifications()),
+        supervisor,
+        true
+      )
+    case "TestUnitNoSpec" =>
+      SUL(
+        TestUnit.TransferLine,
+        new TestUnit.SimulateTL,
+        None,
+        supervisor,
+        true
+      )
+    case "TestUnitNoSpecOPC" =>
+      SUL(
+        TestUnit.TransferLine,
+        new TestUnit.TLOPCSimulate,
+        None,
+        supervisor,
+        true
+      )
     case "CatMouse" =>
       SUL(
         CatAndMouse.CatAndMouse,
