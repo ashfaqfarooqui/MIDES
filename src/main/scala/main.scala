@@ -11,7 +11,6 @@ object ModelBuilder extends Logging {
   val supervisor = LearningType.SUPERVISOR
   val plant      = LearningType.PLANT
 
-
   val modelName      = ConfigHelper.model  //"MachineBufferNoSpec"
   val solver: String = ConfigHelper.solver //"LStarPlantLearner" // "modular", "mono"
 
@@ -73,6 +72,15 @@ object ModelBuilder extends Logging {
         supervisor,
         false
       )
+    case "MachineBufferWithControl" =>
+      SUL(
+        MachineBuffer.MachineBufferWithControl,
+        new MachineBuffer.SimulateMachineBufferWithControl,
+        Some(MachineBuffer.MachineBufferSpecifications()),
+        plant,
+        false
+      )
+
 
     case "MachineBufferOPC" =>
       SUL(

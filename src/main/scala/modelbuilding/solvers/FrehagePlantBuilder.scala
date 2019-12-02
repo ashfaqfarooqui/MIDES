@@ -65,7 +65,8 @@ class FrehagePlantBuilder(_sul: SUL) extends BaseSolver {
 
   }
 
-  override def getAutomata: Automata = {
+  override def getAutomata: Automata = getAutomataPruned
+  def getAutomataPruned: Automata = {
     val modules = for {
       m <- model.modules
       nonLocalVariables = moduleTransitions(m).filter(_.event.getCommand == tau).flatMap(t => t.source.states.keys.filter(k => t.source.states(k) != t.target.states(k)))
@@ -78,6 +79,26 @@ class FrehagePlantBuilder(_sul: SUL) extends BaseSolver {
       transitions: Set[Transition] = moduleTransitions(m).filterNot(_.event.getCommand == tau).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
       //      transitions: Set[Transition] = moduleTransitions(m).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
       alphabet: Alphabet = model.eventMapping(m)
+      iState: State = states(getReducedStateMap(_sul.getInitState, model, m) )
+      fState: Option[Set[State]] = _sul.getGoalStates match {
+        case Some(gs) => Some(gs.map( s => states(getReducedStateMap(s, model, m)) ))
+        case None => None
+      }
+    } yield Automaton(m, states.values.toSet, alphabet, transitions, iState, fState)
+    Automata(modules)
+  }
+
+  def getAutomataFull: Automata = {
+    val modules = for {
+      m <- model.modules
+      states: Map[StateMap, State] = moduleStates(m).map( s => {
+        val state = s
+        val name = (if ( state.states.forall{ case (k,v) => _sul.getInitState.states(k) == v } ) "INIT: " else "") + state.toString
+        (getReducedStateMap(s,model,m),State(name))
+      }).toMap
+      transitions: Set[Transition] = moduleTransitions(m).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
+      //      transitions: Set[Transition] = moduleTransitions(m).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
+      alphabet: Alphabet = new Alphabet(model.eventMapping(m).events, true)
       iState: State = states(getReducedStateMap(_sul.getInitState, model, m) )
       fState: Option[Set[State]] = _sul.getGoalStates match {
         case Some(gs) => Some(gs.map( s => states(getReducedStateMap(s, model, m)) ))
