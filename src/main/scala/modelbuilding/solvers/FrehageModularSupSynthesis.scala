@@ -8,13 +8,13 @@ A brute force BFS that split the result into modules rather than a monolithic pl
 
 package modelbuilding.solvers
 
+import modelbuilding.core.modeling.{ModularModel, Module}
 import modelbuilding.core.{SUL, _}
-import modelbuilding.core.modeling.{Model, ModularModel, Module, Specifications}
-
-import scala.collection.mutable
-import FrehageModularSupSynthesis._
+import modelbuilding.solvers.FrehageModularSupSynthesis._
 import org.supremica.automata
+
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 object FrehageModularSupSynthesis {
 
@@ -37,9 +37,9 @@ object FrehageModularSupSynthesis {
 
 }
 
-class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
+class FrehageModularSupSynthesis(sul: SUL) extends BaseSolver {
 
-  val _model = _sul.model
+  val _model = sul.model
 
   assert(
     _sul.specification.isDefined,
@@ -52,6 +52,7 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
 
   private val specifications = _sul.specification.get
   private val model          = _model.asInstanceOf[ModularModel]
+
   //private val simulator: SUL = model.simulation
 
   def getSupervisorModules(
@@ -120,21 +121,25 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
     }
   }
 
-  private val specModules: Set[Module] = getSupervisorModules(
-    specifications.getSupremicaSpecs
-  )
-  private val remainingPlantModules: Set[String] = model.modules.filterNot(
-    m => specModules.exists(s => model.eventMapping(m).events.subsetOf(s.alphabet.events))
-  )
-  private val plantModules: Set[Module] = remainingPlantModules.map(
-    m => Module(m, model.stateMapping(m), model.eventMapping(m))
-  )
+
+  def processUncontrollableState(m: Module, state: StateMap): Unit = {
+    if (!moduleForbidden(m.name).contains(getReducedStateMap(state, m))) {
+      moduleForbidden(m.name) += getReducedStateMap(state, m)
+      for (t <- moduleTransitions(m.name) if t.target == state && !t.event.isControllable) {
+        processUncontrollableState(m, t.source)
+      }
+    }
+  }
+
+  private val specModules: Set[Module] = getSupervisorModules(specifications.getSupremicaSpecs)
+  private val remainingPlantModules: Set[String] = model.modules.filterNot(m => specModules.exists(s => model.eventMapping(m).events.subsetOf(s.alphabet.events)))
+  private val plantModules: Set[Module] = remainingPlantModules.map(m => Module(m, model.stateMapping(m), model.eventMapping(m)))
 //  private val plantModules: Set[Module] = Set.empty[Module]
   private val modules: Set[Module] = specModules ++ plantModules
 
   modules foreach println
 
-  private val initState: StateMap = specifications.extendStateMap(_sul.getInitState)
+  private val initState: StateMap = specifications.extendStateMap(sul.getInitState)
 
   private var queue: List[StateMap]          = List(initState)
   private val history: mutable.Set[StateMap] = mutable.Set(initState)
@@ -157,8 +162,8 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
     val state = queue.head
     queue = queue.tail
 
-    val outgoingTransitionsInPlant: List[StateMapTransition] =
-      _sul.getOutgoingTransitions(state, model.alphabet)
+
+    val outgoingTransitionsInPlant: List[StateMapTransition] = sul.getOutgoingTransitions(state, model.alphabet)
 
     for (t <- outgoingTransitionsInPlant) {
 
@@ -171,9 +176,10 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
 
       // if event is uncontrollable, those specifications that try to block it should be forbidden
       if (!t.event.isControllable) {
-        remainingSpecifications.filter(m => specTargetStates(m.name).isEmpty).foreach {
-          m =>
-            moduleForbidden(m.name) += getReducedStateMap(state, m)
+
+        remainingSpecifications.filter(m => specTargetStates(m.name).isEmpty).foreach{ m =>
+            processUncontrollableState(m, state)
+            // TODO: Can we also forbid the state in all other modules that might shares the same transition?
         }
       }
 
@@ -221,11 +227,45 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
             moduleStates(m.name) += tReduced.target
             newStateFound = true
           }
+          else if (moduleForbidden(m.name).contains(tReduced.target) && !t.event.isControllable) {
+            processUncontrollableState(m, tReduced.source)
+          }
         }
       }
       if (newStateFound) queue = trans.target :: queue
     }
   }
+
+  /*
+   * PROCESS THE OUTPUT
+   * 1) Identify all `Non Local Variables`
+   * 2) Remove `Non Local Variables` from states and transitions
+   * 3) Remove all uncontrollable states and connected transitions
+   */
+  private var reducedModuleInitStates: Map[String, StateMap] = Map.empty[String, StateMap]
+  private val reducedModuleStates: Map[String, mutable.Set[StateMap]] = modules.map(m => m.name -> mutable.Set.empty[StateMap]).toMap
+  private val reducedModuleForbidden: Map[String, mutable.Set[StateMap]] = modules.map(m => m.name -> mutable.Set.empty[StateMap]).toMap
+  private val reducedModuleTransitions: Map[String, mutable.Set[StateMapTransition]] = modules.map(_.name -> mutable.Set.empty[StateMapTransition]).toMap
+
+  for (m <- modules) {
+    // 1
+    val nonLocalVariables =
+      moduleTransitions(m.name).filter(_.event.getCommand == tau).flatMap(t => t.source.states.keys.filter(k => t.source.states(k) != t.target.states(k)))
+
+    println(m.name, nonLocalVariables)
+
+    // 2
+    def reduce(s: StateMap) = StateMap(s.states.filterKeys(k => !nonLocalVariables.contains(k)), s.specs)
+    reducedModuleInitStates += (m.name -> reduce(getReducedStateMap(initState, m)))
+    reducedModuleStates(m.name) ++= moduleStates(m.name).map(reduce)
+    reducedModuleForbidden(m.name) ++= moduleForbidden(m.name).map(reduce)
+    reducedModuleTransitions(m.name) ++= moduleTransitions(m.name).map(t => StateMapTransition(reduce(t.source), reduce(t.target), t.event))
+
+    // 3
+    reducedModuleStates(m.name) --= reducedModuleForbidden(m.name)
+    reducedModuleTransitions(m.name) --= reducedModuleTransitions(m.name).filter(t => reducedModuleForbidden(m.name).contains(t.source) || reducedModuleForbidden(m.name).contains(t.target))
+  }
+
   println("DONE!")
   println(s"Number of iterations: $count")
 
@@ -233,41 +273,21 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
 
     val automatons = for {
       m <- modules
-      nonLocalVariables = moduleTransitions(m.name)
-        .filter(_.event.getCommand == tau)
-        .flatMap(
-          t => t.source.states.keys.filter(k => t.source.states(k) != t.target.states(k))
-        )
 
-      states: Map[StateMap, State] = moduleStates(m.name)
-        .map(s => {
-          val state =
-            StateMap(s.states.filterKeys(k => !nonLocalVariables.contains(k)), s.specs)
-          val name = ((if (state.states.forall { case (k, v) => initState.states(k) == v }
-                           && state.specs
-                             .forall { case (k, v) => initState.specs(k) == v }) "INIT: "
-                       else "")
-            + state.toString)
-          (s, State(name))
-        })
-        .toMap
-      transitions: Set[Transition] = moduleTransitions(m.name)
-        .filterNot(_.event.getCommand == tau)
-        .map(t => Transition(states(t.source), states(t.target), t.event))
-        .toSet[Transition]
+
+      states: Map[StateMap, State] = reducedModuleStates(m.name).map( s => {
+        val name = (
+          (if (s.states.forall{ case (k,v) => initState.states(k) == v }
+            && s.specs.forall{ case (k,v) => initState.specs(k) == v }) "INIT: " else "")
+          + s.toString )
+        (s, State(name))
+      }).toMap
+      transitions: Set[Transition] = reducedModuleTransitions(m.name).filterNot(_.event.getCommand == tau).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
       alphabet: Alphabet = m.alphabet
-      iState: State      = states(getReducedStateMap(initState, m))
-      fStates: Option[Set[State]] = Some(
-        states
-          .filter(
-            s =>
-              s._1.specs
-                .forall(spec => specifications.isAccepting(spec._1, spec._2.toString))
-          )
-          .values
-          .toSet
-      )
-      forbiddenStates = moduleForbidden(m.name).map(states(_)) match {
+      iState: State = states(reducedModuleInitStates(m.name))
+      fStates: Option[Set[State]] =
+        Some(states.filter(s => s._1.specs.forall(spec => specifications.isAccepting(spec._1,spec._2.toString))).values.toSet)
+      forbiddenStates = reducedModuleForbidden(m.name).intersect(reducedModuleStates(m.name)).map(states(_)) match {
         case x if x.nonEmpty => Some(x.toSet)
         case _               => None
       }

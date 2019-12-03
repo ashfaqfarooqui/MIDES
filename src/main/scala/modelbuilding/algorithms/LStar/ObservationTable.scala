@@ -121,6 +121,7 @@ case class ObservationTable(
     val sufStr = E.toList.map(_.toString).mkString(" | ")
     val div    = "|" + "-" * (1 + maxSa + 1 + sufStr.length) + "|\n"
     buf ++= " \n|T" + " " * (maxSa - 1) + " | "
+
     buf ++= sufStr
     buf += '\n'
 

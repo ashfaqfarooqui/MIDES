@@ -10,6 +10,7 @@ import modelbuilding.core.{
   Uncontrollable,
   tau
 }
+
 import org.supremica.automata
 import org.supremica.automata.algorithms.AutomataSynchronizer.synchronizeAutomata
 import org.supremica.automata.algorithms.Plantifier
@@ -75,10 +76,6 @@ trait Specifications extends Logging {
       t: StateMapTransition,
       specs: Set[String]
     ): Map[String, Option[String]] = {
-
-    println("""##########""")
-    println(t)
-    println(specs)
 
     val sourceStates = specs.map(s => s -> t.source.specs(s)).toMap
 

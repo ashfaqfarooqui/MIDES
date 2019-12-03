@@ -32,12 +32,37 @@ object ModelBuilder extends Logging {
   val modelName      = ConfigHelper.model  //"MachineBufferNoSpec"
   val solver: String = ConfigHelper.solver //"LStarPlantLearner" // "modular", "mono"
 
+
   val sul: SUL = modelName match {
     case "TestUnit" =>
       SUL(
         TestUnit.TransferLine,
         new TestUnit.SimulateTL,
         Some(TLSpecifications()),
+        supervisor,
+        true
+      )
+    case "TestUnitOPC" =>
+      SUL(
+        TestUnit.TransferLine,
+        new TestUnit.TLOPCSimulate,
+        Some(TLSpecifications()),
+        supervisor,
+        true
+      )
+    case "TestUnitNoSpec" =>
+      SUL(
+        TestUnit.TransferLine,
+        new TestUnit.SimulateTL,
+        None,
+        supervisor,
+        true
+      )
+    case "TestUnitNoSpecOPC" =>
+      SUL(
+        TestUnit.TransferLine,
+        new TestUnit.TLOPCSimulate,
+        None,
         supervisor,
         true
       )
@@ -65,18 +90,36 @@ object ModelBuilder extends Logging {
         supervisor,
         false
       )
-    case "MachineBufferNoSpecOpc" =>
+    case "MachineBufferWithControl" =>
+      SUL(
+        MachineBuffer.MachineBufferWithControl,
+        new MachineBuffer.SimulateMachineBufferWithControl,
+        Some(MachineBuffer.MachineBufferSpecifications()),
+        plant,
+        false
+      )
+
+
+    case "MachineBufferOPC" =>
       SUL(
         MachineBuffer.MachineBuffer,
         new MachineBuffer.MBOPCSimulate,
-        None,
+        Some(MachineBuffer.MachineBufferSpecifications()),
         supervisor,
-        true
+        false
       )
     case "MachineBufferNoSpec" =>
       SUL(
         MachineBuffer.MachineBuffer,
         new MachineBuffer.SimulateMachineBuffer,
+        None,
+        supervisor,
+        true
+      )
+    case "MachineBufferNoSpecOPC" =>
+      SUL(
+        MachineBuffer.MachineBuffer,
+        new MachineBuffer.MBOPCSimulate,
         None,
         supervisor,
         true
