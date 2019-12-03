@@ -36,12 +36,13 @@ class MonolithicSolver(sul: SUL) extends BaseSolver {
       val currState                            = queue.dequeue
       val visited                              = visitedSet + currState._1
 
-      info(s"current queue: $queue")
+      info(s"current queue size: ${queue.size}")
       val reachedStates = events.map(
         e =>
+      
           sul.getNextState(currState._1, e.getCommand) match {
             case Some(value) =>
-              transitions = transitions + StateMapTransition(currState._1, value, e)
+              transitions = transitions + StateMapTransition(currState._1,value,e)
               info(s"transition found: $transitions")
               Some(value)
             case _ =>
