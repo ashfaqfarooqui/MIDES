@@ -22,11 +22,13 @@ import grizzled.slf4j.Logging
 import modelbuilding.core.{Alphabet, Automaton, Grammar}
 
 trait CEGenerator extends Logging {
-  def findCE(accessorString: Set[Grammar],
-             distinguishingStrings: Set[Grammar],
-             alphabet: Alphabet,
-             hypAutomaton: Automaton,
-             memberQuery: Grammar => Int): Either[Grammar, Boolean]
+  def findCE(
+      accessorString: Set[Grammar],
+      distinguishingStrings: Set[Grammar],
+      alphabet: Alphabet,
+      hypAutomaton: Automaton,
+      memberQuery: Grammar => Int
+    ): Either[Grammar, Boolean]
 
   // def findCE(t: ObservationTable): Either[Grammar, Boolean]
 }

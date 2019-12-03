@@ -34,15 +34,15 @@ trait TwinCatSimulator extends Simulator with ThreeStateOperation with Logging {
   }
 
   /**
-    * Evaluates if a given command is allowed to be executed on the simulator. This is mainly true for code simulation,
-    * and needs to change for external client simulations. A point to think about is if all commands must always be allowed to
-    * run in the simulator or not.
-    *
-    * @param c The command to evaluate
-    * @param s current state of the system
-    * @param acceptPartialStates
-    * @return
-    */
+ * Evaluates if a given command is allowed to be executed on the simulator. This is mainly true for code simulation,
+ * and needs to change for external client simulations. A point to think about is if all commands must always be allowed to
+ * run in the simulator or not.
+ *
+ * @param c The command to evaluate
+ * @param s current state of the system
+ * @param acceptPartialStates
+ * @return
+ */
   override def evalCommandToRun(
       c: Command,
       s: StateMap,
@@ -57,12 +57,12 @@ trait TwinCatSimulator extends Simulator with ThreeStateOperation with Logging {
   }
 
   /**
-    * Converts the command to a list of actions that will transform the state. These actions are then applied to the
-    * state of the simulator.
-    *
-    * @param c - the command
-    * @return List of [[Action]]
-    */
+ * Converts the command to a list of actions that will transform the state. These actions are then applied to the
+ * state of the simulator.
+ *
+ * @param c - the command
+ * @return List of [[Action]]
+ */
   override def translateCommand(c: Command): List[Action] = c match {
     case `reset`                 => List(ResetAction)
     case `tau`                   => List(TauAction)
@@ -124,4 +124,4 @@ trait TwinCatSimulator extends Simulator with ThreeStateOperation with Logging {
     ): Either[StateMap, StateMap] = ???
 
 }
-*/
+ */

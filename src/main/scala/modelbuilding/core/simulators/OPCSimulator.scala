@@ -1,3 +1,21 @@
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package modelbuilding.core.simulators
 
 import Helpers.ConfigHelper
@@ -30,6 +48,7 @@ trait OPCSimulator
     //val v = variableList.get.map(_._1)
 
     println(s"client $getClient")
+
     //getClient.subscribeToNodes(List("GVL.R1", "GVL.R2", "GVL.R3", "GVL.R4", "GVL.S1", "GVL.S2", "GVL.S3", "GVL.S4", "GVL.S5", "GVL.RESET"))    //Nodes for MB
     getClient.subscribeToNodes(List("GVL.R1", "GVL.R2", "GVL.R3", "GVL.R4", "GVL.R5", "GVL.R6", "GVL.R7", "GVL.S1", "GVL.S2", "GVL.S3", "GVL.S4", "GVL.S5", "GVL.S6", "GVL.S7", "GVL.S8", "GVL.RESET")) //Nodes for TL
   }
@@ -39,12 +58,12 @@ trait OPCSimulator
     * @return
     */
   def resetSystem = {
-    getClient.write("GVL.RESET",true)
+    getClient.write("GVL.RESET", true)
   }
 
   def initializeSystem = {
     getClient.connect()
-    while(!getClient.isConnected){}
+    while (!getClient.isConnected) {}
     subscribeToAllVars
 
     resetSystem
@@ -77,7 +96,6 @@ trait OPCSimulator
   }
 
   override def translateCommand(c: Command): List[Action] =
-
     c match {
       case `reset`                 => List(ResetAction)
       case `tau`                   => List(TauAction)
@@ -85,9 +103,9 @@ trait OPCSimulator
       case y                       => throw new IllegalArgumentException(s"Unknown command: `$y`")
     }
 
-  def isCommandDone(c: Command,acceptPartialState:Boolean) = {
+  def isCommandDone(c: Command, acceptPartialState: Boolean) = {
     //println(s"evaluating  command $c, with guard ${postGuards(c)} and statemap ${getClient.getState}")
-    postGuards(c).eval(getClient.getState,acceptPartialState).get
+    postGuards(c).eval(getClient.getState, acceptPartialState).get
   }
 
   override def runCommand(
@@ -119,7 +137,7 @@ trait OPCSimulator
             import scala.concurrent.duration._
 
             val deadline = 10.seconds.fromNow
-            while (!isCommandDone(c,acceptPartialStates) && deadline.hasTimeLeft()) {
+            while (!isCommandDone(c, acceptPartialStates) && deadline.hasTimeLeft()) {
               //println(s"command $c executed, wait for simulation to complete.")
               //Thread.sleep(1000)
             }
@@ -133,6 +151,7 @@ trait OPCSimulator
               //println("Postactions are set.")
               Thread.sleep(ConfigHelper.runner_timeout)
               Right(getClient.getState)
+
             }else{
               println(s"Error: command $c has not finished in time, wait for return.")
               info(s"Command $c has not finished in time, stop simulation.")
@@ -160,7 +179,7 @@ trait OPCSimulator
       commands: List[Command],
       s: StateMap
     ): Either[StateMap, StateMap] = {
-resetSystem
+    resetSystem
     println("The system has reset.")
     Thread.sleep(ConfigHelper.runner_timeout)
     def runList(c: List[Command], ns: StateMap): Either[StateMap, StateMap] = {
