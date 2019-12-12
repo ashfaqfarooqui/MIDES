@@ -56,25 +56,43 @@ class FrehageModularSupSynthesis(sul: SUL) extends BaseSolver {
 
         val specAlphabets: Map[String, Alphabet] = supremicaSpecs.map(s => s._1 -> new Alphabet(model.alphabet.events.filter(e => s._2.getAlphabet.contains(e.getCommand.toString))))
 
-        val specBlocks = supremicaSpecs.map(s =>
+        def getModuleAlphabets(spec: String, acc: Alphabet): Alphabet = {
+          val nextModules = modularModel.eventMapping.filter{ case(m,a) =>
+            acc.events.exists(e => !e.isControllable && a.events.contains(e))
+          }.keys
+          println(spec, nextModules)
+          val next = new Alphabet(nextModules.flatMap(m => modularModel.eventMapping(m).events).toSet)
+
+          // Iterate the alphabet to increase the scope
+          //if (next.events subsetOf acc.events) acc else getModuleAlphabets(spec, acc + next)
+
+          // Only perform one iteration, including modules that shares uc events directly with the spec.
+          acc + next
+        }
+        val moduleEventMapping: Map[String, Alphabet] = specAlphabets.map(s => s._1
+          -> getModuleAlphabets(s._1,s._2))
+
+//        val moduleStateMapping: Map[String, StateSet] = moduleEventMapping.mapValues{ a1 =>
+        val moduleStateMapping: Map[String, StateSet] = specAlphabets.mapValues{ a1 =>
+          StateSet(
+            modularModel.eventMapping.filter{ case(m,a2) =>
+              a1.events.exists(e => a2.events.contains(e))
+            }.flatMap(x => modularModel.stateMapping(x._1).states).toSet
+          )
+        }
+
+
+        /* val specBlocks = supremicaSpecs.map(s =>
           s._1 -> modularModel.eventMapping.filter(m =>
             m._2.events.map(_.getCommand.toString).intersect(s._2.eventIterator.asScala.map(_.getLabel).toSet).nonEmpty
           ).keys
-        )
+        )*/
 
         supremicaSpecs.keySet.map{ s =>
           Module(
             name = s,
-            stateSet = StateSet(
-              modularModel.eventMapping.filter{ case(m,a) =>
-                specAlphabets(s).events.exists(e => a.events.contains(e))
-              }.flatMap(x => modularModel.stateMapping(x._1).states).toSet
-            ),
-            alphabet = specAlphabets(s) + new Alphabet(
-              modularModel.eventMapping.filter{ case(m,a) =>
-                specAlphabets(s).events.exists(e => !e.isControllable && a.events.contains(e))
-              }.flatMap(_._2.events).toSet
-            ),
+            stateSet = moduleStateMapping(s),
+            alphabet = moduleEventMapping(s),
             Set(s)
           )
         }
@@ -98,7 +116,8 @@ class FrehageModularSupSynthesis(sul: SUL) extends BaseSolver {
 //  private val plantModules: Set[Module] = Set.empty[Module]
   private val modules: Set[Module] = specModules  ++ plantModules
 
-  modules foreach println
+  specModules foreach println
+
 
   private val initState: StateMap = specifications.extendStateMap(sul.getInitState)
 
@@ -132,6 +151,10 @@ class FrehageModularSupSynthesis(sul: SUL) extends BaseSolver {
 
       // if event is uncontrollable, those specifications that try to block it should be forbidden
       if (!t.event.isControllable) {
+        /*println("#########")
+        println(t.source,t.event,t.target)
+        remainingSpecifications.foreach(m => println(m.name, specTargetStates(m.name)))
+        println("#########")*/
         remainingSpecifications.filter(m => specTargetStates(m.name).isEmpty).foreach{ m =>
             processUncontrollableState(m, state)
             // TODO: Can we also forbid the state in all other modules that might shares the same transition?
@@ -194,8 +217,11 @@ class FrehageModularSupSynthesis(sul: SUL) extends BaseSolver {
     // 1
     val nonLocalVariables =
       moduleTransitions(m.name).filter(_.event.getCommand == tau).flatMap(t => t.source.states.keys.filter(k => t.source.states(k) != t.target.states(k)))
+        // IF YOU WANT TO HARDCODE A NON LOCAL VARIABLE .union(if (m.name == "Zone42") Set("w1_5") else Set.empty[String])
 
-    println(m.name, nonLocalVariables)
+
+
+    //println(m.name, nonLocalVariables)
 
     // 2
     def reduce(s: StateMap) = StateMap(s.states.filterKeys(k => !nonLocalVariables.contains(k)), s.specs)
@@ -214,7 +240,6 @@ class FrehageModularSupSynthesis(sul: SUL) extends BaseSolver {
 
 
   override def getAutomata: Automata = {
-
     val automatons = for {
       m <- modules
 
@@ -236,7 +261,7 @@ class FrehageModularSupSynthesis(sul: SUL) extends BaseSolver {
       }
     } yield Automaton(m.name, states.values.toSet, alphabet, transitions, iState, fStates, forbiddenStates)
     Automata(automatons)
-
   }
+
 
 }

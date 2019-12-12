@@ -16,7 +16,6 @@ object CatAndMouseModular extends ModularModel {
   override def stateMapping: Map[String,StateSet] = Map(
     "Cat"->states,
     "Mouse"->states
-
   )
 
   override def eventMapping: Map[String,Alphabet] = Map(
