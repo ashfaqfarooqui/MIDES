@@ -19,16 +19,18 @@
 package modelbuilding.algorithms.EquivalenceOracle
 
 import grizzled.slf4j.Logging
-import modelbuilding.algorithms.LStar.ObservationTable
 import modelbuilding.core.modelInterfaces.Teacher
 import modelbuilding.core.{Alphabet, Automaton, Grammar, State, Symbol}
 
-object Wmethod{
-  def apply(teacher:Teacher, alphabets: Alphabet, nbrState: Int): Wmethod = new Wmethod(teacher,alphabets, nbrState)
+object Wmethod {
+  def apply(teacher: Teacher, alphabets: Alphabet, nbrState: Int): Wmethod =
+    new Wmethod(teacher, alphabets, nbrState)
 }
 
-class Wmethod(teacher:Teacher,alphabets:Alphabet,nbrState: Int) extends CEGenerator with Logging {
-  var CachecPwrA :Map[Int,Set[Grammar]] = Map(0->Set.empty[Grammar])
+class Wmethod(teacher: Teacher, alphabets: Alphabet, nbrState: Int)
+    extends CEGenerator
+    with Logging {
+  var CachecPwrA: Map[Int, Set[Grammar]] = Map(0 -> Set.empty[Grammar])
 
   private def evalString(s: Grammar, a: Automaton): Int = {
     def loop(currState: State, stringToTraverse: List[Symbol]): State = {
@@ -42,31 +44,33 @@ class Wmethod(teacher:Teacher,alphabets:Alphabet,nbrState: Int) extends CEGenera
     val reachedState = loop(a.getInitialState, s.getSequenceAsList)
     //debug(s"reachedstate: $reachedState")
 
-    if(a.getMarkedState.nonEmpty && a.getMarkedState.get.contains(reachedState)){
+    if (a.getMarkedState.nonEmpty && a.getMarkedState.get.contains(reachedState)) {
       2
-    }else {
-      if(reachedState.s!="dump:"){
+    } else {
+      if (reachedState.s != "dump:") {
         1
       } else 0
     }
   }
 
-  override def findCE(accessorString: Set[Grammar],
-                      distinguishingStrings: Set[Grammar],
-                      alphabet: Alphabet,
-                      hypAutomaton: Automaton,
-                      memberQuery: Grammar => Int): Either[Grammar, Boolean] = {
+  override def findCE(
+      accessorString: Set[Grammar],
+      distinguishingStrings: Set[Grammar],
+      alphabet: Alphabet,
+      hypAutomaton: Automaton,
+      memberQuery: Grammar => Int
+    ): Either[Grammar, Boolean] = {
     //override def findCE(t: ObservationTable): Either[Grammar, Boolean] = {
 
-    val P = accessorString //(t.S ++ t.sa).filterNot(p=>t.getRowValues(p).get.forall(_==0))
+    val P = accessorString        //(t.S ++ t.sa).filterNot(p=>t.getRowValues(p).get.forall(_==0))
     val W = distinguishingStrings //t.E
-    val h = hypAutomaton //t.getAutomata
-    val A = alphabet.events //h.alphabet.events
+    val h = hypAutomaton          //t.getAutomata
+    val A = alphabet.events       //h.alphabet.events
 
     CachecPwrA = CachecPwrA + (1 -> A.asInstanceOf[Set[Grammar]])
 
     def loop(n: Int, oldU: Set[Grammar]): Either[Grammar, Boolean] = {
-      val i = nbrState - h.states.size - n
+      val i           = nbrState - h.states.size - n
       val cachedReply = CachecPwrA.get(i)
       lazy val U = if (cachedReply.isDefined) {
         cachedReply.get
@@ -86,7 +90,7 @@ class Wmethod(teacher:Teacher,alphabets:Alphabet,nbrState: Int) extends CEGenera
         w <- W
         u <- U
       } {
-        val s = p + u + w
+        val s     = p + u + w
         val sysOp = memberQuery(s) //t.isMember(s)
         val hypOp = evalString(s, h)
         debug(

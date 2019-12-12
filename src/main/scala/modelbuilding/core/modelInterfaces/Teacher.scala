@@ -26,22 +26,26 @@ trait Teacher {
 
   def isMember(specName: Option[String])(g: Grammar): Int
 
-  def isHypothesisTrue(t: ObservationTable,
-                       ceGenerator: CEGenerator): Either[Grammar, Boolean] = {
-    val P = (t.S ++ t.sa).filterNot(p => t.getRowValues(p).get.forall(_ == 0))
-    val W = t.E
-    val h = t.getAutomata
-    val A = h.alphabet
+  def isHypothesisTrue(
+      t: ObservationTable,
+      ceGenerator: CEGenerator
+    ): Either[Grammar, Boolean] = {
+    val P  = (t.S ++ t.sa).filterNot(p => t.getRowValues(p).get.forall(_ == 0))
+    val W  = t.E
+    val h  = t.getAutomata
+    val A  = h.alphabet
     val ce = ceGenerator.findCE(P, W, A, h, t.isMember)
     ce
   }
 
-  def isHypothesisTrue(accessorString: Set[Grammar],
-                       distinguishingStrings: Set[Grammar],
-                       alphabet: Alphabet,
-                       hypAutomaton: Automaton,
-                       memberQuery: Grammar => Int,
-                       ceGenerator: CEGenerator): Either[Grammar, Boolean] = {
+  def isHypothesisTrue(
+      accessorString: Set[Grammar],
+      distinguishingStrings: Set[Grammar],
+      alphabet: Alphabet,
+      hypAutomaton: Automaton,
+      memberQuery: Grammar => Int,
+      ceGenerator: CEGenerator
+    ): Either[Grammar, Boolean] = {
     val ce = ceGenerator.findCE(
       accessorString,
       distinguishingStrings,

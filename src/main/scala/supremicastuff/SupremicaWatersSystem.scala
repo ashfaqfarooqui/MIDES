@@ -1,3 +1,21 @@
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package supremicastuff
 
 import java.io.File
@@ -5,22 +23,13 @@ import java.util.Calendar
 
 import grizzled.slf4j.Logging
 import net.sourceforge.waters.model.base.EventKind
-import net.sourceforge.waters.model.compiler.{
-  CompilerOperatorTable,
-  ModuleCompiler
-}
+import net.sourceforge.waters.model.compiler.{CompilerOperatorTable, ModuleCompiler}
 import net.sourceforge.waters.model.des.ProductDESProxy
 import net.sourceforge.waters.model.expr.ExpressionParser
-import net.sourceforge.waters.model.marshaller.{
-  DocumentManager,
-  SAXModuleMarshaller
-}
+import net.sourceforge.waters.model.marshaller.{DocumentManager, SAXModuleMarshaller}
 import net.sourceforge.waters.model.module.EventDeclProxy
 import net.sourceforge.waters.plain.des.ProductDESElementFactory
-import net.sourceforge.waters.subject.module.{
-  ModuleSubject,
-  ModuleSubjectFactory
-}
+import net.sourceforge.waters.subject.module.{ModuleSubject, ModuleSubjectFactory}
 import org.supremica.automata
 import org.supremica.automata.Automata
 import org.supremica.automata.IO.ProjectBuildFromWaters
@@ -50,16 +59,16 @@ object SupremicaWatersSystem {
   }
 }
 class SupremicaWatersSystem(
-  val mModule: ModuleSubject /* e.g. ReadSystemFromWmodFile("supremicaFiles/controlabilitytest.xml") */
-) extends SimpleModuleFactory
+    val mModule: ModuleSubject /* e.g. ReadSystemFromWmodFile("supremicaFiles/controlabilitytest.xml") */)
+    extends SimpleModuleFactory
     with Logging {
 
   assert(mModule != null, "The ModuleSubject must be non null")
 
-  lazy val mFactory = new ModuleSubjectFactory()
+  lazy val mFactory                        = new ModuleSubjectFactory()
   lazy val mOptable: CompilerOperatorTable = CompilerOperatorTable.getInstance()
-  lazy val mParser = new ExpressionParser(mFactory, mOptable)
-  lazy val mDocumentManager = new DocumentManager()
+  lazy val mParser                         = new ExpressionParser(mFactory, mOptable)
+  lazy val mDocumentManager                = new DocumentManager()
 
   println("created sup model")
   lazy val getSupremicaAutomata: Automata = {
@@ -78,8 +87,7 @@ class SupremicaWatersSystem(
   def getComment: String =
     if (mModule.getComment == null) "" else s"${mModule.getComment}\n"
 
-  def saveToWMODFile(iFilePath: String,
-                     iModule: ModuleSubject = mModule): Boolean = {
+  def saveToWMODFile(iFilePath: String, iModule: ModuleSubject = mModule): Boolean = {
     try {
       val file = new File(
         iFilePath + (if (!iFilePath.endsWith(".wmod")) iModule.getName + ".wmod"
@@ -112,11 +120,13 @@ class SupremicaWatersSystem(
     }
   }*/
 
-  def getModule(module: ModuleSubject = mModule,
-                hasProperties: Boolean = false): ProductDESProxy = {
+  def getModule(
+      module: ModuleSubject = mModule,
+      hasProperties: Boolean = false
+    ): ProductDESProxy = {
 
-    val expand = Config.EXPAND_EXTENDED_AUTOMATA.isTrue
-    val factory = ProductDESElementFactory.getInstance
+    val expand   = Config.EXPAND_EXTENDED_AUTOMATA.isTrue
+    val factory  = ProductDESElementFactory.getInstance
     val optimize = Config.OPTIMIZING_COMPILER.isTrue
     val compiler = new ModuleCompiler(mDocumentManager, factory, module)
     compiler.setOptimizationEnabled(optimize)
@@ -129,9 +139,9 @@ class SupremicaWatersSystem(
   }
 
   def verifyControllability(
-    hypothesis: automata.Automaton,
-    specs: Automata = getSupremicaSpecs
-  ): (Boolean, String) = {
+      hypothesis: automata.Automaton,
+      specs: Automata = getSupremicaSpecs
+    ): (Boolean, String) = {
     info("Verifying.....")
 
     if (specs.nbrOfAutomata == 0) {
@@ -158,8 +168,10 @@ class SupremicaWatersSystem(
 
 //To create a new Module Subject....
 trait SimpleModuleFactory {
-  def moduleFactory(iModuleName: String,
-                    iModuleComment: Option[String] = None): ModuleSubject = {
+  def moduleFactory(
+      iModuleName: String,
+      iModuleComment: Option[String] = None
+    ): ModuleSubject = {
     val ms = new ModuleSubject(iModuleName, null)
     iModuleComment match {
       case Some(comment) => ms.setComment(comment)
@@ -181,7 +193,6 @@ trait SimpleModuleFactory {
 
 }
 object SimpleModuleFactory extends SimpleModuleFactory {
-  def apply(iModuleName: String,
-            iModuleComment: Option[String] = None): ModuleSubject =
+  def apply(iModuleName: String, iModuleComment: Option[String] = None): ModuleSubject =
     initModule(moduleFactory(iModuleName, iModuleComment))
 }

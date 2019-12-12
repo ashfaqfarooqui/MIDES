@@ -4,12 +4,19 @@ import grizzled.slf4j.Logging
 import modelbuilding.algorithms.EquivalenceOracle.Wmethod
 import modelbuilding.algorithms.LStar.LStar
 import modelbuilding.core.modeling.{Model, ModularModel, Specifications}
-import modelbuilding.core.{Alphabet, Automata, Automaton, SUL, Symbol, Uncontrollable, tau}
+import modelbuilding.core.{
+  Alphabet,
+  Automata,
+  Automaton,
+  SUL,
+  Symbol,
+  Uncontrollable,
+  tau
+}
 import org.supremica.automata
 import org.supremica.automata.algorithms.AutomataSynchronizer.synchronizeAutomata
 
-class LStarSuprSolver(_sul:SUL) extends BaseSolver with Logging {
-
+class LStarSuprSolver(_sul: SUL) extends BaseSolver with Logging {
 
   assert(_sul.specification.isDefined, "Specs need to be defined")
 
@@ -20,12 +27,11 @@ class LStarSuprSolver(_sul:SUL) extends BaseSolver with Logging {
   specs.usePlantifiedSpec
   specs.addSynchronizedSpec
   info(s"using plantified specs")
-  val teacher = _sul
+  val teacher  = _sul
   val alphabet = _model.alphabet + Alphabet(Symbol(tau))
 
-
   //The commented part is applicable for modular learning. When that comes in. FOr now stick to monolithic learning.
-/*
+  /*
   def getRequiredModules(m:ModularModel,spec:automata.Automaton):Map[String,Alphabet]={
     m.eventMapping filter {
       case (k: String, v: Alphabet) => v.events.exists(x => x.getCommand.isInstanceOf[Uncontrollable] && spec.getAlphabet.contains(x.toString))
@@ -61,11 +67,15 @@ class LStarSuprSolver(_sul:SUL) extends BaseSolver with Logging {
 
     val alphabet = alphabetMapping(s._2)
       info(s"learning for ${s._1} with alphabet $alphabet")
-      */
+   */
 //TODO: The Wmethod does not have information about the speck, this will not work for supervisors.....
-    val runner = new LStar(teacher,Some(specs.syncSpecName),alphabet, Wmethod(teacher,alphabet,50)).startLearning().removeTauAndDump
+  val runner = new LStar(
+    teacher,
+    Some(specs.syncSpecName),
+    alphabet,
+    Wmethod(teacher, alphabet, 50)
+  ).startLearning().removeTauAndDump
   //}.toMap
-
 
   override def getAutomata: Automata = {
     Automata(Set(runner))

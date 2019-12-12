@@ -4,6 +4,24 @@ import modelbuilding.core.{LearningType, SUL}
 import modelbuilding.models.TestUnit.TLSpecifications
 import modelbuilding.models._
 import modelbuilding.solvers._
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import supremicastuff.SupremicaHelpers
 
 object ModelBuilder extends Logging {
@@ -21,6 +39,30 @@ object ModelBuilder extends Logging {
         TestUnit.TransferLine,
         new TestUnit.SimulateTL,
         Some(TLSpecifications()),
+        supervisor,
+        true
+      )
+    case "TestUnitOPC" =>
+      SUL(
+        TestUnit.TransferLine,
+        new TestUnit.TLOPCSimulate,
+        Some(TLSpecifications()),
+        supervisor,
+        true
+      )
+    case "TestUnitNoSpec" =>
+      SUL(
+        TestUnit.TransferLine,
+        new TestUnit.SimulateTL,
+        None,
+        supervisor,
+        true
+      )
+    case "TestUnitNoSpecOPC" =>
+      SUL(
+        TestUnit.TransferLine,
+        new TestUnit.TLOPCSimulate,
+        None,
         supervisor,
         true
       )
@@ -88,6 +130,14 @@ object ModelBuilder extends Logging {
       SUL(StickPicking.Sticks, new StickPicking.SimulateSticks(5), None, plant, false)
     case "AGV" =>
       SUL(AGV.Agv, new AGV.SimulateAgv, Some(AGV.AGVSpecifications()), supervisor, false)
+    case "LaneChange" =>
+      SUL(
+        ZenuityLaneChange.LaneChange,
+        new ZenuityLaneChange.LaneChangeSimulate,
+        None,
+        plant,
+        false
+      )
     case _ => throw new Exception("A model wasn't defined.")
   }
 
@@ -100,7 +150,7 @@ object ModelBuilder extends Logging {
       case "frehage1"                => new FrehagePlantBuilderWithPartialStates(sul)
       case "frehage2"                => new FrehagePlantBuilder(sul)
       case "frehage3"                => new FrehageModularSupSynthesis(sul)
-      case "monolithicPlantSolver99" => new MonolithicSolver(sul)
+      case "monolithicPlantSolver" => new MonolithicSolver(sul)
       case "monolithicSupSolver"     => new MonolithicSupSolver(sul)
       case "modularSupSolver"        => new ModularSupSolver(sul)
       case "LStarPlantLearner"       => new LStarPlantSolver(sul)
