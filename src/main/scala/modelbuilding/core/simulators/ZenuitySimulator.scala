@@ -1,4 +1,5 @@
 package modelbuilding.core.simulators
+import Helpers.ConfigHelper
 import grizzled.slf4j.Logging
 import modelbuilding.core._
 import com.mathworks.engine.MatlabEngine
@@ -19,7 +20,7 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
 
   //TODO: put back reset
   def getInitialState: StateMap = {
-    getClient.loadPath("/home/ashfaqf/Code/ZenuityMatlab/")
+    getClient.loadPath(ConfigHelper.matlabPath)
     // getClient.reset
     getClient.getState
   } //.
@@ -28,15 +29,14 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
       c: Command,
       s: StateMap,
       acceptPartialStates: Boolean
-  ): Option[Boolean] = {
-      c match {
+    ): Option[Boolean] = {
+    c match {
       case `reset`                => Some(true)
       case `tau`                  => Some(true)
       case x if guards contains x => guards(x).eval(s, acceptPartialStates)
       case y                      => throw new IllegalArgumentException(s"Unknown command: `$y`")
     }
   }
-  
 
   override def translateCommand(c: Command): List[Action] = {
     c match {
@@ -217,7 +217,7 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
 
     evalCommandToRun(c, s, acceptPartialStates) match {
       case Some(true) =>
-        // info(s"running command $c")
+       debug(s"running command $c, on state $s")
 
         c match {
           case `reset` =>
@@ -228,17 +228,19 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
               ac.next(acc)
             }
 
-            Right(
-              
-                arrayToStateMap(
-                  getClient.runFunction(
-                    16,
-                    "main_v2",
-                    stateMapToStruct(currState)
-                  )
+            val resp = Right(
+              arrayToStateMap(
+                getClient.runFunction(
+                  16,
+                 ConfigHelper.matlabProgram,
+                  stateMapToStruct(currState)
                 )
               )
-            
+            )
+
+            debug(s"get resp $resp")
+            resp
+
         }
       case Some(false) => Left(s)
       case None =>
@@ -256,7 +258,7 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
 
       c match {
         case x :: xs =>
-          println(s"running element $x of the list $c ")
+          //println(s"running element $x of the list $c ")
 
           runCommand(x, ns) match {
             case Right(n) => runList(xs, n)
@@ -266,8 +268,8 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
       }
 
     }
-    println(s"running list $commands")
-    runList(commands,s )
+    //println(s"running list $commands")
+    runList(commands, s)
 
   }
 }

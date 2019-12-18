@@ -32,10 +32,12 @@ case class SUL(
   def getGoalPredicate: Option[Predicate]  = simulator.goalPredicate
 
   def getNextState(state: StateMap, command: Command): Option[StateMap] = {
-    simulator.runCommand(command, state, acceptsPartialStates) match {
+    val resp = simulator.runCommand(command, state, acceptsPartialStates) match {
       case Right(s) => Some(s)
       case Left(_)  => None
     }
+    info(s"got response $resp ")
+    resp
   }
 
   def getNextState(state: StateMap, commands: Alphabet): List[StateMap] =

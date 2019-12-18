@@ -37,7 +37,7 @@ class LaneChangeSimulate extends ZenuitySimulator {
     b2                -> false
   )
   override val goalPredicate = Some(
-    AND(List(EQ(state,"stateA"), EQ(direction, "none")))
+    AND(List(EQ(state,"stateA"), EQ(direction, "none"),EQ(laneChangeRequest,"none"),EQ(b1,false),EQ(b2,false)))
   )
   // val b1  = "b1"
   // val b2  = "b2"
