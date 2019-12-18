@@ -2,6 +2,7 @@ import Helpers.ConfigHelper
 import grizzled.slf4j.Logging
 import modelbuilding.core.{LearningType, SUL}
 import modelbuilding.models.TestUnit.TLSpecifications
+import modelbuilding.models.ZenuityLaneChange.monolithic.LaneChangeSimulateMonolithic
 import modelbuilding.models._
 import modelbuilding.solvers._
 /*
@@ -31,7 +32,6 @@ object ModelBuilder extends Logging {
 
   val modelName      = ConfigHelper.model  //"MachineBufferNoSpec"
   val solver: String = ConfigHelper.solver //"LStarPlantLearner" // "modular", "mono"
-
 
   val sul: SUL = modelName match {
     case "TestUnit" =>
@@ -99,7 +99,6 @@ object ModelBuilder extends Logging {
         false
       )
 
-
     case "MachineBufferOPC" =>
       SUL(
         MachineBuffer.MachineBuffer,
@@ -138,6 +137,14 @@ object ModelBuilder extends Logging {
         plant,
         false
       )
+    case "LaneChangeMonolithic" =>
+      SUL(
+        ZenuityLaneChange.monolithic.LaneChangeMonolithic,
+        new LaneChangeSimulateMonolithic,
+        None,
+        plant,
+        false
+      )
     case _ => throw new Exception("A model wasn't defined.")
   }
 
@@ -147,14 +154,14 @@ object ModelBuilder extends Logging {
     info(s"Starting learner for : $modelName, using $solver as solver")
 
     val result = solver match {
-      case "frehage1"                => new FrehagePlantBuilderWithPartialStates(sul)
-      case "frehage2"                => new FrehagePlantBuilder(sul)
-      case "frehage3"                => new FrehageModularSupSynthesis(sul)
+      case "frehage1"              => new FrehagePlantBuilderWithPartialStates(sul)
+      case "frehage2"              => new FrehagePlantBuilder(sul)
+      case "frehage3"              => new FrehageModularSupSynthesis(sul)
       case "monolithicPlantSolver" => new MonolithicSolver(sul)
-      case "monolithicSupSolver"     => new MonolithicSupSolver(sul)
-      case "modularSupSolver"        => new ModularSupSolver(sul)
-      case "LStarPlantLearner"       => new LStarPlantSolver(sul)
-      case "LStarSuprLearner"        => new LStarSuprSolver(sul)
+      case "monolithicSupSolver"   => new MonolithicSupSolver(sul)
+      case "modularSupSolver"      => new ModularSupSolver(sul)
+      case "LStarPlantLearner"     => new LStarPlantSolver(sul)
+      case "LStarSuprLearner"      => new LStarSuprSolver(sul)
 
     }
 
