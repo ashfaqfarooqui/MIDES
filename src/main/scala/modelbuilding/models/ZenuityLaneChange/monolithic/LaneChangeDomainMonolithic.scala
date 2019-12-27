@@ -16,18 +16,20 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package Helpers
-import com.github.andr83.scalaconfig._
-import com.typesafe.config.ConfigFactory
+package modelbuilding.models.ZenuityLaneChange.monolithic
 
-object ConfigHelper {
-  val config: ScalaConfig = ConfigFactory.load()
+import modelbuilding.core.{Command, Controllable}
 
-  lazy val model: String  = config.asUnsafe[String]("main.Model")
-  lazy val solver: String = config.asUnsafe[String]("main.Solver")
-  lazy val url: String = config.asUnsafe[String]("opc.url")
-  lazy val runner_timeout: Int = config.asUnsafe[Int]("opc.runner_timeout")
-  lazy val matlabPath: String = config.asUnsafe[String]("matlab.program.path")
-  lazy val matlabProgram: String = config.asUnsafe[String]("matlab.program.name")
+trait LaneChangeDomainMonolithic {
+  override def toString: String = this match {
+    case `right`  => "goRight"
+    case `left`   => "goLeft"
+    case `cancel` => "cancelRequest"
+    case `b1`     => "b1"
 
+  }
 }
+case object left   extends Command with LaneChangeDomainMonolithic with Controllable
+case object right  extends Command with LaneChangeDomainMonolithic with Controllable
+case object cancel extends Command with LaneChangeDomainMonolithic with Controllable
+case object b1     extends Command with LaneChangeDomainMonolithic with Controllable

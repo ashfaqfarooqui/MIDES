@@ -16,18 +16,13 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package Helpers
-import com.github.andr83.scalaconfig._
-import com.typesafe.config.ConfigFactory
+package modelbuilding.core
 
-object ConfigHelper {
-  val config: ScalaConfig = ConfigFactory.load()
+case class EventC(name: String) extends Command with Controllable {
+  override def toString: String = name
+}
 
-  lazy val model: String  = config.asUnsafe[String]("main.Model")
-  lazy val solver: String = config.asUnsafe[String]("main.Solver")
-  lazy val url: String = config.asUnsafe[String]("opc.url")
-  lazy val runner_timeout: Int = config.asUnsafe[Int]("opc.runner_timeout")
-  lazy val matlabPath: String = config.asUnsafe[String]("matlab.program.path")
-  lazy val matlabProgram: String = config.asUnsafe[String]("matlab.program.name")
+case class EventUC(name: String) extends Command with Uncontrollable {
+  override def toString: String = name
 
 }

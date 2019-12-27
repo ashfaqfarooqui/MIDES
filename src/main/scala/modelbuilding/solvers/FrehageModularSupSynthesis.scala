@@ -42,7 +42,7 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
   val _model = _sul.model
 
   assert(
-    _sul.specification.isDefined,
+    sul.specification.isDefined,
     "modelbuilder.solver.ModularSupSolver requires a specification."
   )
   assert(
@@ -50,7 +50,7 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
     "modelbuilder.solver.FrehageModularSupSynthesis requires a modular model."
   )
 
-  private val specifications = _sul.specification.get
+  private val specifications = sul.specification.get
   private val model          = _model.asInstanceOf[ModularModel]
 
   //private val simulator: SUL = model.simulation
