@@ -67,9 +67,11 @@ class MonolithicSolver(sul: SUL) extends BaseSolver {
     }
   }
 
-  def mapStates(states: Set[StateMap]): Map[StateMap, State] = {
+  def mapStates( states: Set[StateMap]): Map[StateMap, State] = {
     states.zipWithIndex.toMap.map {
-      case (sm, i) => (sm, if (sm.equals(initState)) State("init") else State(s"s$i"))
+      
+      case (sm, i) => (sm, if (sm.equals(initState)) State(s"Init ${sm.states.filter{k=>
+        model.states.states.contains(k._1) }}") else State(sm.states.filter(k=>model.states.states.contains(k._1)).toString()))
     }
   }
 
