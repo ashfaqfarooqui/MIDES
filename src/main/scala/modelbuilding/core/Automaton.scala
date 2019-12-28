@@ -1,18 +1,30 @@
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package modelbuilding.core
 
 import java.io.{File, PrintWriter}
 
-import scalax.collection.Graph
-import scalax.collection.edge.{LDiEdge, LkDiEdge}
-import scalax.collection.edge.Implicits._
-import scalax.collection.io.dot._
-import implicits._
-import scalax.collection.Graph
-import scalax.collection.GraphPredef._
-import scalax.collection.GraphEdge._
-import scalax.collection.GraphEdge._
-import Helpers.ConfigHelper
 import grizzled.slf4j.Logging
+import scalax.collection.Graph
+import scalax.collection.edge.LkDiEdge
+import scalax.collection.io.dot._
+import scalax.collection.io.dot.implicits._
 
 case class Automaton(
     name: String,
@@ -65,7 +77,7 @@ case class Automaton(
   }
 
   def createDotFile: Unit = {
-    import Helpers.ConfigHelper
+    import modelbuilding.helpers.ConfigHelper
     val gDot          = getGraphAsDot
     val directoryName = ConfigHelper.outputDirectory
     val directory     = new File(directoryName);

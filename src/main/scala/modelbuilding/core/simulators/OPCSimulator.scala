@@ -18,10 +18,10 @@
 
 package modelbuilding.core.simulators
 
-import Helpers.ConfigHelper
 import grizzled.slf4j.Logging
 import modelbuilding.core._
 import modelbuilding.core.externalClients.MiloOPCUAClient
+import modelbuilding.helpers.ConfigHelper
 
 trait OPCVariables {
   val stateExecVariable: String
