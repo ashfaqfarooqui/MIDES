@@ -19,15 +19,14 @@
 package modelbuilding.algorithms.EquivalenceOracle
 
 import grizzled.slf4j.Logging
-import modelbuilding.core.modelInterfaces.Teacher
 import modelbuilding.core.{Alphabet, Automaton, Grammar, State, Symbol}
 
 object Wmethod {
-  def apply(teacher: Teacher, alphabets: Alphabet, nbrState: Int): Wmethod =
-    new Wmethod(teacher, alphabets, nbrState)
+  def apply(alphabets: Alphabet, nbrState: Int): Wmethod =
+    new Wmethod(alphabets, nbrState)
 }
 
-class Wmethod(teacher: Teacher, alphabets: Alphabet, nbrState: Int)
+class Wmethod(alphabets: Alphabet, nbrState: Int)
     extends CEGenerator
     with Logging {
   var CachecPwrA: Map[Int, Set[Grammar]] = Map(0 -> Set.empty[Grammar])

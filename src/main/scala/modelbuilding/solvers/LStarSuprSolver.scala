@@ -73,7 +73,7 @@ class LStarSuprSolver(_sul: SUL) extends BaseSolver with Logging {
     teacher,
     Some(specs.syncSpecName),
     alphabet,
-    Wmethod(teacher, alphabet, 50)
+    Wmethod(alphabet, 50)
   ).startLearning().removeTauAndDump
   //}.toMap
 

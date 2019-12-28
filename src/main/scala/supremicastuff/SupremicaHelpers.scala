@@ -68,7 +68,7 @@ object SupremicaHelpers extends Logging {
     // val fileName = s"$directoryName" +File.seperator+s"$name.xml"
     if (saveToXMLFile(directoryName, fileName, supAut))
       println(
-        s"Exported automata to Supremica XML, file:$directoryName +${File.separator}+ $fileName"
+        s"Exported automata to Supremica XML, file:${directoryName + File.separator + fileName}"
       )
     else
       println("Failed to export automata to Supremica XML.")
