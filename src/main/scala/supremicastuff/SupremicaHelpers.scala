@@ -59,11 +59,17 @@ object SupremicaHelpers extends Logging {
   }
 
   def exportAsSupremicaAutomata(aut: core.Automata, name: String = "Untitled"): Unit = {
-    val supAut = new automata.Automata()
+
+    import Helpers.ConfigHelper
+    val directoryName = ConfigHelper.outputDirectory
+    val fileName      = s"$name.xml"
+    val supAut        = new automata.Automata()
     aut.modules.foreach(a => supAut.addAutomaton(createSupremicaAutomaton(a)))
-    val fileName = s"Output/$name.xml"
-    if (saveToXMLFile(fileName, supAut))
-      println(s"Exported automata to Supremica XML, file: $fileName")
+    // val fileName = s"$directoryName" +File.seperator+s"$name.xml"
+    if (saveToXMLFile(directoryName, fileName, supAut))
+      println(
+        s"Exported automata to Supremica XML, file:$directoryName +${File.separator}+ $fileName"
+      )
     else
       println("Failed to export automata to Supremica XML.")
   }
@@ -86,11 +92,20 @@ object SupremicaHelpers extends Logging {
   }*/
 
   def saveToXMLFile(
-      iFilePath: String = "./supremicaFiles/file.xml",
+      iFilePath: String,
+      fileName: String,
       aut: automata.Automata
     ): Boolean = {
     try {
-      val file = new File(iFilePath)
+
+      val directory = new File(iFilePath);
+      if (!directory.exists()) {
+        directory.mkdir();
+        // If you require it to make the entire directory path including parents,
+        debug("created output directory")
+        // use directory.mkdirs(); here instead.
+      }
+      val file = new File(iFilePath + File.separator + fileName)
       new AutomataToXML(aut).serialize(file)
 
       return true

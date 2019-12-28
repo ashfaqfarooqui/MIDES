@@ -11,6 +11,8 @@ import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import scalax.collection.GraphEdge._
 import scalax.collection.GraphEdge._
+import Helpers.ConfigHelper
+import grizzled.slf4j.Logging
 
 case class Automaton(
     name: String,
@@ -19,7 +21,8 @@ case class Automaton(
     transitions: Set[Transition],
     iState: State,
     fState: Option[Set[State]] = None,
-    forbiddenStates: Option[Set[State]] = None) {
+    forbiddenStates: Option[Set[State]] = None)
+    extends Logging {
 
   lazy val transitionFunction: Map[(State, Symbol), State] =
     transitions.map(t => (t.source, t.event) -> t.target).toMap
@@ -62,8 +65,19 @@ case class Automaton(
   }
 
   def createDotFile: Unit = {
-    val gDot = getGraphAsDot
-    val pw   = new PrintWriter(new File(s"Output/${name.replaceAll("\\s", "")}.dot"))
+    import Helpers.ConfigHelper
+    val gDot          = getGraphAsDot
+    val directoryName = ConfigHelper.outputDirectory
+    val directory     = new File(directoryName);
+    if (!directory.exists()) {
+      directory.mkdir();
+      // If you require it to make the entire directory path including parents,
+      debug("created output directory")
+      // use directory.mkdirs(); here instead.
+    }
+    val pw = new PrintWriter(
+      new File(directoryName + File.separator + s"${name.replaceAll("\\s", "")}.dot")
+    )
     pw.write(gDot)
     pw.close
     println(s"Graph saved to $name.dot")

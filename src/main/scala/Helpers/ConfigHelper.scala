@@ -23,11 +23,12 @@ import com.typesafe.config.ConfigFactory
 object ConfigHelper {
   val config: ScalaConfig = ConfigFactory.load()
 
-  lazy val model: String  = config.asUnsafe[String]("main.Model")
-  lazy val solver: String = config.asUnsafe[String]("main.Solver")
-  lazy val url: String = config.asUnsafe[String]("opc.url")
-  lazy val runner_timeout: Int = config.asUnsafe[Int]("opc.runner_timeout")
-  lazy val matlabPath: String = config.asUnsafe[String]("matlab.program.path")
-  lazy val matlabProgram: String = config.asUnsafe[String]("matlab.program.name")
+  lazy val model: String           = config.asUnsafe[String]("main.Model")
+  lazy val solver: String          = config.asUnsafe[String]("main.Solver")
+  lazy val outputDirectory: String = config.asUnsafe[String]("main.OutputDirectory")
+  lazy val url: String             = config.asUnsafe[String]("opc.url")
+  lazy val runner_timeout: Int     = config.asUnsafe[Int]("opc.runner_timeout")
+  lazy val matlabPath: String      = config.asUnsafe[String]("matlab.program.path")
+  lazy val matlabProgram: String   = config.asUnsafe[String]("matlab.program.name")
 
 }
