@@ -39,10 +39,9 @@ class MonolithicSolver(sul: SUL) extends BaseSolver {
       info(s"current queue size: ${queue.size}")
       val reachedStates = events.map(
         e =>
-      
           sul.getNextState(currState._1, e.getCommand) match {
             case Some(value) =>
-              transitions = transitions + StateMapTransition(currState._1,value,e)
+              transitions = transitions + StateMapTransition(currState._1, value, e)
               info(s"transition found: $transitions")
               Some(value)
             case _ =>
@@ -67,11 +66,17 @@ class MonolithicSolver(sul: SUL) extends BaseSolver {
     }
   }
 
-  def mapStates( states: Set[StateMap]): Map[StateMap, State] = {
+  def mapStates(states: Set[StateMap]): Map[StateMap, State] = {
     states.zipWithIndex.toMap.map {
-      
-      case (sm, i) => (sm, if (sm.equals(initState)) State(s"Init ${sm.states.filter{k=>
-        model.states.states.contains(k._1) }}") else State(sm.states.filter(k=>model.states.states.contains(k._1)).toString()))
+
+      case (sm, i) =>
+        (
+          sm,
+          if (sm.equals(initState)) State(s"Init ${sm.states.filter { k =>
+            model.states.states.contains(k._1)
+          }}")
+          else State(sm.states.filter(k => model.states.states.contains(k._1)).toString())
+        )
     }
   }
 

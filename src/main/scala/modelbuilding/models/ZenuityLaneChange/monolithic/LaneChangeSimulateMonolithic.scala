@@ -41,9 +41,9 @@ class LaneChangeSimulateMonolithic extends ZenuitySimulator {
       List(
         EQ(state, "stateA"),
         EQ(direction, "none"),
-        EQ(laneChangeRequest,false),
+        EQ(laneChangeRequest, false),
         EQ(b1, false),
-      EQ(b2, false)
+        EQ(b2, false)
       )
     )
   )

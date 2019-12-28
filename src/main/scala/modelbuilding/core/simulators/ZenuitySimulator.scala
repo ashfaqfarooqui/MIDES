@@ -217,7 +217,7 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
 
     evalCommandToRun(c, s, acceptPartialStates) match {
       case Some(true) =>
-       debug(s"running command $c, on state $s")
+        debug(s"running command $c, on state $s")
 
         c match {
           case `reset` =>
@@ -232,7 +232,7 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
               arrayToStateMap(
                 getClient.runFunction(
                   16,
-                 ConfigHelper.matlabProgram,
+                  ConfigHelper.matlabProgram,
                   stateMapToStruct(currState)
                 )
               )
