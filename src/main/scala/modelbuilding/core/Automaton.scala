@@ -23,7 +23,8 @@ import java.io.{File, PrintWriter}
 import grizzled.slf4j.Logging
 import scalax.collection.Graph
 import scalax.collection.edge.LkDiEdge
-import scalax.collection.io.dot._ //{DotAttr, DotEdgeStmt, DotGraph, DotRootGraph, Id}
+import scalax.collection.io.dot._
+import scalax.collection.io.dot.implicits.toNodeId
 
 case class Automaton(
     name: String,
@@ -62,8 +63,8 @@ case class Automaton(
                 (
                   root,
                   DotEdgeStmt(
-                    source.toString,
-                    target.toString,
+                    toNodeId(source.toString),
+                    toNodeId(target.toString),
                     if (label.nonEmpty) List(DotAttr(Id("label"), Id(label.toString)))
                     else Nil
                   )
