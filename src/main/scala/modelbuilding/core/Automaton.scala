@@ -23,8 +23,7 @@ import java.io.{File, PrintWriter}
 import grizzled.slf4j.Logging
 import scalax.collection.Graph
 import scalax.collection.edge.LkDiEdge
-import scalax.collection.io.dot._
-import scalax.collection.io.dot.implicits._
+import scalax.collection.io.dot._ //{DotAttr, DotEdgeStmt, DotGraph, DotRootGraph, Id}
 
 case class Automaton(
     name: String,
@@ -48,7 +47,9 @@ case class Automaton(
 
   lazy val getGraphAsDot: String = {
 
-    val root = DotRootGraph(directed = true, id = Some(name))
+    val root = {
+      DotRootGraph(directed = true, id = Some(Id(name)))
+    }
 
     def edgeTransformer(
         innerEdge: Graph[String, LkDiEdge]#EdgeT
@@ -63,7 +64,7 @@ case class Automaton(
                   DotEdgeStmt(
                     source.toString,
                     target.toString,
-                    if (label.nonEmpty) List(DotAttr("label", label.toString))
+                    if (label.nonEmpty) List(DotAttr(Id("label"), Id(label.toString)))
                     else Nil
                   )
                 )
@@ -71,7 +72,9 @@ case class Automaton(
           }
       }
 
-    val gDot = createGraph.toDot(root, edgeTransformer)
+    val gDot = {
+      createGraph.toDot(root, edgeTransformer)
+    }
     gDot
 
   }

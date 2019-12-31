@@ -1,7 +1,6 @@
 package modelbuilding.models.ZenuityLaneChange
 
 import modelbuilding.core.{Command, Controllable}
-import scala.collection.JavaConverters._
 
 trait LaneChangeDomain {
   override def toString: String = this match {

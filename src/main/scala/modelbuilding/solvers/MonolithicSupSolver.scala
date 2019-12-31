@@ -1,6 +1,6 @@
 package modelbuilding.solvers
 import grizzled.slf4j.Logging
-import modelbuilding.core.modeling.{Model, ModularModel, MonolithicModel}
+import modelbuilding.core.interfaces.modeling.{ModularModel, MonolithicModel}
 import modelbuilding.core.{
   AND,
   AlwaysTrue,
@@ -18,8 +18,6 @@ import modelbuilding.core.{
 }
 import modelbuilding.solvers.MonolithicSupSolver._
 import org.supremica._
-import org.supremica.automata.algorithms.AutomataSynchronizer._
-import supremicastuff.SupremicaWatersSystem
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Queue

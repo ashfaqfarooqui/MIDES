@@ -26,9 +26,7 @@ object Wmethod {
     new Wmethod(alphabets, nbrState)
 }
 
-class Wmethod(alphabets: Alphabet, nbrState: Int)
-    extends CEGenerator
-    with Logging {
+class Wmethod(alphabets: Alphabet, nbrState: Int) extends CEGenerator with Logging {
   var CachecPwrA: Map[Int, Set[Grammar]] = Map(0 -> Set.empty[Grammar])
 
   private def evalString(s: Grammar, a: Automaton): Int = {

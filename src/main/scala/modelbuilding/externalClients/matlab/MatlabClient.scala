@@ -1,15 +1,28 @@
-package modelbuilding.core.externalClients
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-import java.util
+package modelbuilding.externalClients.matlab
+
 import java.util.concurrent.TimeUnit
 
 import com.mathworks.engine.MatlabEngine
 import grizzled.slf4j.Logging
 import modelbuilding.core.StateMap
-import com.mathworks.matlab.types.Struct
-import com.mathworks.mvm.MvmFactory
-
-import scala.collection.JavaConverters._
 
 class MatlabClient extends Logging {
 

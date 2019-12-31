@@ -16,6 +16,18 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package modelbuilding.core
+package modelbuilding.core.interfaces.simulator
 
-case class Automata(modules: Set[Automaton])
+import modelbuilding.core.{Action, Command, Predicate}
+
+trait ThreeStateOperation extends TwoStateOperation {
+  val postGuards: Map[Command, Predicate]
+  val postActions: Map[Command, List[Action]]
+
+}
+
+trait TwoStateOperation {
+  val guards: Map[Command, Predicate]
+  val actions: Map[Command, List[Action]]
+
+}

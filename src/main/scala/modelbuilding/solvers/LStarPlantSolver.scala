@@ -3,8 +3,7 @@ package modelbuilding.solvers
 import grizzled.slf4j.Logging
 import modelbuilding.algorithms.EquivalenceOracle.Wmethod
 import modelbuilding.algorithms.LStar.LStar
-import modelbuilding.core.{Alphabet, Automata, SUL, Symbol, tau}
-import modelbuilding.core.modeling.Model
+import modelbuilding.core.{Automata, _}
 
 class LStarPlantSolver(_sul: SUL) extends BaseSolver with Logging {
 

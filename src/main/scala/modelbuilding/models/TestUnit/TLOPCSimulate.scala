@@ -1,17 +1,7 @@
 package modelbuilding.models.TestUnit
 
-import modelbuilding.core.{
-  Action,
-  AlwaysTrue,
-  Assign,
-  Command,
-  EQ,
-  Predicate,
-  StateMap,
-  Toggle,
-  AND
-}
-import modelbuilding.core.simulators.OPCSimulator
+import modelbuilding.core._
+import modelbuilding.externalClients.opc.OPCSimulator
 
 class TLOPCSimulate extends OPCSimulator {
 

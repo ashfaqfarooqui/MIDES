@@ -1,6 +1,6 @@
 package modelbuilding.models.AGV
 
-import modelbuilding.core.modeling._
+import modelbuilding.core.interfaces.modeling.ModularModel
 import modelbuilding.core.{Alphabet, StateSet}
 
 object Agv extends ModularModel {

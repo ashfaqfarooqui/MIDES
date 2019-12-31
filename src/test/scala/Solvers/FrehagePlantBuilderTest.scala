@@ -61,9 +61,9 @@ class FrehagePlantBuilderTest extends FunSuite {
             false
           )
         case "RoboticArm" =>
-          SUL(RobotArm.Arm, new RobotArm.SimulateArm(3, 3), None, plant, false)
+          SUL(RobotArm.Arm, new RobotArm.SimulateArm(3, 3), None, false)
         case "Sticks" =>
-          SUL(StickPicking.Sticks, new StickPicking.SimulateSticks(5), None, plant, false)
+          SUL(StickPicking.Sticks, new StickPicking.SimulateSticks(5), None, false)
         case "AGV" =>
           SUL(
             AGV.Agv,

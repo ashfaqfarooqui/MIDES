@@ -1,8 +1,7 @@
-package modelbuilding.core.simulators
-import modelbuilding.core._
+package modelbuilding.core.interfaces.simulator
 
 import grizzled.slf4j.Logging
-import modelbuilding.core.{Action, Assign, Command, Predicate, StateMap, TauAction}
+import modelbuilding.core.{Action, Assign, Command, Predicate, StateMap, TauAction, _}
 
 trait CodeSimulator extends Simulator with TwoStateOperation with Logging {
 

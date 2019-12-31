@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package modelbuilding.core.externalClients
+package modelbuilding.externalClients.opc
 
 import grizzled.slf4j.Logging
 import modelbuilding.core.StateMap

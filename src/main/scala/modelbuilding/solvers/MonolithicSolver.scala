@@ -1,6 +1,5 @@
 package modelbuilding.solvers
 
-import modelbuilding.core.modeling.Model
 import modelbuilding.core.{
   Automata,
   Automaton,

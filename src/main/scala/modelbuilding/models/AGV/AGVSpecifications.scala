@@ -1,6 +1,6 @@
 package modelbuilding.models.AGV
 
-import modelbuilding.core.modeling.Specifications
+import modelbuilding.core.interfaces.modeling.Specifications
 
 class AGVSpecifications extends Specifications {
   import java.io.File

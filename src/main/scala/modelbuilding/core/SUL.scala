@@ -19,9 +19,9 @@
 package modelbuilding.core
 
 import grizzled.slf4j.Logging
-import modelbuilding.core.modelInterfaces.Teacher
-import modelbuilding.core.modeling.{Model, Specifications}
-import modelbuilding.core.simulators.Simulator
+import modelbuilding.core.interfaces.algorithms.Teacher
+import modelbuilding.core.interfaces.modeling.{Model, Specifications}
+import modelbuilding.core.interfaces.simulator.Simulator
 import org.supremica.automata
 
 import scala.collection.JavaConverters._

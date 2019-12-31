@@ -1,6 +1,6 @@
 package modelbuilding.models.MachineBuffer
 
-import modelbuilding.core.modeling.Specifications
+import modelbuilding.core.interfaces.modeling.Specifications
 
 class MachineBufferSpecifications extends Specifications {
   // Add all specifications available to the model

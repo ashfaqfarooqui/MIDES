@@ -16,25 +16,25 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package modelbuilding.models.ZenuityLaneChange.monolithic
+package modelbuilding.models.ZenuityLaneChange.LaneChangeMoreInputs
 
-import modelbuilding.core.modeling.MonolithicModel
+import modelbuilding.core.interfaces.modeling.MonolithicModel
 import modelbuilding.core.{
-  Symbol,
+  AND,
   Action,
   Alphabet,
   AlwaysTrue,
   Assign,
   Command,
+  EQ,
   EventC,
+  OR,
   Predicate,
   StateSet,
-  EQ,
-  AND,
-  OR
+  Symbol
 }
 
-object LaneChangeMonolithic extends MonolithicModel {
+object LaneChange extends MonolithicModel {
 
   val ops: (Set[EventC], Map[Command, Predicate], Map[Command, List[Action]]) = {
     val ips                                     = (4 to 12).map(x => s"b$x").toSet

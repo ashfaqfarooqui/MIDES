@@ -2,7 +2,7 @@ import grizzled.slf4j.Logging
 import modelbuilding.core.SUL
 import modelbuilding.helpers.ConfigHelper
 import modelbuilding.models.TestUnit.TLSpecifications
-import modelbuilding.models.ZenuityLaneChange.monolithic.LaneChangeSimulateMonolithic
+import modelbuilding.models.ZenuityLaneChange.LaneChangeMoreInputs.LaneChangeSimulateMonolithic
 import modelbuilding.models._
 import modelbuilding.solvers._
 /*
@@ -124,7 +124,7 @@ object ModelBuilder extends Logging {
       )
     case "LaneChangeMonolithic" =>
       SUL(
-        ZenuityLaneChange.monolithic.LaneChangeMonolithic,
+        ZenuityLaneChange.LaneChangeMoreInputs.LaneChange,
         new LaneChangeSimulateMonolithic,
         None,
         false

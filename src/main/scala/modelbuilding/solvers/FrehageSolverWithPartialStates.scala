@@ -1,7 +1,8 @@
 package modelbuilding.solvers
 
+import modelbuilding.core
+import modelbuilding.core.interfaces.modeling.ModularModel
 import modelbuilding.core.{SUL, _}
-import modelbuilding.core.modeling.{Model, ModularModel}
 import modelbuilding.solvers.FrehageSolverWithPartialStates._
 
 object FrehageSolverWithPartialStates {
@@ -108,7 +109,7 @@ class FrehageSolverWithPartialStates(_sul: SUL) extends BaseSolver {
       }
     } yield Automaton(m, states.values.toSet, alphabet, transitions, iState, fState)
 
-    Automata(modules)
+    core.Automata(modules)
 
   }
 

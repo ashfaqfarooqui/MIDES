@@ -1,7 +1,7 @@
 package modelbuilding.models.ZenuityLaneChange
 
+import modelbuilding.core.interfaces.modeling.ModularModel
 import modelbuilding.core.{Alphabet, StateSet}
-import modelbuilding.core.modeling.ModularModel
 
 object LaneChange extends ModularModel {
 

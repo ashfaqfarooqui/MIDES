@@ -1,23 +1,8 @@
 package modelbuilding.models.ZenuityLaneChange
 
-import com.mathworks.matlab.types.Struct
-import modelbuilding.core
-import modelbuilding.core.externalClients.MatlabClient
-import modelbuilding.core.{
-  AND,
-  Action,
-  AlwaysTrue,
-  Assign,
-  AssignInMap,
-  Command,
-  EQ,
-  OR,
-  Predicate,
-  StateMap
-}
-import modelbuilding.core.simulators.ZenuitySimulator
+import modelbuilding.core._
+import modelbuilding.externalClients.matlab.ZenuitySimulator
 
-import scala.collection.JavaConverters._
 class LaneChangeSimulate extends ZenuitySimulator {
 
   val internalState = "self"

@@ -16,12 +16,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package modelbuilding.core.simulators
+package modelbuilding.externalClients.matlab
 
 import com.mathworks.matlab.types.Struct
 import grizzled.slf4j.Logging
 import modelbuilding.core._
-import modelbuilding.core.externalClients.MatlabClient
+import modelbuilding.core.interfaces.simulator.{Simulator, TwoStateOperation}
 import modelbuilding.helpers.ConfigHelper
 
 trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {

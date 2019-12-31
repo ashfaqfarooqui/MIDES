@@ -1,6 +1,6 @@
 package modelbuilding.models.CatAndMouseModular
 
-import modelbuilding.core.modeling.Specifications
+import modelbuilding.core.interfaces.modeling.Specifications
 
 class CatAndMouseModularSpecification extends Specifications {
   import java.io.File

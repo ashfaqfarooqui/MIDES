@@ -25,7 +25,8 @@ A brute force BFS that split the result into modules rather than a monolithic pl
 
 package modelbuilding.solvers
 
-import modelbuilding.core.modeling.{ModularModel, Module}
+import modelbuilding.core
+import modelbuilding.core.interfaces.modeling.{ModularModel, Module}
 import modelbuilding.core.{SUL, _}
 import modelbuilding.solvers.FrehageModularSupSynthesis._
 import org.supremica.automata
@@ -354,7 +355,7 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
       fStates,
       forbiddenStates
     )
-    Automata(automatons)
+    core.Automata(automatons)
   }
 
 }

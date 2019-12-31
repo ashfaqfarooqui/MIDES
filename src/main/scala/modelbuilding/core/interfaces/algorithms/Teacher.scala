@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package modelbuilding.core.modelInterfaces
+package modelbuilding.core.interfaces.algorithms
 
 import modelbuilding.algorithms.EquivalenceOracle.CEGenerator
 import modelbuilding.algorithms.LStar.ObservationTable

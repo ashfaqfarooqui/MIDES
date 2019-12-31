@@ -8,8 +8,9 @@ A brute force BFS that split the result into modules rather than a monolithic pl
 
 package modelbuilding.solvers
 
+import modelbuilding.core
+import modelbuilding.core.interfaces.modeling.ModularModel
 import modelbuilding.core.{SUL, _}
-import modelbuilding.core.modeling.{Model, ModularModel}
 import modelbuilding.solvers.FrehagePlantBuilder._
 
 import scala.collection.mutable
@@ -114,7 +115,7 @@ class FrehagePlantBuilder(_sul: SUL) extends BaseSolver {
         case None     => None
       }
     } yield Automaton(m, states.values.toSet, alphabet, transitions, iState, fState)
-    Automata(modules)
+    core.Automata(modules)
   }
 
   def getAutomataFull: Automata = {
@@ -141,8 +142,15 @@ class FrehagePlantBuilder(_sul: SUL) extends BaseSolver {
         case Some(gs) => Some(gs.map(s => states(getReducedStateMap(s, model, m))))
         case None     => None
       }
-    } yield Automaton(m, states.values.toSet, alphabet, transitions, iState, fState)
-    Automata(modules)
+    } yield core.Automaton(
+      m,
+      states.values.toSet,
+      alphabet,
+      transitions,
+      iState,
+      fState
+    )
+    core.Automata(modules)
   }
 
 }

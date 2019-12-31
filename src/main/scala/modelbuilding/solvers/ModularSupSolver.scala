@@ -1,6 +1,6 @@
 package modelbuilding.solvers
 import grizzled.slf4j.Logging
-import modelbuilding.core.modeling.{Model, ModularModel}
+import modelbuilding.core.interfaces.modeling.ModularModel
 import modelbuilding.core.{
   AND,
   Alphabet,

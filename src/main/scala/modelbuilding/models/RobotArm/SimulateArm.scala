@@ -1,7 +1,7 @@
 package modelbuilding.models.RobotArm
 
 import modelbuilding.core._
-import modelbuilding.core.simulators.{CodeSimulator, Simulator}
+import modelbuilding.core.interfaces.simulator.CodeSimulator
 
 class SimulateArm(gridX: Int, gridY: Int) extends CodeSimulator {
 

@@ -4,9 +4,8 @@ import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutp
 
 import com.github.martincooper.datatable.{DataColumn, DataRow, DataTable}
 import grizzled.slf4j.Logging
-import modelbuilding.core.{Alphabet, Automaton, Grammar, State, Symbol, Transition, tau}
 import modelbuilding.algorithms.LStar.ObservationTable._
-import modelbuilding.core.modelInterfaces.Teacher
+import modelbuilding.core.{Alphabet, Automaton, Grammar, State, Symbol, Transition, tau}
 
 import scala.util.{Failure, Success}
 

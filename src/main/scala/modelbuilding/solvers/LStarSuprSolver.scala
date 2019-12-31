@@ -21,7 +21,7 @@ package modelbuilding.solvers
 import grizzled.slf4j.Logging
 import modelbuilding.algorithms.EquivalenceOracle.Wmethod
 import modelbuilding.algorithms.LStar.LStar
-import modelbuilding.core._
+import modelbuilding.core.{Automata, _}
 
 class LStarSuprSolver(_sul: SUL) extends BaseSolver with Logging {
 

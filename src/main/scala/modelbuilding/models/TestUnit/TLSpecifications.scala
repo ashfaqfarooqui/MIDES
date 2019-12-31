@@ -1,6 +1,6 @@
 package modelbuilding.models.TestUnit
 
-import modelbuilding.core.modeling.Specifications
+import modelbuilding.core.interfaces.modeling.Specifications
 
 class TLSpecifications extends Specifications {
   import java.io.File

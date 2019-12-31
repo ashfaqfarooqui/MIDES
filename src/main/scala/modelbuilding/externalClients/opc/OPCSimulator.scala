@@ -16,11 +16,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package modelbuilding.core.simulators
+package modelbuilding.externalClients.opc
 
 import grizzled.slf4j.Logging
 import modelbuilding.core._
-import modelbuilding.core.externalClients.MiloOPCUAClient
+import modelbuilding.core.interfaces.simulator.{Simulator, ThreeStateOperation}
 import modelbuilding.helpers.ConfigHelper
 
 trait OPCVariables {

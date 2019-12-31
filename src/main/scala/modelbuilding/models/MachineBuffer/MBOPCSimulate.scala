@@ -18,8 +18,8 @@
 
 package modelbuilding.models.MachineBuffer
 
-import modelbuilding.core.simulators.OPCSimulator
 import modelbuilding.core._
+import modelbuilding.externalClients.opc.OPCSimulator
 
 class MBOPCSimulate extends OPCSimulator {
 
