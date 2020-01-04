@@ -23,6 +23,13 @@ import modelbuilding.algorithms.EquivalenceOracle.Wmethod
 import modelbuilding.algorithms.LStar.LStar
 import modelbuilding.core.{Automata, _}
 
+/**
+ * Implementation of the Lstar to learn a monolithic supervisor as described in
+ * "Synthesis of Supervisors for Unknown Plant Models Using Active Learning" Farooqui et. al.
+ *
+ * @param _sul takes a monolithic model with a specification.
+ * 
+ */
 class LStarSuprSolver(_sul: SUL) extends BaseSolver with Logging {
 
   assert(_sul.specification.isDefined, "Specs need to be defined")

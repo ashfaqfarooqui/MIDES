@@ -20,6 +20,12 @@ package modelbuilding.core.interfaces.simulator
 
 import modelbuilding.core.{Action, Command, Predicate}
 
+/**
+  * The following traits allow us to define operations that are two or three state.
+  * Three state operations are an extension to two state operations but with additional guards and actions that are used to "turn off" the operation.
+  * For example, in the [[Machinebuffer]] case when connecting to the simulation post guards are a way to check if the operation has completed.
+  *
+  */
 trait ThreeStateOperation extends TwoStateOperation {
   val postGuards: Map[Command, Predicate]
   val postActions: Map[Command, List[Action]]

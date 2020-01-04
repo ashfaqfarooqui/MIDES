@@ -44,6 +44,10 @@ object ObservationTable {
 
   }
 
+  /**
+   * THis, save and load, functionality does not work currently.
+   * 
+   */
   def saveTable(table: ObservationTable, filePath: String) = {
     import java.io.File
 

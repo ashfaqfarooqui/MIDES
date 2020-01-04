@@ -5,6 +5,12 @@ import modelbuilding.algorithms.EquivalenceOracle.Wmethod
 import modelbuilding.algorithms.LStar.LStar
 import modelbuilding.core.{Automata, _}
 
+/**
+ * The class that is repsonsible to start the [[LStar]] algorithm in order to learn a plant model.
+ *
+ * @param _sul must be a monolithic model.
+ * 
+ */
 class LStarPlantSolver(_sul: SUL) extends BaseSolver with Logging {
 
   val _model   = _sul.model

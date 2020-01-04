@@ -3,14 +3,16 @@
 ** Requirements
 Download and install Simple Build Tool (SBT). Files and instructions for your platform are available at the project website, http://www.scala-sbt.org/.
 
-To run the program go into the project root and run using:
-#+begin_src shell
-sbt run
-#+end_src
+# To run the program go into the project root and run using:
+# #+begin_src shell
+# sbt run
+# #+end_src
 
 ** Running
 
-Configure the SUL in the main file [[file:src/main/scala/main.scala::val%20sul:%20SUL%20=%20modelName%20match%20{][here]]. The SUL takes as parameters: the model, a simulator, specifications if needed, a flag stating if the intention is to learn a plant or a supervisor (this flag is currently redundant) and a boolean value if the model is supposed to accept partial states. Set the model to learn, solver name and other relevant configuration in the [[file://src/main/resources/application.conf][application.conf]].
+Configure the SUL in the main file [[file:src/main/scala/main.scala::val%20sul:%20SUL%20=%20modelName%20match%20{][here]]. The SUL takes as parameters: the model, a simulator, specifications if needed, a flag stating if the intention is to learn a plant or a supervisor (this flag is currently redundant) and a boolean value if the model is supposed to accept partial states. 
+
+Set the model to learn, solver name and other relevant configuration in the [[file://src/main/resources/application.conf][application.conf]]. On running the program the first time after cloning copy the contents of  [[file:src/main/resources/application.conf.example][application.conf.example]] into a application.conf in the same folder.
 
 The model files are created under the [[file:src/main/scala/modelbuilding/models][models folder]] using traits specified in [[file:src/main/scala/modelbuilding/core][core folder]].
 

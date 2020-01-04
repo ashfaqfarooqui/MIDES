@@ -1,10 +1,3 @@
-import grizzled.slf4j.Logging
-import modelbuilding.core.SUL
-import modelbuilding.helpers.ConfigHelper
-import modelbuilding.models.TestUnit.TLSpecifications
-import modelbuilding.models.ZenuityLaneChange.LaneChangeMoreInputs.LaneChangeSimulateMonolithic
-import modelbuilding.models._
-import modelbuilding.solvers._
 /*
  * Learning Automata for Supervisory Synthesis
  *  Copyright (C) 2019
@@ -23,12 +16,19 @@ import modelbuilding.solvers._
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import grizzled.slf4j.Logging
+import modelbuilding.core.SUL
+import modelbuilding.helpers.ConfigHelper
+import modelbuilding.models.TestUnit.TLSpecifications
+import modelbuilding.models.ZenuityLaneChange.LaneChangeMoreInputs.LaneChangeSimulateMonolithic
+import modelbuilding.models._
+import modelbuilding.solvers._
 import supremicastuff.SupremicaHelpers
 
 object ModelBuilder extends Logging {
 
-  val modelName      = ConfigHelper.model  //"MachineBufferNoSpec"
-  val solver: String = ConfigHelper.solver //"LStarPlantLearner" // "modular", "mono"
+  val modelName: String = ConfigHelper.model  //"MachineBufferNoSpec"
+  val solver: String    = ConfigHelper.solver //"LStarPlantLearner" // "modular", "mono"
 
   val sul: SUL = modelName match {
     case "TestUnit" =>

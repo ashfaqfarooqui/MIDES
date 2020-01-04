@@ -36,6 +36,13 @@ object FrehagePlantBuilder {
 
 }
 
+/**
+ * The implementation of the Modular Supervisor Learner as defined in the paper
+ * "Active Learning of Modular Plant Models"
+ * Farooqui et. al. Wodes 2020
+ *
+ * @param _sul must be a modular model.
+ */
 class FrehagePlantBuilder(_sul: SUL) extends BaseSolver {
 
   val _model = _sul.model

@@ -31,6 +31,7 @@ import modelbuilding.core.{SUL, _}
 import modelbuilding.solvers.FrehageModularSupSynthesis._
 import org.supremica.automata
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 
 object FrehageModularSupSynthesis {
@@ -54,6 +55,13 @@ object FrehageModularSupSynthesis {
 
 }
 
+/**
+ * The implementation of the Modular Supervisor Learner as defined in the paper
+ * "Modular Supervisory Synthesis for Unknown Plant Models Using Active Learning"
+ * Hagebring et. al. Wodes 2020
+ *
+ * @param _sul must be a modular model with a specification.
+ */
 class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
 
   val _model = _sul.model

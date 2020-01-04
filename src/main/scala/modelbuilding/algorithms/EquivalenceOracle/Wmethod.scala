@@ -26,6 +26,13 @@ object Wmethod {
     new Wmethod(alphabets, nbrState)
 }
 
+/**
+ * Implementation of the WMethod from testing literature "Testing Software Design Modeled by Finite-State Machines", Chow, T, IEE Trans on Software Engineering 1978.
+ * We terminate if no CE is found for 2 consecutive iterations.
+ *
+ * @param alphabets the event set of the system.
+ * @param nbrState an estimate of the maximum states in the target system.
+ */
 class Wmethod(alphabets: Alphabet, nbrState: Int) extends CEGenerator with Logging {
   var CachecPwrA: Map[Int, Set[Grammar]] = Map(0 -> Set.empty[Grammar])
 
