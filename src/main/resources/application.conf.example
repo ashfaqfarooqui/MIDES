@@ -1,3 +1,19 @@
+
+
+ //=================================================|
+ // Options for "Solver"
+ // "ModularPlantLearnerWithPartialStates"  	   |
+ // "ModularPlantLearner"   			   |
+ // "ModularSupervisorLearner"             	   |
+ // "MonolithicPlantSolver" 			   |
+ // "MonolithicSupSolver"   			   |
+ // "ModularSupSolver"  Incomplete, use ModularSupervisorLearner instead    			   |
+ // "LStarPlantLearner" monolithic models only    		 	   |
+ // "LStarSupervisorLearner" monolithic models only			   |
+ //=================================================*/
+
+
+
 main {
   Model= "LaneChangeMonolithic" // Choose from: TestUnit, CatMouse, CatMouseModular, MachineBuffer,MachineBufferNoSpec,RoboticArm,Sticks,AGV
   Solver= "LStarPlantLearner" //Choose from: frehage1,frehage2,frehage3,monolithicPlantSolver,monolithicSupSolver,modularSupSolver,LStarPlantLearner,LStarSuprLearner

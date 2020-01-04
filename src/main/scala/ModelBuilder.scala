@@ -138,14 +138,15 @@ object ModelBuilder extends Logging {
     info(s"Starting learner for : $modelName, using $solver as solver")
 
     val result = solver match {
-      case "frehage1"              => new FrehagePlantBuilderWithPartialStates(sul)
-      case "frehage2"              => new FrehagePlantBuilder(sul)
-      case "frehage3"              => new FrehageModularSupSynthesis(sul)
-      case "monolithicPlantSolver" => new MonolithicSolver(sul)
-      case "monolithicSupSolver"   => new MonolithicSupSolver(sul)
-      case "modularSupSolver"      => new ModularSupSolver(sul)
-      case "LStarPlantLearner"     => new LStarPlantSolver(sul)
-      case "LStarSuprLearner"      => new LStarSuprSolver(sul)
+      case "ModularPlantLearnerWithPartialStates" =>
+        new FrehagePlantBuilderWithPartialStates(sul)
+      case "ModularPlantLearner"      => new FrehagePlantBuilder(sul)
+      case "ModularSupervisorLearner" => new FrehageModularSupSynthesis(sul)
+      case "MonolithicPlantSolver"    => new MonolithicSolver(sul)
+      case "MonolithicSupSolver"      => new MonolithicSupSolver(sul)
+      case "ModularSupSolver"         => new ModularSupSolver(sul)
+      case "LStarPlantLearner"        => new LStarPlantSolver(sul)
+      case "LStarSupervisorLearner"   => new LStarSuprSolver(sul)
 
     }
 
