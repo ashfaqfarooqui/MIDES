@@ -1,7 +1,7 @@
 package modelbuilding.models.RobotArm
 
 import modelbuilding.core._
-import modelbuilding.core.modeling.MonolithicModel
+import modelbuilding.core.interfaces.modeling.MonolithicModel
 
 object Arm extends MonolithicModel {
 

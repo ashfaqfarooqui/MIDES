@@ -1,4 +1,4 @@
-package modelbuilding.core.simulators
+package modelbuilding.core.interfaces.simulator
 
 import grizzled.slf4j.Logging
 import modelbuilding.core._

@@ -1,6 +1,6 @@
 package modelbuilding.models.AGV
 
-import modelbuilding.core.modeling._
+import modelbuilding.core.interfaces.modeling.ModularModel
 import modelbuilding.core.{Alphabet, StateSet}
 
 object Agv extends ModularModel {
@@ -131,9 +131,9 @@ object Agv extends ModularModel {
     "AGV3" -> Alphabet(w14, w22, c5, c6, u30, u31),
     "AGV4" -> Alphabet(w15, w31, c7, c8, u40, u41, u42, u43, u44, u45),
     "AGV5" -> Alphabet(e20, w13, c9, c10, u50, u51, u52, u53),
-    "WS1" -> Alphabet(w11, w12, w13, w14, w15),
-    "WS2" -> Alphabet(w21, w22, w23, w24),
-    "WS3" -> Alphabet(w31, w32, w33, w34)
+    "WS1"  -> Alphabet(w11, w12, w13, w14, w15),
+    "WS2"  -> Alphabet(w21, w22, w23, w24),
+    "WS3"  -> Alphabet(w31, w32, w33, w34)
   )
 
 }

@@ -21,11 +21,11 @@ package modelbuilding.algorithms.LStar
 import grizzled.slf4j.Logging
 import modelbuilding.algorithms.EquivalenceOracle.CEGenerator
 import modelbuilding.algorithms.LStar.ObservationTable._
-import modelbuilding.core.modelInterfaces.Teacher
-import modelbuilding.core.{Alphabet,Automata, Automaton, Grammar, Symbol, Word, tau}
+import modelbuilding.core.interfaces.algorithms.Teacher
+import modelbuilding.core.{Alphabet, Automata, Automaton, Grammar, Symbol, Word, tau}
+import supremicastuff.SupremicaHelpers
 
 import scala.annotation.tailrec
-import supremicastuff.SupremicaHelpers
 
 class LStar(
     teacher: Teacher,
@@ -69,7 +69,10 @@ class LStar(
       } else {
         info(oTable.getAutomata.toString)
         oTable.getAutomata.createDotFile
-        SupremicaHelpers.exportAsSupremicaAutomata(Automata(Set(oTable.getAutomata.removeTauAndDump)), name ="hypothesis")
+        SupremicaHelpers.exportAsSupremicaAutomata(
+          Automata(Set(oTable.getAutomata.removeTauAndDump)),
+          name = "hypothesis"
+        )
         val counterExample = teacher.isHypothesisTrue(oTable, ceGen)
         info(s"got CE: $counterExample")
         counterExample match {

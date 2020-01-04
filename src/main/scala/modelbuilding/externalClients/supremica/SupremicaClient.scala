@@ -16,6 +16,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package modelbuilding.core
+package modelbuilding.externalClients.supremica
 
-case class Automata(modules: Set[Automaton])
+class SupremicaClient {}
+
+object SupremicaClient {}

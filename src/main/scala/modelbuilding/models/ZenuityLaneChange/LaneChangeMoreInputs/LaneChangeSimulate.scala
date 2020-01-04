@@ -1,23 +1,8 @@
-package modelbuilding.models.ZenuityLaneChange.monolithic
+package modelbuilding.models.ZenuityLaneChange.LaneChangeMoreInputs
 
-import com.mathworks.matlab.types.Struct
-import modelbuilding.core
-import modelbuilding.core.externalClients.MatlabClient
-import modelbuilding.core.{
-  AND,
-  Action,
-  AlwaysTrue,
-  Assign,
-  AssignInMap,
-  Command,
-  EQ,
-  OR,
-  Predicate,
-  StateMap
-}
-import modelbuilding.core.simulators.ZenuitySimulator
+import modelbuilding.core._
+import modelbuilding.externalClients.matlab.ZenuitySimulator
 
-import scala.collection.JavaConverters._
 class LaneChangeSimulateMonolithic extends ZenuitySimulator {
 
   val internalState = "self"
@@ -41,9 +26,9 @@ class LaneChangeSimulateMonolithic extends ZenuitySimulator {
       List(
         EQ(state, "stateA"),
         EQ(direction, "none"),
-        EQ(laneChangeRequest,false),
+        EQ(laneChangeRequest, false),
         EQ(b1, false),
-      EQ(b2, false)
+        EQ(b2, false)
       )
     )
   )
@@ -91,8 +76,8 @@ class LaneChangeSimulateMonolithic extends ZenuitySimulator {
     )
 
   override val goalStates: Option[Set[StateMap]]   = None
-  override val guards: Map[Command, Predicate]     = LaneChangeMonolithic.ops._2
-  override val actions: Map[Command, List[Action]] = LaneChangeMonolithic.ops._3
+  override val guards: Map[Command, Predicate]     = LaneChange.ops._2
+  override val actions: Map[Command, List[Action]] = LaneChange.ops._3
 }
 
 object LaneChangeSimulate {

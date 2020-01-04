@@ -1,15 +1,18 @@
-package modelbuilding.core.simulators
-import modelbuilding.core._
+package modelbuilding.core.interfaces.simulator
 
 import grizzled.slf4j.Logging
-import modelbuilding.core.{Action, Assign, Command, Predicate, StateMap, TauAction}
+import modelbuilding.core.{Action, Assign, Command, Predicate, StateMap, TauAction, _}
 
+/**
+  * This trait defines functions run a code based simulator. Here the simulation model is created using variables and thier transitions in the system.
+  *
+  */
 trait CodeSimulator extends Simulator with TwoStateOperation with Logging {
 
   override val initState: StateMap
   override val goalStates: Option[Set[StateMap]]
   override val goalPredicate: Option[Predicate] = None
-  
+
   def evalCommandToRun(
       c: Command,
       s: StateMap,

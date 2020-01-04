@@ -16,12 +16,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package modelbuilding.core.simulators
+package modelbuilding.externalClients.opc
 
-import Helpers.ConfigHelper
 import grizzled.slf4j.Logging
 import modelbuilding.core._
-import modelbuilding.core.externalClients.MiloOPCUAClient
+import modelbuilding.core.interfaces.simulator.{Simulator, ThreeStateOperation}
+import modelbuilding.helpers.ConfigHelper
 
 trait OPCVariables {
   val stateExecVariable: String
@@ -50,7 +50,26 @@ trait OPCSimulator
     println(s"client $getClient")
 
     //getClient.subscribeToNodes(List("GVL.R1", "GVL.R2", "GVL.R3", "GVL.R4", "GVL.S1", "GVL.S2", "GVL.S3", "GVL.S4", "GVL.S5", "GVL.RESET"))    //Nodes for MB
-    getClient.subscribeToNodes(List("GVL.R1", "GVL.R2", "GVL.R3", "GVL.R4", "GVL.R5", "GVL.R6", "GVL.R7", "GVL.S1", "GVL.S2", "GVL.S3", "GVL.S4", "GVL.S5", "GVL.S6", "GVL.S7", "GVL.S8", "GVL.RESET")) //Nodes for TL
+    getClient.subscribeToNodes(
+      List(
+        "GVL.R1",
+        "GVL.R2",
+        "GVL.R3",
+        "GVL.R4",
+        "GVL.R5",
+        "GVL.R6",
+        "GVL.R7",
+        "GVL.S1",
+        "GVL.S2",
+        "GVL.S3",
+        "GVL.S4",
+        "GVL.S5",
+        "GVL.S6",
+        "GVL.S7",
+        "GVL.S8",
+        "GVL.RESET"
+      )
+    ) //Nodes for TL
   }
 
   /**
@@ -152,7 +171,7 @@ trait OPCSimulator
               Thread.sleep(ConfigHelper.runner_timeout)
               Right(getClient.getState)
 
-            }else{
+            } else {
               println(s"Error: command $c has not finished in time, wait for return.")
               info(s"Command $c has not finished in time, stop simulation.")
               Thread.sleep(ConfigHelper.runner_timeout)

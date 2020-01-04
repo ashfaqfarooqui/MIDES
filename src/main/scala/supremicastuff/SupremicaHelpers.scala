@@ -1,3 +1,21 @@
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package supremicastuff
 
 import java.io.File
@@ -59,11 +77,17 @@ object SupremicaHelpers extends Logging {
   }
 
   def exportAsSupremicaAutomata(aut: core.Automata, name: String = "Untitled"): Unit = {
-    val supAut = new automata.Automata()
+
+    import modelbuilding.helpers.ConfigHelper
+    val directoryName = ConfigHelper.outputDirectory
+    val fileName      = s"$name.xml"
+    val supAut        = new automata.Automata()
     aut.modules.foreach(a => supAut.addAutomaton(createSupremicaAutomaton(a)))
-    val fileName = s"Output/$name.xml"
-    if (saveToXMLFile(fileName, supAut))
-      println(s"Exported automata to Supremica XML, file: $fileName")
+    // val fileName = s"$directoryName" +File.seperator+s"$name.xml"
+    if (saveToXMLFile(directoryName, fileName, supAut))
+      println(
+        s"Exported automata to Supremica XML, file:${directoryName + File.separator + fileName}"
+      )
     else
       println("Failed to export automata to Supremica XML.")
   }
@@ -86,11 +110,20 @@ object SupremicaHelpers extends Logging {
   }*/
 
   def saveToXMLFile(
-      iFilePath: String = "./supremicaFiles/file.xml",
+      iFilePath: String,
+      fileName: String,
       aut: automata.Automata
     ): Boolean = {
     try {
-      val file = new File(iFilePath)
+
+      val directory = new File(iFilePath);
+      if (!directory.exists()) {
+        directory.mkdir();
+        // If you require it to make the entire directory path including parents,
+        debug("created output directory")
+        // use directory.mkdirs(); here instead.
+      }
+      val file = new File(iFilePath + File.separator + fileName)
       new AutomataToXML(aut).serialize(file)
 
       return true

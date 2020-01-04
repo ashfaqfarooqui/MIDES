@@ -1,7 +1,7 @@
 package modelbuilding.models.CatAndMouse
 
 import modelbuilding.core._
-import modelbuilding.core.modeling.MonolithicModel
+import modelbuilding.core.interfaces.modeling.MonolithicModel
 object CatAndMouse extends MonolithicModel {
 
   override val name: String = "CatAndMouse"

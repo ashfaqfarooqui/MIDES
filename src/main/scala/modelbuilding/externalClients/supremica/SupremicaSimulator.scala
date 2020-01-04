@@ -16,20 +16,30 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package modelbuilding.models.ZenuityLaneChange.monolithic
+package modelbuilding.externalClients.supremica
 
-import modelbuilding.core.{Command, Controllable}
+import grizzled.slf4j.Logging
+import modelbuilding.core._
+import modelbuilding.core.interfaces.simulator.Simulator
 
-trait LaneChangeDomainMonolithic {
-  override def toString: String = this match {
-    case `right`  => "goRight"
-    case `left`   => "goLeft"
-    case `cancel` => "cancelRequest"
-    case `b1`     => "b1"
+trait SupremicaSimulator extends Simulator with Logging {
 
-  }
+  override def evalCommandToRun(
+      c: Command,
+      s: StateMap,
+      acceptPartialStates: Boolean
+    ): Option[Boolean] = ???
+
+  override def translateCommand(c: Command): List[Action] = ???
+
+  override def runCommand(
+      c: Command,
+      s: StateMap,
+      acceptPartialStates: Boolean
+    ): Either[StateMap, StateMap] = ???
+
+  override def runListOfCommands(
+      commands: List[Command],
+      s: StateMap
+    ): Either[StateMap, StateMap] = ???
 }
-case object left   extends Command with LaneChangeDomainMonolithic with Controllable
-case object right  extends Command with LaneChangeDomainMonolithic with Controllable
-case object cancel extends Command with LaneChangeDomainMonolithic with Controllable
-case object b1     extends Command with LaneChangeDomainMonolithic with Controllable

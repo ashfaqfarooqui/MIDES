@@ -1,0 +1,35 @@
+
+
+ //=================================================|
+ // Options for "Solver"
+ // "ModularPlantLearnerWithPartialStates"  	   |
+ // "ModularPlantLearner"   			   |
+ // "ModularSupervisorLearner"             	   |
+ // "MonolithicPlantSolver" 			   |
+ // "MonolithicSupSolver"   			   |
+ // "ModularSupSolver"  Incomplete, use ModularSupervisorLearner instead    			   |
+ // "LStarPlantLearner" monolithic models only    		 	   |
+ // "LStarSupervisorLearner" monolithic models only			   |
+ //=================================================*/
+
+
+
+main {
+  Model= "LaneChangeMonolithic" // Choose from: TestUnit, CatMouse, CatMouseModular, MachineBuffer,MachineBufferNoSpec,RoboticArm,Sticks,AGV
+  Solver= "LStarPlantLearner" //Choose from: frehage1,frehage2,frehage3,monolithicPlantSolver,monolithicSupSolver,modularSupSolver,LStarPlantLearner,LStarSuprLearner
+  OutputDirectory = "Output"
+}
+LStar {
+//I cant find the code for this, it doesn't work currently. Thinking about this, it might be the case with the current code that caching is implicitly enabled. Not sure though.
+  AllowCaching = false
+}
+opc {
+  url	= "opc.tcp://COMPUTERNAME:4840" //This should contain the correct server, where normally only the computername should be changed. 4840 is the port.
+  runner_timeout= 1000
+}
+matlab {
+       program {
+	path= "/home/ashfaqf/Code/ZenuityMatlab/"
+	name= "main_v2"
+	}
+}

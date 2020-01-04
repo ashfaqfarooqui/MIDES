@@ -1,7 +1,7 @@
 package modelbuilding.models.CatAndMouseModular
 
-import modelbuilding.core._
-import modelbuilding.core.modeling._
+import modelbuilding.core.interfaces.modeling.ModularModel
+import modelbuilding.core.{Alphabet, _}
 
 object CatAndMouseModular extends ModularModel {
 

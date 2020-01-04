@@ -19,17 +19,21 @@
 package modelbuilding.algorithms.EquivalenceOracle
 
 import grizzled.slf4j.Logging
-import modelbuilding.core.modelInterfaces.Teacher
 import modelbuilding.core.{Alphabet, Automaton, Grammar, State, Symbol}
 
 object Wmethod {
-  def apply(teacher: Teacher, alphabets: Alphabet, nbrState: Int): Wmethod =
-    new Wmethod(teacher, alphabets, nbrState)
+  def apply(alphabets: Alphabet, nbrState: Int): Wmethod =
+    new Wmethod(alphabets, nbrState)
 }
 
-class Wmethod(teacher: Teacher, alphabets: Alphabet, nbrState: Int)
-    extends CEGenerator
-    with Logging {
+/**
+ * Implementation of the WMethod from testing literature "Testing Software Design Modeled by Finite-State Machines", Chow, T, IEE Trans on Software Engineering 1978.
+ * We terminate if no CE is found for 2 consecutive iterations.
+ *
+ * @param alphabets the event set of the system.
+ * @param nbrState an estimate of the maximum states in the target system.
+ */
+class Wmethod(alphabets: Alphabet, nbrState: Int) extends CEGenerator with Logging {
   var CachecPwrA: Map[Int, Set[Grammar]] = Map(0 -> Set.empty[Grammar])
 
   private def evalString(s: Grammar, a: Automaton): Int = {

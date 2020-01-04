@@ -21,6 +21,10 @@ package modelbuilding.algorithms.EquivalenceOracle
 import grizzled.slf4j.Logging
 import modelbuilding.core.{Alphabet, Automaton, Grammar}
 
+/**
+ * An interface for any equivalence oracle. 
+ * 
+ */
 trait CEGenerator extends Logging {
   def findCE(
       accessorString: Set[Grammar],

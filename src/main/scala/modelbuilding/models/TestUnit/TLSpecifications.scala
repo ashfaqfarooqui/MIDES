@@ -1,9 +1,12 @@
 package modelbuilding.models.TestUnit
 
-import modelbuilding.core.modeling.Specifications
+import modelbuilding.core.interfaces.modeling.Specifications
 
 class TLSpecifications extends Specifications {
-  override val specFilePath: Option[String] = Some("SupremicaModels/TransferLine.wmod")
+  import java.io.File
+  override val specFilePath: Option[String] = Some(
+    "SupremicaModels" + File.separator + "TransferLine.wmod"
+  )
   addSpecsFromSupremica(specFilePath.get)
 
 }

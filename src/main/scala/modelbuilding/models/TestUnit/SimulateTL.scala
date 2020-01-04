@@ -1,7 +1,7 @@
 package modelbuilding.models.TestUnit
 
 import modelbuilding.core._
-import modelbuilding.core.simulators.{CodeSimulator, Simulator}
+import modelbuilding.core.interfaces.simulator.CodeSimulator
 
 class SimulateTL extends CodeSimulator {
 

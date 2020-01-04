@@ -1,23 +1,8 @@
 package modelbuilding.models.ZenuityLaneChange
 
-import com.mathworks.matlab.types.Struct
-import modelbuilding.core
-import modelbuilding.core.externalClients.MatlabClient
-import modelbuilding.core.{
-  AND,
-  Action,
-  AlwaysTrue,
-  Assign,
-  AssignInMap,
-  Command,
-  EQ,
-  OR,
-  Predicate,
-  StateMap
-}
-import modelbuilding.core.simulators.ZenuitySimulator
+import modelbuilding.core._
+import modelbuilding.externalClients.matlab.ZenuitySimulator
 
-import scala.collection.JavaConverters._
 class LaneChangeSimulate extends ZenuitySimulator {
 
   val internalState = "self"
@@ -37,7 +22,15 @@ class LaneChangeSimulate extends ZenuitySimulator {
     b2                -> false
   )
   override val goalPredicate = Some(
-    AND(List(EQ(state,"stateA"), EQ(direction, "none"),EQ(laneChangeRequest,"none"),EQ(b1,false),EQ(b2,false)))
+    AND(
+      List(
+        EQ(state, "stateA"),
+        EQ(direction, "none"),
+        EQ(laneChangeRequest, "none"),
+        EQ(b1, false),
+        EQ(b2, false)
+      )
+    )
   )
   // val b1  = "b1"
   // val b2  = "b2"

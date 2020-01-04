@@ -8,5 +8,4 @@ target/
 *.dot
 *.sc
 /.bloop
-
 src/main/resources/application.conf

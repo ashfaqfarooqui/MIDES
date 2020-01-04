@@ -1,17 +1,16 @@
 package modelbuilding.models.MachineBuffer
 
-import modelbuilding.core._
-import modelbuilding.core.modeling._
+import modelbuilding.core.interfaces.modeling.ModularModel
+import modelbuilding.core.{Alphabet, _}
 
 object MachineBuffer extends ModularModel {
 
   override val name: String         = "MachineBufferMachine"
   override val modules: Set[String] = Set("Machine1", "Machine2")
 
-
   val alphabet = Alphabet(load1, load2, unload1, unload2)
 
-  val stateString: String = "m1 m2"
+  val stateString: String       = "m1 m2"
   override val states: StateSet = StateSet(stateString.split(" ").toSet)
 
   override def stateMapping: Map[String, StateSet] = Map(

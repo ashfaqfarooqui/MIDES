@@ -16,18 +16,16 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package Helpers
-import com.github.andr83.scalaconfig._
-import com.typesafe.config.ConfigFactory
+package modelbuilding.helpers
 
-object ConfigHelper {
-  val config: ScalaConfig = ConfigFactory.load()
+object Diagnostic {
 
-  lazy val model: String  = config.asUnsafe[String]("main.Model")
-  lazy val solver: String = config.asUnsafe[String]("main.Solver")
-  lazy val url: String = config.asUnsafe[String]("opc.url")
-  lazy val runner_timeout: Int = config.asUnsafe[Int]("opc.runner_timeout")
-  lazy val matlabPath: String = config.asUnsafe[String]("matlab.program.path")
-  lazy val matlabProgram: String = config.asUnsafe[String]("matlab.program.name")
+  def time[R](block: => R): R = {
+    val t0     = System.nanoTime()
+    val result = block // call-by-name
+    val t1     = System.nanoTime()
+    println("Time: " + (t1 - t0) + "ns")
+    result
+  }
 
 }

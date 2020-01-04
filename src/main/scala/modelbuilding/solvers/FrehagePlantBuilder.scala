@@ -8,8 +8,9 @@ A brute force BFS that split the result into modules rather than a monolithic pl
 
 package modelbuilding.solvers
 
+import modelbuilding.core
+import modelbuilding.core.interfaces.modeling.ModularModel
 import modelbuilding.core.{SUL, _}
-import modelbuilding.core.modeling.{Model, ModularModel}
 import modelbuilding.solvers.FrehagePlantBuilder._
 
 import scala.collection.mutable
@@ -35,6 +36,13 @@ object FrehagePlantBuilder {
 
 }
 
+/**
+ * The implementation of the Modular Supervisor Learner as defined in the paper
+ * "Active Learning of Modular Plant Models"
+ * Farooqui et. al. Wodes 2020
+ *
+ * @param _sul must be a modular model.
+ */
 class FrehagePlantBuilder(_sul: SUL) extends BaseSolver {
 
   val _model = _sul.model
@@ -114,27 +122,42 @@ class FrehagePlantBuilder(_sul: SUL) extends BaseSolver {
         case None     => None
       }
     } yield Automaton(m, states.values.toSet, alphabet, transitions, iState, fState)
-    Automata(modules)
+    core.Automata(modules)
   }
 
   def getAutomataFull: Automata = {
     val modules = for {
       m <- model.modules
-      states: Map[StateMap, State] = moduleStates(m).map( s => {
-        val state = s
-        val name = (if ( state.states.forall{ case (k,v) => _sul.getInitState.states(k) == v } ) "INIT: " else "") + state.toString
-        (getReducedStateMap(s,model,m),State(name))
-      }).toMap
-      transitions: Set[Transition] = moduleTransitions(m).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
+      states: Map[StateMap, State] = moduleStates(m)
+        .map(s => {
+          val state = s
+          val name = (if (state.states
+                            .forall { case (k, v) => _sul.getInitState.states(k) == v })
+                        "INIT: "
+                      else "") + state.toString
+          (getReducedStateMap(s, model, m), State(name))
+        })
+        .toMap
+      transitions: Set[Transition] = moduleTransitions(m)
+        .map(getReducedStateMapTransition(_, model, m))
+        .map(t => Transition(states(t.source), states(t.target), t.event))
+        .toSet[Transition]
       //      transitions: Set[Transition] = moduleTransitions(m).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
       alphabet: Alphabet = new Alphabet(model.eventMapping(m).events, true)
-      iState: State = states(getReducedStateMap(_sul.getInitState, model, m) )
+      iState: State      = states(getReducedStateMap(_sul.getInitState, model, m))
       fState: Option[Set[State]] = _sul.getGoalStates match {
-        case Some(gs) => Some(gs.map( s => states(getReducedStateMap(s, model, m)) ))
-        case None => None
+        case Some(gs) => Some(gs.map(s => states(getReducedStateMap(s, model, m))))
+        case None     => None
       }
-    } yield Automaton(m, states.values.toSet, alphabet, transitions, iState, fState)
-    Automata(modules)
+    } yield core.Automaton(
+      m,
+      states.values.toSet,
+      alphabet,
+      transitions,
+      iState,
+      fState
+    )
+    core.Automata(modules)
   }
 
 }

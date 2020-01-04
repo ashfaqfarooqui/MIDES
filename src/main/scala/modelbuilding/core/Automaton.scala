@@ -1,16 +1,30 @@
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package modelbuilding.core
 
 import java.io.{File, PrintWriter}
 
+import grizzled.slf4j.Logging
 import scalax.collection.Graph
-import scalax.collection.edge.{LDiEdge, LkDiEdge}
-import scalax.collection.edge.Implicits._
+import scalax.collection.edge.LkDiEdge
 import scalax.collection.io.dot._
-import implicits._
-import scalax.collection.Graph
-import scalax.collection.GraphPredef._
-import scalax.collection.GraphEdge._
-import scalax.collection.GraphEdge._
+import scalax.collection.io.dot.implicits.toNodeId
 
 case class Automaton(
     name: String,
@@ -19,7 +33,8 @@ case class Automaton(
     transitions: Set[Transition],
     iState: State,
     fState: Option[Set[State]] = None,
-    forbiddenStates: Option[Set[State]] = None) {
+    forbiddenStates: Option[Set[State]] = None)
+    extends Logging {
 
   lazy val transitionFunction: Map[(State, Symbol), State] =
     transitions.map(t => (t.source, t.event) -> t.target).toMap
@@ -33,7 +48,9 @@ case class Automaton(
 
   lazy val getGraphAsDot: String = {
 
-    val root = DotRootGraph(directed = true, id = Some(name))
+    val root = {
+      DotRootGraph(directed = true, id = Some(Id(name)))
+    }
 
     def edgeTransformer(
         innerEdge: Graph[String, LkDiEdge]#EdgeT
@@ -46,9 +63,9 @@ case class Automaton(
                 (
                   root,
                   DotEdgeStmt(
-                    source.toString,
-                    target.toString,
-                    if (label.nonEmpty) List(DotAttr("label", label.toString))
+                    toNodeId(source.toString),
+                    toNodeId(target.toString),
+                    if (label.nonEmpty) List(DotAttr(Id("label"), Id(label.toString)))
                     else Nil
                   )
                 )
@@ -56,14 +73,27 @@ case class Automaton(
           }
       }
 
-    val gDot = createGraph.toDot(root, edgeTransformer)
+    val gDot = {
+      createGraph.toDot(root, edgeTransformer)
+    }
     gDot
 
   }
 
   def createDotFile: Unit = {
-    val gDot = getGraphAsDot
-    val pw   = new PrintWriter(new File(s"Output/${name.replaceAll("\\s", "")}.dot"))
+    import modelbuilding.helpers.ConfigHelper
+    val gDot          = getGraphAsDot
+    val directoryName = ConfigHelper.outputDirectory
+    val directory     = new File(directoryName);
+    if (!directory.exists()) {
+      directory.mkdir();
+      // If you require it to make the entire directory path including parents,
+      debug("created output directory")
+      // use directory.mkdirs(); here instead.
+    }
+    val pw = new PrintWriter(
+      new File(directoryName + File.separator + s"${name.replaceAll("\\s", "")}.dot")
+    )
     pw.write(gDot)
     pw.close
     println(s"Graph saved to $name.dot")

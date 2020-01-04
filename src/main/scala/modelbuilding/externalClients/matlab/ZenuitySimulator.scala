@@ -1,14 +1,29 @@
-package modelbuilding.core.simulators
-import Helpers.ConfigHelper
+/*
+ * Learning Automata for Supervisory Synthesis
+ *  Copyright (C) 2019
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package modelbuilding.externalClients.matlab
+
+import com.mathworks.matlab.types.Struct
 import grizzled.slf4j.Logging
 import modelbuilding.core._
-import com.mathworks.engine.MatlabEngine
-import com.mathworks.matlab.types.Struct
+import modelbuilding.core.interfaces.simulator.{Simulator, TwoStateOperation}
+import modelbuilding.helpers.ConfigHelper
 
-import scala.collection.JavaConverters._
-import modelbuilding.core.externalClients.{MatlabClient, MiloOPCUAClient}
-
-import scala.concurrent.Future
 trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
 
   private var matlabClient: Option[MatlabClient] = None
@@ -217,7 +232,7 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
 
     evalCommandToRun(c, s, acceptPartialStates) match {
       case Some(true) =>
-       debug(s"running command $c, on state $s")
+        debug(s"running command $c, on state $s")
 
         c match {
           case `reset` =>
@@ -232,7 +247,7 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
               arrayToStateMap(
                 getClient.runFunction(
                   16,
-                 ConfigHelper.matlabProgram,
+                  ConfigHelper.matlabProgram,
                   stateMapToStruct(currState)
                 )
               )

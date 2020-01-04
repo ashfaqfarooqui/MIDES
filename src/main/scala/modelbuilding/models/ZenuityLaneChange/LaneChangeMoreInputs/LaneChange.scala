@@ -16,25 +16,25 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package modelbuilding.models.ZenuityLaneChange.monolithic
+package modelbuilding.models.ZenuityLaneChange.LaneChangeMoreInputs
 
-import modelbuilding.core.modeling.MonolithicModel
+import modelbuilding.core.interfaces.modeling.MonolithicModel
 import modelbuilding.core.{
-  Symbol,
+  AND,
   Action,
   Alphabet,
   AlwaysTrue,
   Assign,
   Command,
+  EQ,
   EventC,
+  OR,
   Predicate,
   StateSet,
-  EQ,
-  AND,
-  OR
+  Symbol
 }
 
-object LaneChangeMonolithic extends MonolithicModel {
+object LaneChange extends MonolithicModel {
 
   val ops: (Set[EventC], Map[Command, Predicate], Map[Command, List[Action]]) = {
     val ips                                     = (4 to 12).map(x => s"b$x").toSet
@@ -42,26 +42,29 @@ object LaneChangeMonolithic extends MonolithicModel {
     var tempGuards: Map[Command, Predicate]     = Map.empty[Command, Predicate]
     var tempActions: Map[Command, List[Action]] = Map.empty[Command, List[Action]]
     val events: Set[EventC] = subsets.map { s =>
-      if(s.isEmpty){
+      if (s.isEmpty) {
         EventC("empty")
-      }else EventC(s.mkString)
+      } else EventC(s.mkString)
     }.toSet
 
-    val preds:Map[String,Predicate] = Map(
-      "b4"->OR(List(EQ("state","stateB"),EQ("state","stateC"),EQ("state","stateD"))),
-      "b5"->OR(List(EQ("state","stateB"),EQ("state","stateD"))),
-      "b6"->EQ("state","stateB"),
-      "b7"->EQ("state","stateC"),
-      "b8"->EQ("state","stateD"),
-      "b9"->EQ("state","stateD"),
-      "b10"->EQ("state","stateE"),
-      "b11"->EQ("state","stateE"),
-      "b12"->EQ("state","stateE"),
-"empty" -> OR(List(EQ("state","stateF"),EQ("state","stateG")))
-
+    val preds: Map[String, Predicate] = Map(
+      "b4" -> OR(
+        List(EQ("state", "stateB"), EQ("state", "stateC"), EQ("state", "stateD"))
+      ),
+      "b5"    -> OR(List(EQ("state", "stateB"), EQ("state", "stateD"))),
+      "b6"    -> EQ("state", "stateB"),
+      "b7"    -> EQ("state", "stateC"),
+      "b8"    -> EQ("state", "stateD"),
+      "b9"    -> EQ("state", "stateD"),
+      "b10"   -> EQ("state", "stateE"),
+      "b11"   -> EQ("state", "stateE"),
+      "b12"   -> EQ("state", "stateE"),
+      "empty" -> OR(List(EQ("state", "stateF"), EQ("state", "stateG")))
     )
     events.foreach { e =>
-      tempGuards = tempGuards + (e -> AND(ips.filter(i=>e.name.contains(i)||e.name=="empty").map(preds).toList))
+      tempGuards = tempGuards + (e -> AND(
+        ips.filter(i => e.name.contains(i) || e.name == "empty").map(preds).toList
+      ))
       tempActions = tempActions + (e -> ips
         .filter(i => e.toString.contains(i))
         .map(x => Assign(x, true))

@@ -1,7 +1,7 @@
 package modelbuilding.models.StickPicking
 
 import modelbuilding.core._
-import modelbuilding.core.modeling.MonolithicModel
+import modelbuilding.core.interfaces.modeling.MonolithicModel
 
 object Sticks extends MonolithicModel {
 
