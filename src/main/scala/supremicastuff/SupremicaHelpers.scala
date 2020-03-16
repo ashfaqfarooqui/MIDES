@@ -27,6 +27,12 @@ import org.supremica.automata
 import org.supremica.automata.IO.AutomataToXML
 import org.supremica.automata._
 import org.supremica.automata.algorithms._
+import org.supremica.automata.LabeledEvent
+
+import scala.collection.JavaConverters._
+import scala.collection.immutable.Queue
+import net.sourceforge.waters.model.des.EventProxy
+import net.sourceforge.waters.subject.module.ModuleSubject
 
 object SupremicaHelpers extends Logging {
 
@@ -76,6 +82,19 @@ object SupremicaHelpers extends Logging {
     aut
   }
 
+  def automatonToEFA(mModule: ModuleSubject, aut:Automaton)={
+
+    import org.supremica.automata.ExtendedAutomaton
+
+    val efa = new ExtendedAutomaton(aut.getName(),aut.getKind())
+
+    aut.getEvents.asScala.foreach(x=>efa.addEvent(x.getName(),x.getKind().toString()))
+    aut.getStates().asScala.foreach(x=>efa.addState(x.getName()))
+
+
+
+
+  }
   def exportAsSupremicaAutomata(aut: core.Automata, name: String = "Untitled"): Unit = {
 
     import modelbuilding.helpers.ConfigHelper

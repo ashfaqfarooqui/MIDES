@@ -17,13 +17,15 @@
  */
 
 package modelbuilding.externalClients.matlab
-
-import com.mathworks.matlab.types.Struct
 import grizzled.slf4j.Logging
 import modelbuilding.core._
+import com.mathworks.engine.MatlabEngine
+import com.mathworks.matlab.types.Struct
 import modelbuilding.core.interfaces.simulator.{Simulator, TwoStateOperation}
 import modelbuilding.helpers.ConfigHelper
 
+import scala.collection.JavaConverters._
+import scala.concurrent.Future
 trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
 
   private var matlabClient: Option[MatlabClient] = None
@@ -78,33 +80,6 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
   val b10               = "b10"
   val b11               = "b11"
   val b12               = "b12"
-
-  def getReducedState(sp: StateMap): StateMap = {
-    val stateSet = Set(state, direction, laneChangeRequest, b1, b2)
-    StateMap(sp.name, states = sp.states.filterKeys(stateSet.contains))
-  }
-
-  def extend(s: StateMap): StateMap = {
-    //THis function is only to test lane change....
-
-    val initialDecisionMap =
-      Map(
-        // b1  -> false,
-        // b2  -> false,
-        b3  -> false,
-        b4  -> false,
-        b5  -> false,
-        b6  -> false,
-        b7  -> false,
-        b8  -> false,
-        b9  -> false,
-        b10 -> false,
-        b11 -> false,
-        b12 -> false
-      )
-
-    StateMap(states = s.states + (laneChngReq -> "none") ++ initialDecisionMap)
-  }
 
   def arrayToStateMap(r: java.lang.Object): StateMap = {
     val response = r.asInstanceOf[Array[java.lang.Object]]
@@ -242,7 +217,6 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
             val currState = translateCommand(c).foldLeft(s) { (acc, ac) =>
               ac.next(acc)
             }
-
             val resp = Right(
               arrayToStateMap(
                 getClient.runFunction(
@@ -269,6 +243,7 @@ trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
       commands: List[Command],
       s: StateMap
     ): Either[StateMap, StateMap] = {
+    @scala.annotation.tailrec
     def runList(c: List[Command], ns: StateMap): Either[StateMap, StateMap] = {
 
       c match {

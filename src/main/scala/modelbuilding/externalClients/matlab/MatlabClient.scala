@@ -76,11 +76,11 @@ class MatlabClient extends Logging {
     val a = getEngine.feval[Array[java.lang.Object]](5, "initialize")
     def matlabResponseToMap(a: Array[java.lang.Object]) = {
       Map(
-        "state"           -> a(0),
-        "direction"       -> a(1),
-        "laneChngRequest" -> a(2),
-        "b1"              -> a(3),
-        "b2"              -> a(4)
+        "state"             -> a(0),
+        "direction"         -> a(1),
+        "laneChangeRequest" -> a(2),
+        "b1"                -> a(3),
+        "b2"                -> a(4)
       )
     }
     val state = StateMap(matlabResponseToMap(a))
