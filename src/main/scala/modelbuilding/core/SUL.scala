@@ -18,6 +18,7 @@
 
 package modelbuilding.core
 
+import modelbuilding.helpers.Statistics
 import grizzled.slf4j.Logging
 import modelbuilding.core.interfaces.algorithms.Teacher
 import modelbuilding.core.interfaces.modeling.{Model, Specifications}
@@ -50,6 +51,7 @@ case class SUL(
     extends Teacher
     with Logging {
 
+  val statistics = new Statistics
   def getInitState: StateMap               = simulator.initState
   def getGoalStates: Option[Set[StateMap]] = simulator.goalStates
   def getGoalPredicate: Option[Predicate]  = simulator.goalPredicate
@@ -192,6 +194,8 @@ case class SUL(
     * @return - 0,1, or 2.
     */
   def isMember(specName: Option[String])(sequence: Grammar): Int = {
+    
+    statistics.membQueries = statistics.membQueries + 1
     val member = if (specName.isDefined) {
       if (!isSequenceUnControllableInSpec(sequence, model.alphabet, specName.get)) {
         lazy val specAllowed = isSequenceAllowedInSpec(sequence, specName.get) match {

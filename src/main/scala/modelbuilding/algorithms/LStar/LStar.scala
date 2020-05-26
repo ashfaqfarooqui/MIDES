@@ -40,6 +40,8 @@ class LStar(
   @tailrec
   private def learn(oTable: ObservationTable): Automaton = {
     info(s"S: ${oTable.S.size}, E: ${oTable.E.size}")
+    info(s"member: ${teacher.statistics.membQueries}")
+            info(s"EQ: ${teacher.statistics.eqQueries}")
     info(s"Instance: ${oTable.instance}")
     debug(oTable.prettyPrintTable)
 
@@ -73,6 +75,7 @@ class LStar(
           Automata(Set(oTable.getAutomata.removeTauAndDump)),
           name = "hypothesis"
         )
+        teacher.statistics.eqQueries = teacher.statistics.eqQueries + 1
         val counterExample = teacher.isHypothesisTrue(oTable, ceGen)
         info(s"got CE: $counterExample")
         counterExample match {
