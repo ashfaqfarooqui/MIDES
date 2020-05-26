@@ -24,6 +24,7 @@ import modelbuilding.core.{Alphabet, Automaton, Grammar}
 
 trait Teacher {
 
+  val statistics: modelbuilding.helpers.Statistics
   def isMember(specName: Option[String])(g: Grammar): Int
 
   def isHypothesisTrue(

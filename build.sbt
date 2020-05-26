@@ -2,7 +2,7 @@ name := "Model Building"
 
 version := "1.0"
 
-scalaVersion := "2.12.9"
+scalaVersion := "2.12.10"
 
 
 // javacOptions in (Compile, compile) ++= Seq(                              //
@@ -55,7 +55,9 @@ libraryDependencies ++= Seq(
   "com.typesafe"             % "config"           % "1.4.0",
   "com.github.martincooper"  %% "scala-datatable" % "0.8.0",
   "org.scalactic"            %% "scalactic"       % "3.0.5",
-  "org.scalatest"            %% "scalatest"       % "3.0.5" % "test"
+  "org.scalatest"            %% "scalatest"       % "3.0.5" % "test",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
+
   // "nl.vroste"               %% "scala-ads-client" % "0.1.0-SNAPSHOT"
 )
 

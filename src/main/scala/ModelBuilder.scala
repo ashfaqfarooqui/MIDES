@@ -21,6 +21,7 @@ import modelbuilding.core.SUL
 import modelbuilding.helpers.ConfigHelper
 import modelbuilding.models.TestUnit.TLSpecifications
 import modelbuilding.models.ZenuityLaneChange.LaneChangeMoreInputs.LaneChangeSimulateMonolithic
+import modelbuilding.models.ZenuityLaneChange.LaneChangeModular.LaneChangeSimulateModular
 import modelbuilding.models._
 import modelbuilding.solvers._
 import supremicastuff.SupremicaHelpers
@@ -126,6 +127,13 @@ object ModelBuilder extends Logging {
       SUL(
         ZenuityLaneChange.LaneChangeMoreInputs.LaneChange,
         new LaneChangeSimulateMonolithic,
+        None,
+        false
+      )
+    case "LaneChangeModular" =>
+      SUL(
+        ZenuityLaneChange.LaneChangeModular.LaneChange,
+        new LaneChangeSimulateModular,
         None,
         false
       )
