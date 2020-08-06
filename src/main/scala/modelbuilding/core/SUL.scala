@@ -51,6 +51,8 @@ case class SUL(
     extends Teacher
     with Logging {
 
+  var simQueries: Int = 0
+
   val statistics = new Statistics
   def getInitState: StateMap               = simulator.initState
   def getGoalStates: Option[Set[StateMap]] = simulator.goalStates
@@ -66,6 +68,7 @@ case class SUL(
       case Left(_)  => None
     }
     info(s"got response $resp ")
+    simQueries += 1
     resp
   }
 

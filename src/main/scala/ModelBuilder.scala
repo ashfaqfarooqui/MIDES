@@ -149,6 +149,8 @@ object ModelBuilder extends Logging {
       case "ModularPlantLearnerWithPartialStates" =>
         new FrehagePlantBuilderWithPartialStates(sul)
       case "ModularPlantLearner"      => new FrehagePlantBuilder(sul)
+      case "ModularPlantLearnerWithoutTau"      => new FrehagePlantBuilderWithoutTau(sul)
+      case "ModularPlantLearnerWithoutTauNew"      => new FrehagePlantBuilderWithoutTauNew(sul)
       case "ModularSupervisorLearner" => new FrehageModularSupSynthesis(sul)
       case "MonolithicPlantSolver"    => new MonolithicSolver(sul)
       case "MonolithicSupSolver"      => new MonolithicSupSolver(sul)
@@ -159,6 +161,8 @@ object ModelBuilder extends Logging {
     }
 
     info("Learning done!, writing results")
+
+    println("Queries to the simulator: ", sul.simQueries)
 
     val automata = result.getAutomata
 

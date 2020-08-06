@@ -52,7 +52,7 @@ object ReadFromWmodFile {
         new ModuleSubjectFactory(),
         CompilerOperatorTable.getInstance()
       )
-      Some(
+      return Some(
         marshaller.unmarshal(fileUri).asInstanceOf[ModuleSubject]
       )
     } catch {
@@ -99,7 +99,7 @@ trait SupremicaBase {
 }
 
 class SupremicaWatersSystem(
-    val mModule: ModuleSubject = SimpleModuleFactory("NewModule") /* e.g. ReadSystemFromWmodFile("supremicaFiles/controlabilitytest.xml") */)
+    val mModule: ModuleSubject = SimpleModuleFactory("NewModule") /* e.g. ReadSystemFromWmodFile("supremicaFiles/controlabilitytest.wmod") */)
     extends SimpleModuleFactory
     with SupremicaBase
     with Logging {
