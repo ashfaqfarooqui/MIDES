@@ -21,7 +21,7 @@ class SimulateArm(gridX: Int, gridY: Int) extends CodeSimulator {
   }
 
   // Not applicable since evalCommandToRun requires some special treatment (implementation of predicate `NEXT`)
-  override val guards: Map[Command, Predicate] = Map.empty[Command, Predicate]
+  val guardsC: Map[Command, Predicate] = Map.empty[Command, Predicate]
 
   override def evalCommandToRun(
       c: Command,
@@ -56,7 +56,7 @@ class SimulateArm(gridX: Int, gridY: Int) extends CodeSimulator {
     }
   }
 
-  override val actions: Map[Command, List[Action]] = Map(
+  val actionsC: Map[Command, List[Action]] = Map(
     left    -> List(Decr(x, 1)),
     right   -> List(Incr(x, 1)),
     up      -> List(Incr(y, 1)),
@@ -68,4 +68,7 @@ class SimulateArm(gridX: Int, gridY: Int) extends CodeSimulator {
     reset   -> initState.getState.toList.map(x => Assign(x._1, x._2)),
     tau     -> List(TauAction)
   )
+
+  override val guards: Map[String, Predicate] = guardsC.map(x => x._1.toString -> x._2)
+  override val actions: Map[String, List[Action]] = actionsC.map(x => x._1.toString -> x._2)
 }

@@ -21,7 +21,7 @@ trait CodeSimulator extends Simulator with TwoStateOperation with Logging {
     c match {
       case `reset`                => Some(true)
       case `tau`                  => Some(true)
-      case x if guards contains x => guards(x).eval(s, acceptPartialStates)
+      case x if guards contains x.toString => guards(x).eval(s, acceptPartialStates)
       case y                      => throw new IllegalArgumentException(s"Unknown command: `$y`")
     }
 
@@ -29,7 +29,7 @@ trait CodeSimulator extends Simulator with TwoStateOperation with Logging {
     c match {
       case `reset`                => initState.getState.toList.map(x => Assign(x._1, x._2))
       case `tau`                  => List(TauAction)
-      case x if guards contains x => actions(x)
+      case x if guards contains x.toString => actions(x)
       case y                      => throw new IllegalArgumentException(s"Unknown command: `$y`")
     }
 

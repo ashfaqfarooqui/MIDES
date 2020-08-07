@@ -18,7 +18,7 @@ class SimulateTL extends CodeSimulator {
     AND(EQ(m1, Initial), EQ(m2, Initial), EQ(tu, Initial))
   )
 
-  override val guards: Map[Command, Predicate] = Map(
+  val guardsC: Map[Command, Predicate] = Map(
     start1  -> EQ(m1, Initial),
     finish1 -> EQ(m1, Working),
     start2  -> EQ(m2, Initial),
@@ -28,7 +28,7 @@ class SimulateTL extends CodeSimulator {
     reject  -> EQ(tu, Working)
   )
 
-  override val actions: Map[Command, List[Action]] = Map(
+  val actionsC: Map[Command, List[Action]] = Map(
     start1  -> List(Assign(m1, Working)),
     finish1 -> List(Assign(m1, Initial)),
     start2  -> List(Assign(m2, Working)),
@@ -38,4 +38,6 @@ class SimulateTL extends CodeSimulator {
     reject  -> List(Assign(tu, Initial))
   )
 
+  override val guards: Map[String, Predicate] = guardsC.map(x => x._1.toString -> x._2)
+  override val actions: Map[String, List[Action]] = actionsC.map(x => x._1.toString -> x._2)
 }

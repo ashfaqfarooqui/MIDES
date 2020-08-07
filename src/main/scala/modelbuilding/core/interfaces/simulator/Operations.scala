@@ -26,14 +26,19 @@ import modelbuilding.core.{Action, Command, Predicate}
   * For example, in the [[Machinebuffer]] case when connecting to the simulation post guards are a way to check if the operation has completed.
   *
   */
+
 trait ThreeStateOperation extends TwoStateOperation {
-  val postGuards: Map[Command, Predicate]
-  val postActions: Map[Command, List[Action]]
+  val postGuards: Map[String, Predicate]
+  val postActions: Map[String, List[Action]]
+  def postGuards(c: Command): Predicate = postGuards(c.toString)
+  def postActions(c: Command): List[Action] = postActions(c.toString)
 
 }
 
 trait TwoStateOperation {
-  val guards: Map[Command, Predicate]
-  val actions: Map[Command, List[Action]]
+  val guards: Map[String, Predicate]
+  val actions: Map[String, List[Action]]
+  def guards(c: Command): Predicate = guards(c.toString)
+  def actions(c: Command): List[Action] = actions(c.toString)
 
 }

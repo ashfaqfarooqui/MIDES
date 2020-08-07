@@ -37,6 +37,7 @@ sealed trait Predicate {
         case LE(l, r)    => evalEqualities(l, r, _ < _)
         case GREQ(l, r)  => evalEqualities(l, r, _ >= _)
         case LEQ(l, r)   => evalEqualities(l, r, _ <= _)
+        case CUSTOM(l, r, f)   => evalEqualities(l, r, f)
         case AlwaysTrue  => Some(true)
         case AlwaysFalse => Some(false)
         case p           => throw new IllegalArgumentException(s"Unknown predicate: $p")
@@ -71,6 +72,7 @@ case class GR(l: String, r: Any)   extends Predicate
 case class LE(l: String, r: Any)   extends Predicate
 case class GREQ(l: String, r: Any) extends Predicate
 case class LEQ(l: String, r: Any)  extends Predicate
+case class CUSTOM(l: String, r: Any, f: (Any, Any) => Boolean)  extends Predicate
 
 // Secondary constructors to handle simplify lists
 object AND { def apply(p: Predicate*) = new AND(p.toList) }

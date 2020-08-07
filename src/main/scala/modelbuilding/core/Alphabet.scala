@@ -28,6 +28,8 @@ object Alphabet {
       val a = _a.head match {
         case _: Symbol  => _a.toSet.asInstanceOf[Set[Symbol]]
         case _: Command => _a.toSet.asInstanceOf[Set[Command]].map(Symbol)
+        case _: Set[Symbol] => _a.head.asInstanceOf[Set[Symbol]]
+        case _: Set[Command] => _a.head.asInstanceOf[Set[Command]].map(Symbol)
         case t =>
           throw new IllegalArgumentException(
             s"Alphabet only accept inputs of either Seq[Symbol] or Seq[Command], not `${t.getClass}`"
@@ -50,5 +52,6 @@ case class Alphabet(
                                                                        Set.empty[Symbol])
 
   def +(that: Alphabet): Alphabet = new Alphabet(this.events union that.events)
+  def -(that: Alphabet): Alphabet = new Alphabet(this.events diff that.events)
   override def toString: String   = s"Alphabet(${events.mkString(", ")})"
 }

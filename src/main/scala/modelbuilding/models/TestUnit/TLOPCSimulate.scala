@@ -42,7 +42,7 @@ class TLOPCSimulate extends OPCSimulator {
 
   override val goalStates: Option[Set[StateMap]] = None
 
-  override val guards: Map[Command, Predicate] = Map(
+  val guardsC: Map[Command, Predicate] = Map(
     start1  -> AND(EQ("GVL.S1", true), EQ("GVL.S2", false)),
     finish1 -> EQ("GVL.S2", true),
     start2  -> AND(EQ("GVL.S3", true), EQ("GVL.S4", false)),
@@ -52,7 +52,7 @@ class TLOPCSimulate extends OPCSimulator {
     reject  -> EQ("GVL.S6", true)
   )
 
-  override val actions: Map[Command, List[Action]] = Map(
+  val actionsC: Map[Command, List[Action]] = Map(
     start1  -> List(Assign("GVL.R1", true)),
     finish1 -> List(Assign("GVL.R2", true)),
     start2  -> List(Assign("GVL.R3", true)),
@@ -62,7 +62,7 @@ class TLOPCSimulate extends OPCSimulator {
     reject  -> List(Assign("GVL.R7", true))
   )
 
-  override val postGuards: Map[Command, Predicate] = Map(
+  val postGuardsC: Map[Command, Predicate] = Map(
     start1  -> EQ("GVL.S1", false),
     finish1 -> EQ("GVL.S2", false),
     start2  -> EQ("GVL.S3", false),
@@ -73,7 +73,7 @@ class TLOPCSimulate extends OPCSimulator {
   )
 
   //Remember: this can be if the action success or fails
-  override val postActions: Map[Command, List[Action]] = Map(
+  val postActionsC: Map[Command, List[Action]] = Map(
     start1  -> List(Assign("GVL.R1", false)),
     finish1 -> List(Assign("GVL.R2", false)),
     start2  -> List(Assign("GVL.R3", false)),
@@ -83,4 +83,8 @@ class TLOPCSimulate extends OPCSimulator {
     reject  -> List(Assign("GVL.R7", false))
   )
 
+  override val guards: Map[String, Predicate] = guardsC.map(x => x._1.toString -> x._2)
+  override val actions: Map[String, List[Action]] = actionsC.map(x => x._1.toString -> x._2)
+  override val postGuards: Map[String, Predicate] = postGuardsC.map(x => x._1.toString -> x._2)
+  override val postActions: Map[String, List[Action]] = postActionsC.map(x => x._1.toString -> x._2)
 }

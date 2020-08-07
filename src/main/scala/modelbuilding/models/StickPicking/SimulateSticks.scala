@@ -26,7 +26,7 @@ class SimulateSticks(sticks: Int) extends CodeSimulator {
     sticks
   }
 
-  override val guards: Map[Command, Predicate] = {
+  val guardsC: Map[Command, Predicate] = {
     val rem_one   = GR(Ssticks, 0)
     val rem_two   = GR(Ssticks, 1)
     val rem_three = GR(Ssticks, 2)
@@ -42,7 +42,7 @@ class SimulateSticks(sticks: Int) extends CodeSimulator {
     )
   }
 
-  override val actions: Map[Command, List[Action]] = Map(
+  val actionsC: Map[Command, List[Action]] = Map(
     e11 -> List(Decr(Ssticks, 1), Assign(player, p2)),
     e12 -> List(Decr(Ssticks, 2), Assign(player, p2)),
     e21 -> List(Decr(Ssticks, 1), Assign(player, p1)),
@@ -51,4 +51,6 @@ class SimulateSticks(sticks: Int) extends CodeSimulator {
     e23 -> List(Decr(Ssticks, 3), Assign(player, p1))
   )
 
+  override val guards: Map[String, Predicate] = guardsC.map(x => x._1.toString -> x._2)
+  override val actions: Map[String, List[Action]] = actionsC.map(x => x._1.toString -> x._2)
 }

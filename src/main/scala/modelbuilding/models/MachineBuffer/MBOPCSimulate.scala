@@ -53,7 +53,7 @@ class MBOPCSimulate extends OPCSimulator {
 
   override val goalStates: Option[Set[StateMap]] = None
 
-  override val guards: Map[Command, Predicate] = Map(
+  val guardsC: Map[Command, Predicate] = Map(
     // The guards below were used for the case that there is no connection between machine 1 and machine 2
     load1   -> AND(EQ("GVL.S1", true), EQ("GVL.S2", false)), //make guard to be such that state is initial
     unload1 -> EQ("GVL.S2", true),
@@ -66,14 +66,14 @@ class MBOPCSimulate extends OPCSimulator {
     unload2 -> AND(EQ("GVL.S4", true), EQ("GVL.S5", false)),*/
   )
 
-  override val actions: Map[Command, List[Action]] = Map(
+  val actionsC: Map[Command, List[Action]] = Map(
     load1   -> List(Assign("GVL.R1", true)),
     unload1 -> List(Assign("GVL.R2", true)),
     load2   -> List(Assign("GVL.R3", true)),
     unload2 -> List(Assign("GVL.R4", true))
   )
 
-  override val postGuards: Map[Command, Predicate] = Map(
+  val postGuardsC: Map[Command, Predicate] = Map(
     // The guards below were used for the case that there is no connection between machine 1 and machine 2
     load1   -> EQ("GVL.S1", false), //make guard to be such that state is initial
     unload1 -> EQ("GVL.S2", false),
@@ -87,11 +87,15 @@ class MBOPCSimulate extends OPCSimulator {
   )
 
   //Remember: this can be if the action success or fails
-  override val postActions: Map[Command, List[Action]] = Map(
+  val postActionsC: Map[Command, List[Action]] = Map(
     load1   -> List(Assign("GVL.R1", false)),
     unload1 -> List(Assign("GVL.R2", false)),
     load2   -> List(Assign("GVL.R3", false)),
     unload2 -> List(Assign("GVL.R4", false))
   )
 
+  override val guards: Map[String, Predicate] = guardsC.map(x => x._1.toString -> x._2)
+  override val actions: Map[String, List[Action]] = actionsC.map(x => x._1.toString -> x._2)
+  override val postGuards: Map[String, Predicate] = postGuardsC.map(x => x._1.toString -> x._2)
+  override val postActions: Map[String, List[Action]] = postActionsC.map(x => x._1.toString -> x._2)
 }

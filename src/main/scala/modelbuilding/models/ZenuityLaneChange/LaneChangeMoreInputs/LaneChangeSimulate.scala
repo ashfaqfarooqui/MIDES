@@ -76,8 +76,11 @@ class LaneChangeSimulateMonolithic extends ZenuitySimulator {
     )
 
   override val goalStates: Option[Set[StateMap]]   = None
-  override val guards: Map[Command, Predicate]     = LaneChange.ops._2
-  override val actions: Map[Command, List[Action]] = LaneChange.ops._3
+  val guardsC: Map[Command, Predicate]     = LaneChange.ops._2
+  val actionsC: Map[Command, List[Action]] = LaneChange.ops._3
+
+  override val guards: Map[String, Predicate] = guardsC.map(x => x._1.toString -> x._2)
+  override val actions: Map[String, List[Action]] = actionsC.map(x => x._1.toString -> x._2)
 }
 
 object LaneChangeSimulate {

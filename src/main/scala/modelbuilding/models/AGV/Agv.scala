@@ -7,8 +7,8 @@ object Agv extends ModularModel {
 
   override val name: String = "AGV"
   override val modules: Set[String] = Set(
-    "Input 1",
-    "Input 3",
+    "Input1",
+    "Input3",
     "Output",
     "AGV1",
     "AGV2",
@@ -81,8 +81,8 @@ object Agv extends ModularModel {
   override val states: StateSet = StateSet(stateString.split(" ").toSet)
 
   override def stateMapping: Map[String, StateSet] = Map(
-    "Input 1" -> StateSet("in1", "v1l", "v1p"),
-    "Input 3" -> StateSet("in3", "v2l", "v2p"),
+    "Input1" -> StateSet("in1", "v1l", "v1p"),
+    "Input3" -> StateSet("in3", "v2l", "v2p"),
     "Output"  -> StateSet("out", "v5l", "v5p"),
     "AGV1"    -> StateSet("v1l", "v1p", "in1", "w2"),
     "AGV2"    -> StateSet("v2l", "v2p", "in3", "w3"),
@@ -108,8 +108,8 @@ object Agv extends ModularModel {
   )
 
   override val eventMapping: Map[String, Alphabet] = Map(
-    "Input 1" -> Alphabet(e10, e11),
-    "Input 3" -> Alphabet(e30, e31),
+    "Input1" -> Alphabet(e10, e11),
+    "Input3" -> Alphabet(e30, e31),
     "Output"  -> Alphabet(e20, e21),
     "AGV1"    -> Alphabet(e10, w23, c1, c2, u10, u11),
     "AGV2" -> Alphabet(

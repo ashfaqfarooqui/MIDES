@@ -76,7 +76,7 @@ class LaneChangeSimulate extends ZenuitySimulator {
     )
 
   override val goalStates: Option[Set[StateMap]] = None
-  override val guards: Map[Command, Predicate] = Map(
+  val guardsC: Map[Command, Predicate] = Map(
     goRight       -> AlwaysTrue,
     goLeft        -> AlwaysTrue,
     cancelRequest -> AlwaysTrue,
@@ -101,7 +101,7 @@ class LaneChangeSimulate extends ZenuitySimulator {
     b9false       -> AlwaysTrue,
     b10false      -> AlwaysTrue
   )
-  override val actions: Map[Command, List[Action]] = Map(
+  val actionsC: Map[Command, List[Action]] = Map(
     goRight       -> List(Assign(laneChngReq, RIGHT)),
     goLeft        -> List(Assign(laneChngReq, LEFT)),
     cancelRequest -> List(Assign(laneChngReq, CANCEL)),
@@ -126,6 +126,9 @@ class LaneChangeSimulate extends ZenuitySimulator {
     b9false       -> List(Assign(b9, false)),
     b10false      -> List(Assign(b10, false))
   )
+
+  override val guards: Map[String, Predicate] = guardsC.map(x => x._1.toString -> x._2)
+  override val actions: Map[String, List[Action]] = actionsC.map(x => x._1.toString -> x._2)
 }
 
 object LaneChangeSimulate {

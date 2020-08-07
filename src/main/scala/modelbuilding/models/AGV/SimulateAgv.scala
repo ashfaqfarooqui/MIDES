@@ -54,7 +54,7 @@ class SimulateAgv extends CodeSimulator {
 
   override val goalStates: Option[Set[StateMap]] = None
 
-  override val guards: Map[Command, Predicate] = Map(
+  val guardsC: Map[Command, Predicate] = Map(
     c1  -> AND(EQ(v1p, "i1"), EQ(v1l, true)),
     c2  -> AND(EQ(v1p, "w2i"), EQ(v1l, false)),
     c3  -> AND(EQ(v2p, "i3"), EQ(v2l, true)),
@@ -110,7 +110,7 @@ class SimulateAgv extends CodeSimulator {
     w34 -> EQ(w3, "w34")
   )
 
-  override val actions: Map[Command, List[Action]] = Map(
+  val actionsC: Map[Command, List[Action]] = Map(
     c1  -> List(Assign(v1p, "z1")),
     c2  -> List(Assign(v1p, "z1")),
     c3  -> List(Assign(v2p, "z1")),
@@ -171,4 +171,6 @@ class SimulateAgv extends CodeSimulator {
     w34 -> List(Assign(w3, "w31"))
   )
 
+  override val guards: Map[String, Predicate] = guardsC.map(x => x._1.toString -> x._2)
+  override val actions: Map[String, List[Action]] = actionsC.map(x => x._1.toString -> x._2)
 }

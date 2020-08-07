@@ -109,7 +109,7 @@ trait OPCSimulator
     c match {
       case `reset`                => Some(true)
       case `tau`                  => Some(true)
-      case x if guards contains x => guards(x).eval(s, acceptPartialStates)
+      case x if guards contains x.toString => guards(x).eval(s, acceptPartialStates)
       case y                      => throw new IllegalArgumentException(s"Unknown command: `$y`")
     }
   }
@@ -118,7 +118,7 @@ trait OPCSimulator
     c match {
       case `reset`                 => List(ResetAction)
       case `tau`                   => List(TauAction)
-      case x if actions contains x => actions(x)
+      case x if actions contains x.toString => actions(x)
       case y                       => throw new IllegalArgumentException(s"Unknown command: `$y`")
     }
 

@@ -10,45 +10,65 @@ package modelbuilding.solvers
 
 import modelbuilding.core
 import modelbuilding.core.interfaces.modeling.ModularModel
+import modelbuilding.core.interfaces.simulator.TimedCodeSimulator
 import modelbuilding.core.{SUL, _}
-import modelbuilding.solvers.FrehagePlantBuilderWithoutTauNew._
+import modelbuilding.solvers.FrehageCompositionalOptimization._
 
 import scala.collection.mutable
 
-object FrehagePlantBuilderWithoutTauNew {
+/*
+
+# Combining Learning with Compositional Optimiztaion
+
+
+## Contributions:
+  - Can reduce the memory allocation of the learning based when pruning non optimal paths
+
+## Challanges:
+  - Direct the learning based on the optimization
+    - Identify "target states" and "source states" for the optimization
+  - Separate the search on local and shared events
+  - DFS on local events in source states of each module
+  - BFS on shared events in all combination of local states to determine if they are target states and to identify new source states
+
+TODO:
+  [ ] Simulation: fix the duration of the actions.
+  [ ] ...
+
+  */
+
+object FrehageCompositionalOptimizationBACKUP {
 
   def getReducedStateMap(state: StateMap, model: ModularModel, module: String): StateMap =
     StateMap(
       state.name,
       state.states.filterKeys(s => model.stateMapping(module).states.contains(s))
     )
-
-  def getReducedStateMapTransition(
-      t: StateMapTransition,
-      model: ModularModel,
-      module: String
-    ): StateMapTransition =
-    StateMapTransition(
-      getReducedStateMap(t.source, model, module),
-      getReducedStateMap(t.target, model, module),
-      t.event
-    )
 }
 
 /**
- * The implementation of the Modular Supervisor Learner as defined in the paper
- * "Active Learning of Modular Plant Models"
- * Farooqui et. al. Wodes 2020
- *
- * @param _sul must be a modular model.
- */
-class FrehagePlantBuilderWithoutTauNew(_sul: SUL) extends BaseSolver {
+  * The implementation of the ... as defined in the paper
+  * "..."
+  * Hagebring et. al. ...
+  *
+  * @param _sul must be a modular model.
+  */
+class FrehageCompositionalOptimizationBACKUP(_sul: SUL) extends BaseSolver {
 
   val _model = _sul.model
-  assert(_model.isModular, "modelbuilder.solver.FrehagePlantBuilderWithoutTau requires a modular model.")
+  assert(_model.isModular, "modelbuilder.solver.FrehageCompositionalOptimization requires a modular model.")
   private val model = _model.asInstanceOf[ModularModel]
 
-  private var queue: List[StateMapTransition] = _sul.getOutgoingTransitions(_sul.getInitState, model.alphabet)
+  val _sim = _sul.simulator
+  assert(_sim.isInstanceOf[TimedCodeSimulator], "modelbuilder.solver.FrehageCompositionalOptimization requires a simulator of type TimedCodeSimulator.")
+  private val sim = _sim.asInstanceOf[TimedCodeSimulator]
+
+
+  private var queue = collection.mutable.PriorityQueue((0, sim.initState))(
+    Ordering.by((_: (Int, StateMap))._1).reverse
+  )
+
+
 
   // One queue for each module to track new states that should be explored.
   private val moduleStates: Map[String, mutable.Set[StateMap]] = model.modules
@@ -66,38 +86,38 @@ class FrehagePlantBuilderWithoutTauNew(_sul: SUL) extends BaseSolver {
   while ({
     count += 1
     println(s"Iteration: $count")
-    queue.nonEmpty
+    moduleStates.foreach(x => println(x._1 + x._2.map(s => (s.getKey("r_1_l").get, s.getKey("r_2_l").get))))
+    nonLocalVariables foreach println
+    queue.nonEmpty // && count < 10
   }) {
-
-    val next: List[StateMapTransition] = queue
-    queue = List.empty[StateMapTransition]
+    val state = queue.dequeue()._2
+    val next: List[StateMapTransition] =
+      _sul.getOutgoingTransitions(state, model.alphabet)
 
     next.foreach { t =>
-      val changedVars = t.target.states.keySet.filter(k => t.source.states(k) != t.target.states(k))
+
+      val changedVars =
+        t.target.states.keySet.filter(k => t.source.states(k) != t.target.states(k))
       var newStateFound = false
-      var possibleCommands: Alphabet = Alphabet()
-      for (m <- model.modules) {
-        val changedLocal = model.stateMapping(m).states intersect changedVars
+      for (m <- model.modules
+           if (model.stateMapping(m).states intersect changedVars).nonEmpty) {
+
         val tReducedTarget = getReducedStateMap(t.target, model, m)
-        val eventIsPartOfModule = model.eventMapping(m).events contains t.event
-        if (eventIsPartOfModule) {
+
+        if (model.eventMapping(m).events contains t.event)
           moduleTransitions(m) += StateMapTransition(
             getReducedStateMap(t.source, model, m),
             tReducedTarget,
             t.event
           )
-        }
-        if (changedLocal.nonEmpty) {
-          if( !(moduleStates(m) contains tReducedTarget)) {
-            moduleStates(m) += tReducedTarget
-            newStateFound = true
-          }
-          if (!eventIsPartOfModule) nonLocalVariables(m) ++= changedLocal
-          possibleCommands += model.eventMapping(m)
+        else nonLocalVariables(m) ++= (model.stateMapping(m).states intersect changedVars)
+
+        if (!(moduleStates(m) contains tReducedTarget)) {
+          moduleStates(m) += tReducedTarget
+          newStateFound = true
         }
       }
-
-      if (newStateFound) queue = _sul.getOutgoingTransitions(t.target, possibleCommands) ++ queue
+      if (newStateFound) queue.enqueue((count,t.target))
     }
 
   }
@@ -110,19 +130,22 @@ class FrehagePlantBuilderWithoutTauNew(_sul: SUL) extends BaseSolver {
         .map(s => {
           val state = StateMap(s.states.filterKeys(k => !nonLocalVariables(m).contains(k)))
           val name = (if (state.states
-                            .forall { case (k, v) => _sul.getInitState.states(k) == v })
-                        "INIT: "
-                      else "") + state.toString
+            .forall { case (k, v) => _sul.getInitState.states(k) == v })
+            "INIT: "
+          else "") + state.toString
           (getReducedStateMap(s, model, m), State(name))
         })
         .toMap
       transitions: Set[Transition] = moduleTransitions(m)
-        .filterNot(_.event.getCommand == tau)
-        .map(getReducedStateMapTransition(_, model, m))
+        .map(t => StateMapTransition(
+          getReducedStateMap(t.source, model, m),
+          getReducedStateMap(t.target, model, m),
+          Symbol(new ControllableCommand(f"(${t.event.toString}, ${sim.calculateDuration(t)}%.2f)"))
+        ))
         .map(t => Transition(states(t.source), states(t.target), t.event))
         .toSet[Transition]
       //      transitions: Set[Transition] = moduleTransitions(m).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
-      alphabet: Alphabet = model.eventMapping(m)
+      alphabet: Alphabet = Alphabet(transitions.map(_.event))
       iState: State      = states(getReducedStateMap(_sul.getInitState, model, m))
       fState: Option[Set[State]] = _sul.getGoalStates match {
         case Some(gs) => Some(gs.map(s => states(getReducedStateMap(s, model, m))))
@@ -139,18 +162,22 @@ class FrehagePlantBuilderWithoutTauNew(_sul: SUL) extends BaseSolver {
         .map(s => {
           val state = s
           val name = (if (state.states
-                            .forall { case (k, v) => _sul.getInitState.states(k) == v })
-                        "INIT: "
-                      else "") + state.toString
+            .forall { case (k, v) => _sul.getInitState.states(k) == v })
+            "INIT: "
+          else "") + state.toString
           (getReducedStateMap(s, model, m), State(name))
         })
         .toMap
       transitions: Set[Transition] = moduleTransitions(m)
-        .map(getReducedStateMapTransition(_, model, m))
+        .map(t => StateMapTransition(
+          getReducedStateMap(t.source, model, m),
+          getReducedStateMap(t.target, model, m),
+          Symbol(new ControllableCommand(f"(${t.event.toString}, ${sim.calculateDuration(t)}%.2f)"))
+        ))
         .map(t => Transition(states(t.source), states(t.target), t.event))
         .toSet[Transition]
       //      transitions: Set[Transition] = moduleTransitions(m).map(getReducedStateMapTransition(_,model,m)).map( t => Transition(states(t.source), states(t.target), t.event)).toSet[Transition]
-      alphabet: Alphabet = new Alphabet(model.eventMapping(m).events, true)
+      alphabet: Alphabet = Alphabet(transitions.map(_.event))
       iState: State      = states(getReducedStateMap(_sul.getInitState, model, m))
       fState: Option[Set[State]] = _sul.getGoalStates match {
         case Some(gs) => Some(gs.map(s => states(getReducedStateMap(s, model, m))))

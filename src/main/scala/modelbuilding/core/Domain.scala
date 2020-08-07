@@ -92,5 +92,18 @@ case class Word(pf: List[Symbol], w: Symbol) extends Grammar {
 }
 
 case class Language(l: Set[Grammar])
-case class Transition(source: State, target: State, event: Symbol)
+case class Transition(source: State, target: State, event: Symbol) {
+  def canEqual(a: Any) = a.isInstanceOf[Transition]
+  override def equals(that:Any) =
+    that match {
+      case that: Transition => {
+        that.canEqual(this) &&
+        this.source == that.source &&
+        this.target == that.target &&
+        this.event.toString == that.event.toString
+      }
+      case _ => false
+    }
+  override def hashCode = (source.s, target.s, event.toString).##
+}
 case class StateMapTransition(source: StateMap, target: StateMap, event: Symbol)

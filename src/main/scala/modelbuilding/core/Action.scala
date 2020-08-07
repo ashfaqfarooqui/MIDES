@@ -20,6 +20,8 @@ trait Action {
       case Toggle(k) => s.next(k, !s.getKey(k).get.asInstanceOf[Boolean])
       case ToggleWithValues(k: String, v: (Any, Any)) =>
         s.next(k, if (s.getKey(k).get == v._1) v._2 else v._1)
+      case Transform(k, f) =>
+        s.next(k, f(s.getOrElse(k, 0)))
     }
   }
 }
@@ -30,6 +32,7 @@ case class Incr(key: String, value: AnyVal)                          extends Act
 case class Decr(key: String, value: AnyVal)                          extends Action
 case class Toggle(key: String)                                       extends Action
 case class ToggleWithValues(key: String, value: (Any, Any))          extends Action
+case class Transform(key: String, function: Any=>Any)                extends Action
 
 case object TauAction   extends Action { val key = "" }
 case object ResetAction extends Action { val key = "" }

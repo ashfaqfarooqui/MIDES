@@ -14,7 +14,7 @@ class SimulateCatAndMouseModular extends CodeSimulator {
   override val goalStates: Option[Set[StateMap]] = None
   override val goalPredicate: Option[Predicate]  = Some(AND(EQ(cat, R2), EQ(mouse, R4)))
 
-  override val guards: Map[Command, Predicate] = Map(
+  val guardsC: Map[Command, Predicate] = Map(
     c1 -> EQ(cat, R0),
     c2 -> EQ(cat, R1),
     c3 -> EQ(cat, R2),
@@ -30,7 +30,7 @@ class SimulateCatAndMouseModular extends CodeSimulator {
     m6 -> EQ(mouse, R3)
   )
 
-  override val actions: Map[Command, List[Action]] = Map(
+  val actionsC: Map[Command, List[Action]] = Map(
     c1 -> List(Assign(cat, R1)),
     c2 -> List(Assign(cat, R2)),
     c3 -> List(Assign(cat, R0)),
@@ -46,4 +46,6 @@ class SimulateCatAndMouseModular extends CodeSimulator {
     m6 -> List(Assign(mouse, R0))
   )
 
+  override val guards: Map[String, Predicate] = guardsC.map(x => x._1.toString -> x._2)
+  override val actions: Map[String, List[Action]] = actionsC.map(x => x._1.toString -> x._2)
 }

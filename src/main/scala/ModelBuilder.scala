@@ -17,7 +17,7 @@
  */
 
 import grizzled.slf4j.Logging
-import modelbuilding.core.SUL
+import modelbuilding.core.{SUL, Transition}
 import modelbuilding.helpers.ConfigHelper
 import modelbuilding.models.TestUnit.TLSpecifications
 import modelbuilding.models.ZenuityLaneChange.LaneChangeMoreInputs.LaneChangeSimulateMonolithic
@@ -137,6 +137,15 @@ object ModelBuilder extends Logging {
         None,
         false
       )
+    case "WeldingRobots" =>
+      val robots = 2
+      val tasks = 3
+      SUL(
+        new WeldingRobots.WeldingRobots(robots, tasks),
+        new WeldingRobots.WeldingRobotsSimulation(robots, tasks),
+        None,
+        false
+      )
     case _ => throw new Exception("A model wasn't defined.")
   }
 
@@ -157,6 +166,7 @@ object ModelBuilder extends Logging {
       case "ModularSupSolver"         => new ModularSupSolver(sul)
       case "LStarPlantLearner"        => new LStarPlantSolver(sul)
       case "LStarSupervisorLearner"   => new LStarSuprSolver(sul)
+      case "CompositionalOptimization"   => new FrehageCompositionalOptimization(sul)
 
     }
 
