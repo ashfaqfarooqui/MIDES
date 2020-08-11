@@ -116,6 +116,14 @@ class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
       println(s"Trans: $countTrans")
 //      println(s"Trans: $countTrans", s" ${t.event} ${t.source.getState("r_1_l")} ${t.source.getState("r_2_l")} $d ${sim.calculateDuration(t)}")
 
+      /*
+       *
+       * Only local transitions to queue
+       * Shared transitions are added to module and the targets are added to the source queue
+       * A local transition is only added if the target has never been seen (local loops are useless).
+       *
+       */
+
       val changedVars = t.target.states.keySet.filter(k => t.source.states(k) != t.target.states(k))
       var newStateFound = false
       var possibleCommands: Alphabet = Alphabet()
@@ -164,7 +172,7 @@ class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
         .map(t => Transition(
           states(getReducedStateMap(t.source, model, m)),
           states(getReducedStateMap(t.target, model, m)),
-          Symbol(new ControllableCommand(f"(${t.event.toString}, ${sim.calculateDuration(t)}%.2f)"))
+          Symbol(EventC(f"(${t.event.toString}, ${sim.calculateDuration(t)}%.2f)"))
         )).toSet[Transition]
       alphabet: Alphabet = Alphabet(transitions.map(_.event))
       iState: State      = states(getReducedStateMap(_sul.getInitState, model, m))
@@ -193,7 +201,7 @@ class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
         .map(t => StateMapTransition(
           getReducedStateMap(t.source, model, m),
           getReducedStateMap(t.target, model, m),
-          Symbol(new ControllableCommand(f"(${t.event.toString}, ${sim.calculateDuration(t)}%.2f)"))
+          Symbol(EventC(f"(${t.event.toString}, ${sim.calculateDuration(t)}%.2f)"))
         ))
         .map(t => Transition(states(t.source), states(t.target), t.event))
         .toSet[Transition]

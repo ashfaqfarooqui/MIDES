@@ -140,7 +140,7 @@ class FrehageCompositionalOptimizationBACKUP(_sul: SUL) extends BaseSolver {
         .map(t => StateMapTransition(
           getReducedStateMap(t.source, model, m),
           getReducedStateMap(t.target, model, m),
-          Symbol(new ControllableCommand(f"(${t.event.toString}, ${sim.calculateDuration(t)}%.2f)"))
+          Symbol(EventC(f"(${t.event.toString}, ${sim.calculateDuration(t)}%.2f)"))
         ))
         .map(t => Transition(states(t.source), states(t.target), t.event))
         .toSet[Transition]
@@ -172,7 +172,7 @@ class FrehageCompositionalOptimizationBACKUP(_sul: SUL) extends BaseSolver {
         .map(t => StateMapTransition(
           getReducedStateMap(t.source, model, m),
           getReducedStateMap(t.target, model, m),
-          Symbol(new ControllableCommand(f"(${t.event.toString}, ${sim.calculateDuration(t)}%.2f)"))
+          Symbol(EventC(f"(${t.event.toString}, ${sim.calculateDuration(t)}%.2f)"))
         ))
         .map(t => Transition(states(t.source), states(t.target), t.event))
         .toSet[Transition]
