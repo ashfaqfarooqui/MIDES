@@ -2,8 +2,7 @@ name := "Model Building"
 
 version := "1.0"
 
-scalaVersion := "2.12.10"
-
+scalaVersion := "2.12.12"
 
 // javacOptions in (Compile, compile) ++= Seq(                              //
 //   "-source",                                                             //
