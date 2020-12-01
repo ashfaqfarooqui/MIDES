@@ -1,4 +1,7 @@
+#+Title: MIDES - Model Inference and control for Discrete-Event Systems
+
 * About
+
 * Usage
 ** Requirements
 Download and install Simple Build Tool (SBT). Files and instructions for your platform are available at the project website, http://www.scala-sbt.org/.

@@ -8,5 +8,5 @@ target/
 *.dot
 *.sc
 /.bloop
-src/main/resources/application.conf
+coreLib/src/main/resources/application.conf
 /project/metals.sbt
