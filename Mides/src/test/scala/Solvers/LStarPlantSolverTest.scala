@@ -20,15 +20,17 @@ package Solvers
 
 import modelbuilding.core.SUL
 import TestUnit.TLSpecifications
-import modelbuilding.models._
-import modelbuilding.solvers.FrehageModularSupSynthesis
+import modelbuilding.solvers.LStarPlantSolver
 import org.scalatest.FunSuite
 
-class FrehageModularSupSynthesisTest extends FunSuite {
+class LStarPlantSolverTest extends FunSuite {
 
-  test("Frehage modular supervisor solver") {
+  test("lStar solver") {
 
-    val testList = Map("MachineBuffer" -> Map("size" -> 1, "tran" -> 12, "states" -> 8))
+    val testList = Map(
+      "MachineBuffer" -> Map("size" -> 1, "tran" -> 8, "states" -> 4),
+      "TestUnit"      -> Map("size" -> 1, "tran" -> 72, "states" -> 9)
+    )
     testList.foreach { t =>
       val sul = t._1 match {
         case "TestUnit" =>
@@ -39,12 +41,7 @@ class FrehageModularSupSynthesisTest extends FunSuite {
             true
           )
         case "CatMouse" =>
-          SUL(
-            CatAndMouse.CatAndMouse,
-            new CatAndMouse.SimulateCatAndMouse,
-            None,
-            false
-          )
+          SUL(CatAndMouse.CatAndMouse, new CatAndMouse.SimulateCatAndMouse, None, false)
         case "CatMouseModular" =>
           SUL(
             CatAndMouseModular.CatAndMouseModular,
@@ -73,11 +70,12 @@ class FrehageModularSupSynthesisTest extends FunSuite {
         case _ => throw new Exception("A model wasn't defined.")
       }
 
-      val aut = new FrehageModularSupSynthesis(sul).getAutomata.modules
+      val aut = new LStarPlantSolver(sul).getAutomata.modules
       assert(aut.size == t._2("size"))
       assert(aut.head.transitions.size == t._2("tran"))
       assert(aut.head.states.size == t._2("states"))
 
     }
   }
+
 }

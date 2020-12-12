@@ -20,7 +20,6 @@ package Solvers
 
 import modelbuilding.core.SUL
 import TestUnit.TLSpecifications
-import modelbuilding.models._
 import modelbuilding.solvers.MonolithicSolver
 import org.scalatest.FunSuite
 

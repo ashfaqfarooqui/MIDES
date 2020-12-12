@@ -20,15 +20,14 @@ package Solvers
 
 import modelbuilding.core.SUL
 import TestUnit.TLSpecifications
-import modelbuilding.models._
-import modelbuilding.solvers.MonolithicSupSolver
+import modelbuilding.solvers.FrehageModularSupSynthesis
 import org.scalatest.FunSuite
 
-class MonolithicSupSolverTest extends FunSuite {
+class FrehageModularSupSynthesisTest extends FunSuite {
 
-  test("monolithic supervisor solver") {
+  test("Frehage modular supervisor solver") {
 
-    val testList = Map("MachineBuffer" -> Map("size" -> 1, "tran" -> 11, "states" -> 8))
+    val testList = Map("MachineBuffer" -> Map("size" -> 1, "tran" -> 8, "states" -> 6))
     testList.foreach { t =>
       val sul = t._1 match {
         case "TestUnit" =>
@@ -73,7 +72,7 @@ class MonolithicSupSolverTest extends FunSuite {
         case _ => throw new Exception("A model wasn't defined.")
       }
 
-      val aut = new MonolithicSupSolver(sul).getAutomata.modules
+      val aut = new FrehageModularSupSynthesis(sul).getAutomata.modules
       assert(aut.size == t._2("size"))
       assert(aut.head.transitions.size == t._2("tran"))
       assert(aut.head.states.size == t._2("states"))

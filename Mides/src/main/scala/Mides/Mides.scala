@@ -6,8 +6,8 @@ import ZenuityLaneChange.LaneChangeMoreInputs.LaneChangeSimulateMonolithic
 import grizzled.slf4j.Logging
 import modelbuilding.core.SUL
 import modelbuilding.helpers.ConfigHelper
-import modelbuilding.solvers._
 import supremicastuff.SupremicaHelpers
+import modelbuilding.solvers._
 
 object Mides extends Logging {
 

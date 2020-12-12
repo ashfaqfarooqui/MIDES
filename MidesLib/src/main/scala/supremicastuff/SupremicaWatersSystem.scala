@@ -52,7 +52,7 @@ object ReadFromWmodFile {
         new ModuleSubjectFactory(),
         CompilerOperatorTable.getInstance()
       )
-      Some(
+      return Some(
         marshaller.unmarshal(fileUri).asInstanceOf[ModuleSubject]
       )
     } catch {

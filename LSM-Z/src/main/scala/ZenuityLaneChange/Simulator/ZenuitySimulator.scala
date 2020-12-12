@@ -22,6 +22,7 @@ import com.mathworks.matlab.types.Struct
 import modelbuilding.core._
 import modelbuilding.core.interfaces.simulator.{Simulator, TwoStateOperation}
 import ZenuityLaneChange.externalClient.matlab.MatlabClient
+import grizzled.slf4j.Logging
 import modelbuilding.helpers.ConfigHelper
 trait ZenuitySimulator extends Simulator with TwoStateOperation with Logging {
 
