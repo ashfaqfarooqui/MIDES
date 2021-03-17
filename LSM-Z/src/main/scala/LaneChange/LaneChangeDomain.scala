@@ -1,4 +1,4 @@
-package ZenuityLaneChange
+package LaneChange
 
 import modelbuilding.core.{Command, Controllable}
 

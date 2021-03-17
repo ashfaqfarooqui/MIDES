@@ -1,9 +1,9 @@
-package ZenuityLaneChange
+package LaneChange
 
-import ZenuityLaneChange.Simulator.ZenuitySimulator
+import LaneChange.Simulator.Simulator
 import modelbuilding.core._
 
-class LaneChangeSimulate extends ZenuitySimulator {
+class LaneChangeSimulate extends Simulator {
 
   val internalState = "self"
   val decVar        = "decision_var"
