@@ -1,4 +1,4 @@
-#+Title: MIDES - Model Inference and control for Discrete-Event Systems
+#+Title: MIDES - Model Inference for Discrete-Event Systems
 
 * About
 
@@ -18,9 +18,11 @@ Configure the SUL in the main file [[file:src/main/scala/main.scala::val%20sul:%
 
 Set the model to learn, solver name and other relevant configuration in the [[file://src/main/resources/application.conf][application.conf]]. On running the program the first time after cloning copy the contents of  [[file:src/main/resources/application.conf.example][application.conf.example]] into a application.conf in the same folder.
 
-The model files are created under the [[file:src/main/scala/modelbuilding/models][models folder]] using traits specified in [[file:src/main/scala/modelbuilding/core][core folder]].
+The model files are created under the [[file:Models][models folder]] using traits specified in [[file:MidesLib/src/main/scala/modelbuilding/core/][core folder]].
 
-Provide the name of the model [[file:src/main/scala/main.scala::val%20modelName%20=%20"TestUnit"][here]] and the solver you want to use [[file:src/main/scala/main.scala::val%20solver:%20String%20=%20"LStarSuprLearner"%20//%20"modular",%20"mono"][here]] and run the program using ~sbt run.~
+# Provide the name of the model [[file:src/main/scala/main.scala::val%20modelName%20=%20"TestUnit"][here]] and the solver you want to use [[file:src/main/scala/main.scala::val%20solver:%20String%20=%20"LStarSuprLearner"%20//%20"modular",%20"mono"][here]] and run the program using
+
+Run the program using ~sbt mides/run~ from the terminal.
 
 * Contributing
 
