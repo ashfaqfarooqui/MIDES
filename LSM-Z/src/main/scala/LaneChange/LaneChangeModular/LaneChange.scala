@@ -1,4 +1,4 @@
-package ZenuityLaneChange.LaneChangeModular
+package LaneChange.LaneChangeModular
 
 import modelbuilding.core.interfaces.modeling.ModularModel
 import modelbuilding.core._

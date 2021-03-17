@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package ZenuityLaneChange.externalClient.matlab
+package LaneChange.externalClient.matlab
 
 import java.util.concurrent.TimeUnit
 
@@ -65,7 +65,7 @@ class MatlabClient extends Logging {
 
   def loadPath(filePath: String): Unit = {
     getEngine
-      .evalAsync("addpath(\"/home/ashfaqf/Code/ZenuityMatlab/\")")
+      .evalAsync("addpath(\"/home/ashfaqf/Code/Matlab/\")")
       .get(30, TimeUnit.SECONDS)
     //Thread.sleep(10000)
 

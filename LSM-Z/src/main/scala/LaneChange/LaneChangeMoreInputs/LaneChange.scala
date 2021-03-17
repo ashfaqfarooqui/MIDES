@@ -1,4 +1,4 @@
-package ZenuityLaneChange.LaneChangeMoreInputs
+package LaneChange.LaneChangeMoreInputs
 
 /*
  * Learning Automata for Supervisory Synthesis

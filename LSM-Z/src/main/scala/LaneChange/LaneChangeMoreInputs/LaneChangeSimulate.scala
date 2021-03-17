@@ -1,9 +1,9 @@
-package ZenuityLaneChange.LaneChangeMoreInputs
+package LaneChange.LaneChangeMoreInputs
 
-import ZenuityLaneChange.Simulator.ZenuitySimulator
+import LaneChange.Simulator.Simulator
 import modelbuilding.core._
 
-class LaneChangeSimulateMonolithic extends ZenuitySimulator {
+class LaneChangeSimulateMonolithic extends Simulator {
 
   val internalState = "self"
   val decVar        = "decision_var"

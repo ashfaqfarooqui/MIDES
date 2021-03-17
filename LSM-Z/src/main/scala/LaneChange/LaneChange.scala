@@ -1,4 +1,4 @@
-package ZenuityLaneChange
+package LaneChange
 
 import modelbuilding.core.interfaces.modeling.ModularModel
 import modelbuilding.core.{Alphabet, StateSet}
