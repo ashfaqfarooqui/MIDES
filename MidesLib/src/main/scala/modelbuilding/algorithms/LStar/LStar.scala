@@ -78,9 +78,12 @@ class LStar(
         teacher.statistics.eqQueries = teacher.statistics.eqQueries + 1
         val counterExample = teacher.isHypothesisTrue(oTable, ceGen)
         info(s"got CE: $counterExample")
+
         counterExample match {
           case Right(bool) => oTable.getAutomata
           case Left(command) =>
+            println(s"got CE: ${command.length}")
+
             val toAppend: Grammar = command match {
               case w: Word   => w
               case s: Symbol => s

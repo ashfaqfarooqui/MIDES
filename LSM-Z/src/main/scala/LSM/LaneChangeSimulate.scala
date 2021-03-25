@@ -1,9 +1,9 @@
-package LaneChange
+package LSM
 
-import LaneChange.Simulator.Simulator
+import LSM.MatlabSimulator.MatlabSimulator
 import modelbuilding.core._
 
-class LaneChangeSimulate extends Simulator {
+class LaneChangeSimulate extends MatlabSimulator {
 
   val internalState = "self"
   val decVar        = "decision_var"

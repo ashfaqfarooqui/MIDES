@@ -1,4 +1,4 @@
-package LaneChange.LaneChangeMoreInputs
+package LSM.LaneChangeMoreInputs
 
 /*
  * Learning Automata for Supervisory Synthesis

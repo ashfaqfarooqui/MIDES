@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package LaneChange.externalClient.matlab
+package matlab
 
 import java.util.concurrent.TimeUnit
 

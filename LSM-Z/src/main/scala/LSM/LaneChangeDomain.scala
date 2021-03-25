@@ -1,4 +1,4 @@
-package LaneChange
+package LSM
 
 import modelbuilding.core.{Command, Controllable}
 

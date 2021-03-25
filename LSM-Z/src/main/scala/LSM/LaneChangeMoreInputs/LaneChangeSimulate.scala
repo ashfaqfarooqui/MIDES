@@ -1,9 +1,9 @@
-package LaneChange.LaneChangeMoreInputs
+package LSM.LaneChangeMoreInputs
 
-import LaneChange.Simulator.Simulator
+import LSM.MatlabSimulator.MatlabSimulator
 import modelbuilding.core._
 
-class LaneChangeSimulateMonolithic extends Simulator {
+class LaneChangeSimulateMonolithic extends MatlabSimulator {
 
   val internalState = "self"
   val decVar        = "decision_var"
@@ -21,7 +21,9 @@ class LaneChangeSimulateMonolithic extends Simulator {
     b1                -> false,
     b2                -> false
   )
-  override val goalPredicate = Some(
+  override val goalPredicate = Some(AlwaysTrue)
+  /*
+  Some(
     AND(
       List(
         EQ(state, "stateA"),
@@ -31,7 +33,8 @@ class LaneChangeSimulateMonolithic extends Simulator {
         EQ(b2, false)
       )
     )
-  )
+ )*/
+
   // val b1  = "b1"
   // val b2  = "b2"
   // val b3  = "b3"

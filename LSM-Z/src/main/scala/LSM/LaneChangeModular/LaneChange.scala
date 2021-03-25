@@ -1,4 +1,4 @@
-package LaneChange.LaneChangeModular
+package LSM.LaneChangeModular
 
 import modelbuilding.core.interfaces.modeling.ModularModel
 import modelbuilding.core._

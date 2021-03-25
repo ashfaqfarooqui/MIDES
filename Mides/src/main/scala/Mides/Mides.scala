@@ -1,8 +1,8 @@
 package Mides
 
 import TestUnit.TLSpecifications
-import LaneChange.LaneChangeModular.LaneChangeSimulateModular
-import LaneChange.LaneChangeMoreInputs.LaneChangeSimulateMonolithic
+import LSM.LaneChangeModular.LaneChangeSimulateModular
+import LSM.LaneChangeMoreInputs.LaneChangeSimulateMonolithic
 import grizzled.slf4j.Logging
 import modelbuilding.core.SUL
 import modelbuilding.helpers.ConfigHelper
@@ -101,21 +101,21 @@ object Mides extends Logging {
       SUL(AGV.Agv, new AGV.SimulateAgv, Some(AGV.AGVSpecifications()), false)
     case "LaneChange" =>
       SUL(
-        LaneChange.LaneChange,
-        new LaneChange.LaneChangeSimulate,
+        LSM.LaneChange,
+        new LSM.LaneChangeSimulate,
         None,
         false
       )
     case "LaneChangeMonolithic" =>
       SUL(
-        LaneChange.LaneChangeMoreInputs.LaneChange,
+        LSM.LaneChangeMoreInputs.LaneChange,
         new LaneChangeSimulateMonolithic,
         None,
         false
       )
     case "LaneChangeModular" =>
       SUL(
-        LaneChange.LaneChangeModular.LaneChange,
+        LSM.LaneChangeModular.LaneChange,
         new LaneChangeSimulateModular,
         None,
         false
