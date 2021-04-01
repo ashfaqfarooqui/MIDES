@@ -39,10 +39,12 @@ lazy val midesLib = (project in file("MidesLib")).settings(
   settings,
   deps,
   unmanagedJars in Compile ++= Seq(
-    new java.io.File("lib/Supremica.jar")
+    new java.io.File("lib/Supremica.jar"),
+    new java.io.File("lib/SupremicaLib.jar")
   ).classpath,
   unmanagedJars in Runtime ++= Seq(
-    new java.io.File("lib/Supremica.Jar")
+    new java.io.File("lib/Supremica.Jar"),
+    new java.io.File("lib/SupremicaLib.jar")
   ).classpath
 )
 lazy val mides =
