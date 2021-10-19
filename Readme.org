@@ -1,7 +1,7 @@
 #+Title: MIDES - Model Inference for Discrete-Event Systems
 
 * About
-
+[[https://www.youtube.com/watch?v=iKHNUhrWc0Y][http://img.youtube.com/vi/iKHNUhrWc0Y/0.jpg]]
 * Usage
 
 ** Requirements
@@ -37,6 +37,20 @@ If you edit the code without Intellij, it is always a good practice to run ~sbt 
 - [[https://github.com/ashfaqfarooqui][Ashfaq Farooqui]]
 - [[https://github.com/frehage][Fredrik Hagebring]]
 - [[https://github.com/ramontijsseclaase][Ramon Tijsse Claase]]
+
+* Citation
+To cite this tool use:
+
+#+BEGIN_QUOTE
+@INPROCEEDINGS{farooquiMIDES2021,
+  author={Farooqui, Ashfaq and Hagebring, Fredrik and Fabian, Martin},
+  booktitle={2021 IEEE 17th International Conference on Automation Science and Engineering (CASE)}, 
+  title={MIDES: A Tool for Supervisor Synthesis via Active Learning}, 
+  year={2021},
+  pages={792-797},
+  doi={10.1109/CASE49439.2021.9551435}}
+
+#+END_QUOTE
 
 * License
 The project is licensed under the [[./LICENSE][ GNU General Public License version 3 (or newer).]]
