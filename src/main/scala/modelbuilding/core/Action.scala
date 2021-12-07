@@ -8,6 +8,7 @@ trait Action {
       case TauAction                       => s
       case x if !(s.states contains x.key) => s
       case Assign(k: String, v: Any)       => s.next(k, v)
+      case AssignPredicateValue(k: String, p: Predicate)       => s.next(k, p.eval(s).getOrElse(false))
       case AssignInMap(k: String, m: String, v: Any) =>
         s.next(
           k,
@@ -27,6 +28,7 @@ trait Action {
 }
 
 case class Assign(key: String, value: Any)                           extends Action
+case class AssignPredicateValue(key: String, predicate: Predicate)   extends Action
 case class AssignInMap(key: String, internalKey: String, value: Any) extends Action
 case class Incr(key: String, value: AnyVal)                          extends Action
 case class Decr(key: String, value: AnyVal)                          extends Action

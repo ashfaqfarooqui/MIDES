@@ -10,13 +10,14 @@
  // "ModularSupSolver"  Incomplete, use ModularSupervisorLearner instead    			   |
  // "LStarPlantLearner" monolithic models only    		 	   |
  // "LStarSupervisorLearner" monolithic models only			   |
+ // "CompositionalOptimization" plant learner with comp opt. currently only works with model `WeldingRobots`
  //=================================================*/
 
 
 
 main {
-  Model= "LaneChangeMonolithic" // Choose from: TestUnit, CatMouse, CatMouseModular, MachineBuffer,MachineBufferNoSpec,RoboticArm,Sticks,AGV
-  Solver= "LStarPlantLearner" //Choose from: frehage1,frehage2,frehage3,monolithicPlantSolver,monolithicSupSolver,modularSupSolver,LStarPlantLearner,LStarSuprLearner
+  Model= "WeldingRobots" // Choose from: WeldingRobots, TestUnit, CatMouse, CatMouseModular, MachineBuffer,MachineBufferNoSpec,RoboticArm,Sticks,AGV
+  Solver= "CompositionalOptimization" //Choose from: frehage1,frehage2,frehage3,monolithicPlantSolver,monolithicSupSolver,modularSupSolver,LStarPlantLearner,LStarSuprLearner
   OutputDirectory = "Output"
 }
 LStar {

@@ -49,10 +49,15 @@ class WeldingRobotsSimulation(
 
   override val initState: StateMap               =
     StateMap(
-      (1 to n_robots).flatMap(r => Map[String,Any](s"r_${r}_l" -> 0, s"r_${r}_t" -> 0)).toMap +
+      (1 to n_robots).flatMap(r => Map[String,Any](s"r_${r}_l" -> 0, s"r_${r}_d" -> false, s"r_${r}_t" -> 0)).toMap +
       ("s" -> false)
     )
-  override val goalStates: Option[Set[StateMap]] = None
+  val goalState: StateMap =
+    StateMap(
+      (1 to n_robots).flatMap(r => Map[String,Any](s"r_${r}_l" -> 0, s"r_${r}_d" -> true, s"r_${r}_t" -> (math.pow(2,n_tasks)-1))).toMap +
+        ("s" -> true)
+    )
+  override val goalStates: Option[Set[StateMap]] = Some(Set(goalState))
   override val goalPredicate: Option[Predicate]  = None
 
   def BIT(v: String, i: Int): Predicate = CUSTOM(v,i,(x:Any, y: Any) => (x.asInstanceOf[Int] & 1<<(y.asInstanceOf[Int]-1)) != 0)
@@ -71,14 +76,14 @@ class WeldingRobotsSimulation(
         ++ (n_independent+1 to n_independent+halfway).map(t => s"e_${r}_${t}" -> AND(NBIT(s"r_${r}_t", t), NEQ(s"r_${r}_l", t), EQ("s", false)))
         ++ (n_independent+halfway+1 to n_tasks).map(t => s"e_${r}_${t}" -> AND(NBIT(s"r_${r}_t", t), NEQ(s"r_${r}_l", t), EQ("s", true)))
     ).toMap +
-    ("s" -> AND((1 to n_robots).flatMap(r => List(EQ(s"r_${r}_l", 0), BITS(s"r_${r}_t", math.pow(2,halfway).toInt-1<<n_independent))).toList))
+    ("s" -> AND(EQ("s",false) :: (1 to n_robots).flatMap(r => List(EQ(s"r_${r}_d", true))).toList))
 
   def BitSet(v: String, i: Int): Action = Transform(v, (x: Any) => x.asInstanceOf[Int] | 1 << (i-1))
 
   override val actions: Map[String, List[Action]] =
     (1 to n_robots).flatMap(r =>
-      Map[String,List[Action]](s"e_${r}_0" -> List(Assign(s"r_${r}_l", 0)))
-      ++ (1 to n_tasks).map(t => s"e_${r}_${t}" -> List(Assign(s"r_${r}_l", t), BitSet(s"r_${r}_t", t)))
+      Map[String,List[Action]](s"e_${r}_0" -> List(Assign(s"r_${r}_l", 0), AssignPredicateValue(s"r_${r}_d", BITS(s"r_${r}_t", math.pow(2,halfway).toInt-1<<n_independent))))
+        ++ (1 to n_tasks).map(t => s"e_${r}_${t}" -> List(Assign(s"r_${r}_l", t), Assign(s"r_${r}_d", false), BitSet(s"r_${r}_t", t)))
     ).toMap + ("s" -> List(Assign("s", true)))
 
   override def calculateDuration(t: StateMapTransition): Duration = {

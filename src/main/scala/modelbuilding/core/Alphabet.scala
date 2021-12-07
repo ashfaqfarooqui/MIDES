@@ -53,5 +53,11 @@ case class Alphabet(
 
   def +(that: Alphabet): Alphabet = new Alphabet(this.events union that.events)
   def -(that: Alphabet): Alphabet = new Alphabet(this.events diff that.events)
+  def intersect(that: Alphabet): Alphabet = new Alphabet(this.events intersect that.events)
+  def &(that: Alphabet): Alphabet = this.intersect(that)
+
+  def contains(event: Symbol): Boolean = this.events.contains(event)
+  def filter(x: Symbol => Boolean): Alphabet = Alphabet(this.events.filter(x))
+
   override def toString: String   = s"Alphabet(${events.mkString(", ")})"
 }

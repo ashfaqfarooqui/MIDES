@@ -12,9 +12,7 @@ import modelbuilding.core
 import modelbuilding.core.interfaces.modeling.ModularModel
 import modelbuilding.core.interfaces.simulator.TimedCodeSimulator
 import modelbuilding.core.{SUL, _}
-import modelbuilding.models.WeldingRobots.WeldingRobotsSimulation
 import modelbuilding.solvers.FrehageCompositionalOptimization._
-import supremicastuff.SupremicaHelpers
 
 import scala.collection.mutable
 
@@ -45,14 +43,6 @@ TODO:
 
   */
 
-object FrehageCompositionalOptimization {
-
-  def getReducedStateMap(state: StateMap, model: ModularModel, module: String): StateMap =
-    StateMap(
-      state.name,
-      state.states.filterKeys(s => model.stateMapping(module).states.contains(s))
-    )
-}
 
 /**
   * The implementation of the ... as defined in the paper
@@ -61,7 +51,7 @@ object FrehageCompositionalOptimization {
   *
   * @param _sul must be a modular model.
   */
-class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
+class FrehageCompositionalOptimizationNEW(_sul: SUL) extends BaseSolver {
 
   val t_start = System.nanoTime()
 
@@ -80,7 +70,7 @@ class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
     Ordering.by((_: (Double, StateMapTransition))._1).reverse
   )
 
-    var moduleTransitions: mutable.Map[String, List[StateMapTransition]] =
+  var moduleTransitions: mutable.Map[String, List[StateMapTransition]] =
     mutable.Map(model.modules.map(_ -> List.empty[StateMapTransition]).toSeq:_*)
 
   // Keep track of the state variables that should be kept for the final automaton
@@ -139,7 +129,6 @@ class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
     // Add the outgoing transitions from the source to the queue to start the expansion
     transitions ++= _sul.getOutgoingTransitions(source, alphabet).map(t => (sim.calculateDuration(t),t))
 
-
     // Loop until there are no new paths over local transitions to expand for the current source state.
     while ({
       countTrans += 1
@@ -147,7 +136,6 @@ class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
       transitions.nonEmpty // && count < 10
     })
     {
-
 
       val (d, t) = transitions.dequeue()
       //      if (t.event.toString == "e_1_1")
@@ -164,26 +152,20 @@ class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
       val isSharedEvent = sharedEvents.events contains t.event
 
 
-      val changedVars = t.target.states.keySet.filter(k => t.source.states(k) != t.target.states(k))
+      //      val changedVars = t.target.states.keySet.filter(k => t.source.states(k) != t.target.states(k))
+      val changedVars = model.stateMapping.mapValues(s => s.states intersect t.target.states.keySet.filter(k => t.source.states(k) != t.target.states(k)))
+
       var newStateFound = false
       var possibleCommands: Alphabet = Alphabet()
       for (m <- model.modules) {
 
 
-        t0 = System.nanoTime() // START OF t1
-        t1 += System.nanoTime()-t0 // END OF t1
-
-        t0 = System.nanoTime() // START OF t2
-        t2 += System.nanoTime() - t0 // END OF t2
-
-        t0 = System.nanoTime()
-        t3 += System.nanoTime() - t0
-
-        val changedLocal = model.stateMapping(m).states intersect changedVars
+//        val changedLocal = model.stateMapping(m).states intersect changedVars
         val tReducedTarget = getReducedStateMap(t.target, model, m)
         val tReducedTargetLocal = tReducedTarget.states.filterKeys(localVariables(m).contains)
         val eventIsPartOfModule = model.eventMapping(m).events contains t.event
 
+        t0 = System.nanoTime() // START OF t1
         /*
          * Only local transitions to queue
          * Shared transitions are added to module and the targets are added to the source queue
@@ -197,20 +179,34 @@ class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
             t.event
           )
         }
+        t1 += System.nanoTime()-t0 // END OF t1
 
-        if (changedLocal.nonEmpty) {
-          if (!eventIsPartOfModule && (changedLocal intersect localVariables(m)).nonEmpty) {
-            localVariables(m) --= changedLocal
+
+        if (changedVars(m).nonEmpty) {
+          t0 = System.nanoTime() // START OF t2
+          if (!eventIsPartOfModule && (changedVars(m) intersect localVariables(m)).nonEmpty) {
+            localVariables(m) --= changedVars(m)
             localStates(m) = localStates(m).map(_.filterKeys(localVariables(m).contains))
           }
-          if( !(moduleStates(m) contains tReducedTarget)) {
-            moduleStates(m) += tReducedTarget
+          t2 += System.nanoTime() - t0 // END OF t2
+          t0 = System.nanoTime()
+//          if( !(moduleStates(m) contains tReducedTarget)) {
+//            moduleStates(m) += tReducedTarget
+//            localStates(m) += tReducedTargetLocal
+//            possibleCommands += model.eventMapping(m) intersect alphabet
+//            newStateFound = true
+//          }
+          val x = moduleStates(m).size
+          moduleStates(m) += tReducedTarget
+          if (x < moduleStates(m).size) {
             localStates(m) += tReducedTargetLocal
-            possibleCommands += model.eventMapping(m).intersect(alphabet)
+            possibleCommands += model.eventMapping(m) intersect alphabet
             newStateFound = true
           }
+          t3 += System.nanoTime() - t0
         }
       }
+
       if (newStateFound) {
         //        println(possibleCommands)
         if (isSharedEvent) {
@@ -229,8 +225,6 @@ class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
 
     }
 
-
-
     /*model.modules.foreach{m =>
       //      println("### " + m)
       //      println(source)
@@ -244,8 +238,6 @@ class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
     model.modules.foreach(m => moduleTransitions(m) = sourceTransitions(m).toList ::: moduleTransitions(m))
 
   }
-
-
 
   //  states.foreach{ ss =>
   //    println("### " + ss._1)
@@ -318,10 +310,5 @@ class FrehageCompositionalOptimization(_sul: SUL) extends BaseSolver {
   }
 
   val time_total = System.nanoTime()-t_start
-
-//  val automata = getAutomataFull
-//  automata.modules foreach println
-//  automata.modules.foreach(_.createDotFile)
-//  SupremicaHelpers.exportAsSupremicaAutomata(automata, name = "WeldingRobotsFull")
 
 }

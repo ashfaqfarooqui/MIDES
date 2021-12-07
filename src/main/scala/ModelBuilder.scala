@@ -138,8 +138,8 @@ object ModelBuilder extends Logging {
         false
       )
     case "WeldingRobots" =>
-      val robots = 2
-      val tasks = 3
+      val robots = 1
+      val tasks = 11
       SUL(
         new WeldingRobots.WeldingRobots(robots, tasks),
         new WeldingRobots.WeldingRobotsSimulation(robots, tasks),
@@ -152,33 +152,97 @@ object ModelBuilder extends Logging {
   def main(args: Array[String]): Unit = {
 
     //info(s"Running sul: $sul")
-    info(s"Starting learner for : $modelName, using $solver as solver")
+    //    info(s"Starting learner for : $modelName, using $solver as solver")
 
-    val result = solver match {
-      case "ModularPlantLearnerWithPartialStates" =>
-        new FrehagePlantBuilderWithPartialStates(sul)
-      case "ModularPlantLearner"      => new FrehagePlantBuilder(sul)
-      case "ModularPlantLearnerWithoutTau"      => new FrehagePlantBuilderWithoutTau(sul)
-      case "ModularPlantLearnerWithoutTauNew"      => new FrehagePlantBuilderWithoutTauNew(sul)
-      case "ModularSupervisorLearner" => new FrehageModularSupSynthesis(sul)
-      case "MonolithicPlantSolver"    => new MonolithicSolver(sul)
-      case "MonolithicSupSolver"      => new MonolithicSupSolver(sul)
-      case "ModularSupSolver"         => new ModularSupSolver(sul)
-      case "LStarPlantLearner"        => new LStarPlantSolver(sul)
-      case "LStarSupervisorLearner"   => new LStarSuprSolver(sul)
-      case "CompositionalOptimization"   => new FrehageCompositionalOptimization(sul)
+    //    val result = solver match {
+    //      case "ModularPlantLearnerWithPartialStates" =>
+    //        new FrehagePlantBuilderWithPartialStates(sul)
+    //      case "ModularPlantLearner"      => new FrehagePlantBuilder(sul)
+    //      case "ModularPlantLearnerWithoutTau"      => new FrehagePlantBuilderWithoutTau(sul)
+    //      case "ModularPlantLearnerWithoutTauNew"      => new FrehagePlantBuilderWithoutTauNew(sul)
+    //      case "ModularSupervisorLearner" => new FrehageModularSupSynthesis(sul)
+    //      case "MonolithicPlantSolver"    => new MonolithicSolver(sul)
+    //      case "MonolithicSupSolver"      => new MonolithicSupSolver(sul)
+    //      case "ModularSupSolver"         => new ModularSupSolver(sul)
+    //      case "LStarPlantLearner"        => new LStarPlantSolver(sul)
+    //      case "LStarSupervisorLearner"   => new LStarSuprSolver(sul)
+    //      case "CompositionalOptimization"   => new FrehageCompositionalOptimization(sul)
+    //
+    //    }
+
+    //    info("Learning done!, writing results")
+    //
+    //    println("Queries to the simulator: ", sul.simQueries)
+    //
+    //    val automata = result.getAutomata
+
+    //    automata.modules foreach println
+    //    automata.modules.foreach(_.createDotFile)
+    //    SupremicaHelpers.exportAsSupremicaAutomata(automata, name = modelName)
+
+
+    /*
+     * Experiments for Hagebring_TASE2021
+     */
+
+    def solve(r:Int,t:Int,s:Int): (Long,Long,Long) = {
+      val t0 = System.nanoTime()
+      val sul = SUL(
+        model = new WeldingRobots.WeldingRobots(r, t),
+        simulator = new WeldingRobots.WeldingRobotsSimulation(r, t, seed = s),
+        specification = None,
+        acceptsPartialStates = false
+      )
+//      val sol = new FrehageCompositionalOptimization(sul)
+      val sol = new FrehageCompositionalOptimizationNEW(sul)
+      (sol.maxSize,sul.simQueries,System.nanoTime()-t0)
+    }
+    // Prevent bias to setup time during experiments
+    solve(3,3,1);solve(3,3,1);solve(3,3,1)
+
+
+    /*
+     * 3:   3-10
+     * 4:   3-10
+     * 5:   3-8
+     * 6:
+     * 7:
+     * 8:
+     * 9:
+     * 10:
+     */
+    val (r_min, r_max) = (10, 10)
+    val (t_min, t_max) = (10, 10)
+
+    val seeds = 1 to 1
+
+    val t0 = System.nanoTime()
+    var t1: Long = 0
+    var t2: Long = 0
+    var t3: Long = 0
+    var t4: Long = 0
+    var t5: Long = 0
+    var t6: Long = 0
+    var t7: Long = 0
+    for (s <- seeds; r <- r_min to r_max; t <- t_min to t_max) {
+
+      val (maxSize,simQueries,time) = solve(r,t,s)
+      println(s"$r $t $s $maxSize $simQueries $time")
+
+//      val (sol1, sol2) = solve(r,t,s)
+//      t1 += sol1.time_total
+//      t2 += sol2.time_total
+//      t3 += sol2.t1
+//      t4+= sol2.t2
+//      t5 += sol2.t3
+//      t6 += sol1.moduleTransitions.map(_._2.size).sum
+//      t7 += sol2.moduleTransitions.map(_._2.size).sum
 
     }
+//    println(s"TIME: ${t1/1000000} ${t2/1000000} ${t3/1000000} ${t4/1000000} ${t5/1000000} $t6 $t7")
 
-    info("Learning done!, writing results")
-
-    println("Queries to the simulator: ", sul.simQueries)
-
-    val automata = result.getAutomata
-
-    automata.modules foreach println
-    automata.modules.foreach(_.createDotFile)
-    SupremicaHelpers.exportAsSupremicaAutomata(automata, name = modelName)
   }
+
+
 
 }

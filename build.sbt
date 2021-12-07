@@ -32,10 +32,10 @@ scalaVersion := "2.12.10"
 
 //if (true) {
 unmanagedJars in Compile ++= Seq(
-  new java.io.File("/usr/local/MATLAB/R2019b/extern/engines/java/jar/engine.jar")
+  new java.io.File("C:/Program Files/MATLAB/R2021a/extern/engines/java/jar/engine.jar")
 ).classpath
 unmanagedJars in Runtime ++= Seq(
-  new java.io.File("/usr/local/MATLAB/R2019b/extern/engines/java/jar/engine.jar")
+  new java.io.File("C:/Program Files/MATLAB/R2021a/extern/engines/java/jar/engine.jar")
 ).classpath
 //}
 
@@ -63,7 +63,7 @@ libraryDependencies ++= Seq(
 
 resolvers ++= Seq(
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/Releases",
-  "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
+  "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
   "sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
   Resolver.mavenLocal
 )
