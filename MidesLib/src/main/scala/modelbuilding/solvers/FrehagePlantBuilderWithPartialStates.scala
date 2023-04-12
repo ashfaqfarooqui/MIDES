@@ -10,7 +10,9 @@ object FrehagePlantBuilderWithPartialStates {
   def getReducedStateMap(state: StateMap, model: ModularModel, module: String): StateMap =
     StateMap(
       state.name,
-      state.states.filterKeys(s => model.stateMapping(module).states.contains(s))
+      state.states.view
+        .filterKeys(s => model.stateMapping(module).states.contains(s))
+        .toMap
     )
 
   def getReducedStateMapTransition(

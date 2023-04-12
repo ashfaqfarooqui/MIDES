@@ -39,8 +39,9 @@ object FrehageModularSupSynthesis {
   def getReducedStateMap(state: StateMap, module: Module): StateMap =
     StateMap(
       name = state.name,
-      states = state.states.filterKeys(s => module.stateSet.states.contains(s)),
-      specs = state.specs.filterKeys(s => module.specs.contains(s))
+      states =
+        state.states.view.filterKeys(s => module.stateSet.states.contains(s)).toMap,
+      specs = state.specs.view.filterKeys(s => module.specs.contains(s)).toMap
     )
 
   def getReducedStateMapTransition(
@@ -124,16 +125,17 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
         )
 
 //        val moduleStateMapping: Map[String, StateSet] = moduleEventMapping.mapValues{ a1 =>
-        val moduleStateMapping: Map[String, StateSet] = specAlphabets.mapValues { a1 =>
-          StateSet(
-            modularModel.eventMapping
-              .filter { case (m, a2) =>
-                a1.events.exists(e => a2.events.contains(e))
-              }
-              .flatMap(x => modularModel.stateMapping(x._1).states)
-              .toSet
-          )
-        }
+        val moduleStateMapping: Map[String, StateSet] = specAlphabets.view.mapValues {
+          a1 =>
+            StateSet(
+              modularModel.eventMapping
+                .filter { case (m, a2) =>
+                  a1.events.exists(e => a2.events.contains(e))
+                }
+                .flatMap(x => modularModel.stateMapping(x._1).states)
+                .toSet
+            )
+        }.toMap
 
         supremicaSpecs.keySet.map { s =>
           Module(
@@ -238,7 +240,7 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
         t.source,
         StateMap(
           states = t.target.states,
-          specs = specTargetStates.filter(_._2.nonEmpty).mapValues(_.get)
+          specs = specTargetStates.filter(_._2.nonEmpty).view.mapValues(_.get).toMap
         ),
         t.event
       )
@@ -300,7 +302,10 @@ class FrehageModularSupSynthesis(_sul: SUL) extends BaseSolver {
 
     // 2
     def reduce(s: StateMap) =
-      StateMap(s.states.filterKeys(k => !nonLocalVariables.contains(k)), s.specs)
+      StateMap(
+        s.states.view.filterKeys(k => !nonLocalVariables.contains(k)).toMap,
+        s.specs
+      )
     reducedModuleInitStates += (m.name -> reduce(getReducedStateMap(initState, m)))
     reducedModuleStates(m.name) ++= moduleStates(m.name).map(reduce)
     reducedModuleForbidden(m.name) ++= moduleForbidden(m.name).map(reduce)

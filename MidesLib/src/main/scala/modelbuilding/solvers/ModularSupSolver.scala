@@ -63,11 +63,18 @@ object ModularSupSolver {
     )(sp: StateMap
     ): StateMap = {
     def reducedVariables: Set[StateSet] =
-      model.stateMapping.filterKeys(getRequiredModules(model, spec).contains).values.toSet
+      model.stateMapping.view
+        .filterKeys(getRequiredModules(model, spec).contains)
+        .toMap
+        .values
+        .toSet
     StateMap(
       sp.name,
-      states =
-        sp.states.filterKeys((reducedVariables.flatMap(_.states) + spec.getName).contains)
+      states = sp.states.view
+        .filterKeys(
+          (reducedVariables.flatMap(_.states) + spec.getName).contains
+        )
+        .toMap
     )
   }
 

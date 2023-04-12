@@ -25,7 +25,10 @@ class MonolithicSolver(sul: SUL) extends BaseSolver {
   val queue: Queue[StateMap] = Queue(initState)
 
   def getReducedState(sp: StateMap): StateMap = {
-    StateMap(sp.name, states = sp.states.filterKeys(model.states.states.contains))
+    StateMap(
+      sp.name,
+      states = sp.states.view.filterKeys(model.states.states.contains).toMap
+    )
   }
   def extend(s: StateMap): StateMap = {
     //THis function is only to test lane change....

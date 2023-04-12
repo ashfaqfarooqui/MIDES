@@ -1,7 +1,7 @@
 name := "Model Building"
 
 version := "2.0-alpha"
-ThisBuild / scalaVersion := "2.12.12"
+ThisBuild / scalaVersion := "2.13.10"
                                                                        //
 
 lazy val global = project
@@ -29,10 +29,8 @@ lazy val models = (project in file("Models")).settings(settings, deps).dependsOn
 
 
 val deps = libraryDependencies ++= Seq(
-  "org.scala-graph"         %% "graph-core"               % "1.13.1",
-  "org.scala-graph"         %% "graph-dot"                % "1.13.0",
-  "org.eclipse.milo"         % "sdk-client"               % "0.6.9",
-  "org.eclipse.milo"         % "stack-client"             % "0.6.9",
+  "org.scala-graph"         %% "graph-core"               % "1.13.5",
+  "org.scala-graph"         %% "graph-dot"                % "1.13.3",
   "com.github.nscala-time"  %% "nscala-time"              % "2.32.0",
   "org.clapper"             %% "grizzled-slf4j"           % "1.3.4",
   "org.slf4j"                % "slf4j-api"                % "1.7.25",
@@ -45,7 +43,7 @@ val deps = libraryDependencies ++= Seq(
   "com.stephenn"            %% "scala-datatable"          % "0.9.0",
   "org.scalactic"           %% "scalactic"                % "3.2.15",
   "org.scalatest"           %% "scalatest"                % "3.2.15" % "test",
-  "org.scala-lang.modules"  %% "scala-parser-combinators" % "1.1.2"
+  "org.scala-lang.modules"  %% "scala-parser-combinators" % "2.2.0"
 )
 
 lazy val settings =

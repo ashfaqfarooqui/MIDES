@@ -20,7 +20,9 @@ object FrehagePlantBuilder {
   def getReducedStateMap(state: StateMap, model: ModularModel, module: String): StateMap =
     StateMap(
       state.name,
-      state.states.filterKeys(s => model.stateMapping(module).states.contains(s))
+      state.states.view
+        .filterKeys(s => model.stateMapping(module).states.contains(s))
+        .toMap
     )
 
   def getReducedStateMapTransition(
@@ -102,7 +104,8 @@ class FrehagePlantBuilder(_sul: SUL) extends BaseSolver {
       //      nonLocalVariables = Set.empty[String]
       states: Map[StateMap, State] = moduleStates(m)
         .map(s => {
-          val state = StateMap(s.states.filterKeys(k => !nonLocalVariables.contains(k)))
+          val state =
+            StateMap(s.states.view.filterKeys(k => !nonLocalVariables.contains(k)).toMap)
           val name = (if (
                         state.states
                           .forall { case (k, v) => _sul.getInitState.states(k) == v }
