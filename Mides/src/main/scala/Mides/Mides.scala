@@ -1,8 +1,5 @@
 package Mides
 
-import TestUnit.TLSpecifications
-import LSM.LaneChangeModular.LaneChangeSimulateModular
-import LSM.LaneChangeMoreInputs.LaneChangeSimulateMonolithic
 import grizzled.slf4j.Logging
 import modelbuilding.core.SUL
 import modelbuilding.helpers.ConfigHelper
@@ -15,34 +12,7 @@ object Mides extends Logging {
   val solver: String    = ConfigHelper.solver //"LStarPlantLearner" // "modular", "mono"
 
   val sul: SUL = modelName match {
-    case "TestUnit" =>
-      SUL(
-        TestUnit.TransferLine,
-        new TestUnit.SimulateTL,
-        Some(TLSpecifications()),
-        true
-      )
-    case "TestUnitOPC" =>
-      SUL(
-        TestUnit.TransferLine,
-        new TestUnit.TLOPCSimulate,
-        Some(TLSpecifications()),
-        true
-      )
-    case "TestUnitNoSpec" =>
-      SUL(
-        TestUnit.TransferLine,
-        new TestUnit.SimulateTL,
-        None,
-        true
-      )
-    case "TestUnitNoSpecOPC" =>
-      SUL(
-        TestUnit.TransferLine,
-        new TestUnit.TLOPCSimulate,
-        None,
-        true
-      )
+
     case "CatMouse" =>
       SUL(
         CatAndMouse.CatAndMouse,
@@ -71,25 +41,10 @@ object Mides extends Logging {
         Some(MachineBuffer.MachineBufferSpecifications()),
         false
       )
-
-    case "MachineBufferOPC" =>
-      SUL(
-        MachineBuffer.MachineBuffer,
-        new MachineBuffer.MBOPCSimulate,
-        Some(MachineBuffer.MachineBufferSpecifications()),
-        false
-      )
     case "MachineBufferNoSpec" =>
       SUL(
         MachineBuffer.MachineBuffer,
         new MachineBuffer.SimulateMachineBuffer,
-        None,
-        true
-      )
-    case "MachineBufferNoSpecOPC" =>
-      SUL(
-        MachineBuffer.MachineBuffer,
-        new MachineBuffer.MBOPCSimulate,
         None,
         true
       )
@@ -99,27 +54,7 @@ object Mides extends Logging {
       SUL(StickPicking.Sticks, new StickPicking.SimulateSticks(5), None, false)
     case "AGV" =>
       SUL(AGV.Agv, new AGV.SimulateAgv, Some(AGV.AGVSpecifications()), false)
-    case "LaneChange" =>
-      SUL(
-        LSM.LaneChange,
-        new LSM.LaneChangeSimulate,
-        None,
-        false
-      )
-    case "LaneChangeMonolithic" =>
-      SUL(
-        LSM.LaneChangeMoreInputs.LaneChange,
-        new LaneChangeSimulateMonolithic,
-        None,
-        false
-      )
-    case "LaneChangeModular" =>
-      SUL(
-        LSM.LaneChangeModular.LaneChange,
-        new LaneChangeSimulateModular,
-        None,
-        false
-      )
+
     case _ => throw new Exception("A model wasn't defined.")
   }
 

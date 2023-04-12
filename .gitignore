@@ -9,5 +9,7 @@ target/
 *.sc
 /.bloop
 Mides/src/main/resources/application.conf
-/project/metals.sbt
+/project/*.sbt
+/project/project/*.sbt
 metals.sbt
+/.bsp/

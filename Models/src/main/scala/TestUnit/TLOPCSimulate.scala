@@ -1,12 +1,12 @@
 package TestUnit
-
+/*
 import modelbuilding.core._
 import modelbuilding.externalClients.opc.OPCSimulator
 
 class TLOPCSimulate extends OPCSimulator {
 
   /** Define state we are interested in. These state variables will be synced with the actual system.
-    */
+ */
   val m1 = "m1"
   val m2 = "m2"
   val tu = "tu"
@@ -83,3 +83,4 @@ class TLOPCSimulate extends OPCSimulator {
   )
 
 }
+ */

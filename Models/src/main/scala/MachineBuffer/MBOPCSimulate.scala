@@ -15,7 +15,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
+/*
 package MachineBuffer
 
 import modelbuilding.core._
@@ -24,7 +24,7 @@ import modelbuilding.externalClients.opc.OPCSimulator
 class MBOPCSimulate extends OPCSimulator {
 
   /** Define state we are interested in. These state variables will be synced with the actual system.
-    */
+ */
   val m1 = "m1"
   val m2 = "m2"
 
@@ -97,3 +97,4 @@ class MBOPCSimulate extends OPCSimulator {
   )
 
 }
+ */
