@@ -15,11 +15,14 @@ lazy val midesLib = (project in file("MidesLib")).settings(
   deps,
   unmanagedJars in Compile ++= Seq(
     new java.io.File("lib/Supremica.jar"),
-    new java.io.File("lib/SupremicaLib.jar")
+    new java.io.File("lib/SupremicaLib.jar"),
+     new File("lib/libsumo-1.16.0.jar")
   ).classpath,
   unmanagedJars in Runtime ++= Seq(
     new java.io.File("lib/Supremica.Jar"),
-    new java.io.File("lib/SupremicaLib.jar")
+    new java.io.File("lib/SupremicaLib.jar"),
+    new File("lib/libsumo-1.16.0.jar")
+
   ).classpath
 )
 lazy val mides =
@@ -43,8 +46,11 @@ val deps = libraryDependencies ++= Seq(
   "com.stephenn"            %% "scala-datatable"          % "0.9.0",
   "org.scalactic"           %% "scalactic"                % "3.2.15",
   "org.scalatest"           %% "scalatest"                % "3.2.15" % "test",
-  "org.scala-lang.modules"  %% "scala-parser-combinators" % "2.2.0"
+  "org.scala-lang.modules"  %% "scala-parser-combinators" % "2.2.0",
+"org.eclipse.sumo" % "libsumo" % "1.17.0",
+"org.eclipse.sumo" % "libtraci" % "1.17.0"
 )
+
 
 lazy val settings =
   commonSettings ++
@@ -59,7 +65,8 @@ lazy val compilerOptions = Seq(
   "-language:postfixOps",
   "-deprecation",
   "-encoding",
-  "utf8"
+  "utf8",
+  "-Djava.library.path=../sumo/bin"
 )
 lazy val scalafmtSettings =
   Seq(
@@ -72,6 +79,7 @@ lazy val commonSettings = Seq(
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/Releases",
     "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
     "sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
+    "eclipse-sumo" at "https://repo.eclipse.org/content/repositories/sumo-releases/",
     Resolver.mavenLocal
   )
 )

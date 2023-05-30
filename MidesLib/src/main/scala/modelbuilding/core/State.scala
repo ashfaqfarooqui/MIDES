@@ -4,7 +4,7 @@ object State {
   def apply(s: AnyVal) = new State(s.toString)
 }
 case class State(s: String) {
-  override def toString = s
+  override def toString: String = s
 }
 
 object StateSet {
@@ -26,7 +26,7 @@ case class StateMap(
     states: Map[String, Any],
     specs: Map[String, String] = Map.empty[String, String]) {
 
-  def removeKeys(key: Set[String]) =
+  def removeKeys(key: Set[String]): StateMap =
     StateMap(states = this.getState.view.filterKeys(!key.contains(_)).toMap)
   def getState: Map[String, Any]                = states
   def getOrElse(key: String, default: Any): Any = this.states.getOrElse(key, default)
@@ -39,8 +39,8 @@ case class StateMap(
       Left("Key does not exist")
     }
   }
-  def next(sMap: (String, Any))    = this.copy(states = this.states + sMap)
-  def next(sMap: Map[String, Any]) = this.copy(states = this.states ++ sMap)
+  def next(sMap: (String, Any)): StateMap    = this.copy(states = this.states + sMap)
+  def next(sMap: Map[String, Any]): StateMap = this.copy(states = this.states ++ sMap)
 
   def equals(o: StateMap): Boolean = this.getState.forall { p =>
     o.getState(p._1) == p._2

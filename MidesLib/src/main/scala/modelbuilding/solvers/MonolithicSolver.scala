@@ -218,7 +218,7 @@ class MonolithicSolver(sul: SUL) extends BaseSolver {
 
       val variables: Set[String] = init.states.keySet
       val variableInitMap: Map[String, String] =
-        init.states.map(x => x._1 -> x._2.toString())
+        init.states.map(x => x._1 -> x._2.toString)
 
       @tailrec
       def populateDomain(
@@ -230,7 +230,7 @@ class MonolithicSolver(sul: SUL) extends BaseSolver {
           case x :: xs =>
             val agg: Map[String, Set[String]] = variables.map { v =>
               val aggDomain =
-                dom.getOrElse(v, Set.empty[String]) + x.target.states(v).toString()
+                dom.getOrElse(v, Set.empty[String]) + x.target.states(v).toString
               (v -> aggDomain)
             }.toMap
             populateDomain(xs, dom ++ agg)
